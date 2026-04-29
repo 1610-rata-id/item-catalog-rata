@@ -1,29 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// 🔥 DEBUG ENV
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-console.log("SUPABASE URL:", supabaseUrl);
-console.log("SUPABASE KEY:", supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error("ENV ERROR: Supabase URL / KEY tidak terbaca");
-}
-
-const supabase = createClient(
-  supabaseUrl || "",
-  supabaseKey || ""
-);
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
 }
 
-// 🔥 TYPE (UPDATED)
 type Item = {
   id: number;
   item_name: string;
@@ -32,7 +20,7 @@ type Item = {
   price: number;
   vendor?: string;
   item_code?: string;
-  uom?: string; // ✅ NEW FIELD
+  uom?: string;
   description?: string;
 };
 
@@ -41,7 +29,12 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // 🔥 ZOOM STATE
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const dragging = useRef(false);
+  const start = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     getItems();
@@ -50,26 +43,24 @@ export default function Home() {
   async function getItems() {
     const { data, error } = await supabase.from("items").select("*");
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-
     if (error) {
-      setErrorMsg(error.message);
+      console.error(error.message);
       return;
     }
 
-    if (!data || data.length === 0) {
-      setErrorMsg("Data kosong dari Supabase");
-    }
+    const mapped = (data || []).map((item: any) => ({
+      ...item,
+      uom: item.UOM,
+    }));
 
-    setItems(data || []);
+    setItems(mapped);
   }
 
   const categories = ["All", ...new Set(items.map((i) => i.category))];
 
   const filteredItems = items.filter((item) => {
-    const matchSearch = (item.item_name || "")
-      .toLowerCase()
+    const matchSearch = item.item_name
+      ?.toLowerCase()
       .includes(search.toLowerCase());
 
     const matchCategory =
@@ -79,15 +70,52 @@ export default function Home() {
     return matchSearch && matchCategory;
   });
 
+  // 🔥 HANDLE ZOOM SCROLL
+  const handleWheel = (e: any) => {
+    e.preventDefault();
+    const delta = e.deltaY * -0.001;
+    setZoom((z) => Math.min(3, Math.max(1, z + delta)));
+  };
+
+  // 🔥 DRAG START
+  const handleMouseDown = (e: any) => {
+    dragging.current = true;
+    start.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+  };
+
+  // 🔥 DRAG MOVE
+  const handleMouseMove = (e: any) => {
+    if (!dragging.current) return;
+
+    setPosition({
+      x: e.clientX - start.current.x,
+      y: e.clientY - start.current.y,
+    });
+  };
+
+  // 🔥 DRAG END
+  const handleMouseUp = () => {
+    dragging.current = false;
+  };
+
+  // 🔥 DOUBLE CLICK RESET
+  const handleDoubleClick = () => {
+    setZoom(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  // 🔥 RESET SAAT CLOSE
+  const closePopup = () => {
+    setSelectedItem(null);
+    setZoom(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
   return (
     <main className="bg-gray-100 min-h-screen">
-
-      {/* 🔥 DEBUG */}
-      <div className="p-4 text-xs text-red-500">
-        <p>ENV URL: {supabaseUrl || "❌ undefined"}</p>
-        <p>ENV KEY: {supabaseKey ? "✅ loaded" : "❌ undefined"}</p>
-        {errorMsg && <p>ERROR: {errorMsg}</p>}
-      </div>
 
       <div className="max-w-7xl mx-auto flex gap-6 p-4 md:p-6">
 
@@ -113,11 +141,14 @@ export default function Home() {
         {/* CONTENT */}
         <div className="flex-1">
 
-          <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-black">
-              Item Catalog
-            </h1>
-          </div>
+  {/* 🔥 TEST VERSION */}
+  <h1 className="text-red-500 text-xl">
+    VERSION: FINAL-TEST-123
+  </h1>
+
+  <h1 className="text-2xl md:text-3xl font-bold text-black mb-6">
+    Item Catalog
+  </h1>
 
           {/* SEARCH */}
           <div className="sticky top-0 z-40 bg-gray-100 pb-4">
@@ -129,7 +160,7 @@ export default function Home() {
                 placeholder="Cari item..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full p-3 pl-10 pr-10 rounded-full border border-gray-300 bg-white text-black shadow-sm"
+                className="w-full p-3 pl-10 pr-10 rounded-full border bg-white"
               />
 
               {search && (
@@ -143,38 +174,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* MOBILE CATEGORY */}
-          <div className="md:hidden mb-4">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full p-3 rounded-xl border bg-white"
-            >
-              {categories.map((cat) => (
-                <option key={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* EMPTY */}
-          {filteredItems.length === 0 && (
-            <div className="text-center text-gray-500 mt-10">
-              Tidak ada item ditemukan
-            </div>
-          )}
-
           {/* GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
 
             {filteredItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition cursor-pointer overflow-hidden"
               >
                 <img
                   src={item.image_url}
-                  className="w-full h-44 md:h-48 object-cover"
+                  className="w-full h-44 object-contain bg-white"
                 />
 
                 <div className="p-4">
@@ -197,57 +208,62 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔥 POPUP FIXED */}
+      {/* POPUP */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full md:max-w-2xl rounded-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+        >
+          <div className="bg-white w-full md:max-w-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
-            {/* CLOSE */}
             <button
-              onClick={() => setSelectedItem(null)}
-              className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 shadow z-10"
+              onClick={closePopup}
+              className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 shadow"
             >
               ✖
             </button>
 
-            {/* IMAGE */}
-            <div className="w-full h-64 md:h-72 bg-gray-100">
+            {/* 🔥 ADVANCED IMAGE */}
+            <div
+              className="w-full h-64 bg-gray-100 overflow-hidden cursor-grab flex items-center justify-center"
+              onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+              onDoubleClick={handleDoubleClick}
+            >
               <img
                 src={selectedItem.image_url}
-                className="w-full h-full object-cover"
+                style={{
+                  transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+                }}
+                className="max-h-full object-contain select-none pointer-events-none transition-transform duration-100"
               />
             </div>
 
-            {/* CONTENT */}
             <div className="p-5 overflow-y-auto">
 
-              <h2 className="text-xl md:text-2xl font-bold text-black">
+              <h2 className="text-xl font-bold">
                 {selectedItem.item_name}
               </h2>
 
-              <p className="text-gray-500 mt-1">
+              <p className="text-gray-500">
                 {selectedItem.category}
               </p>
 
-              {/* INFO */}
-              <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-600">
-                <p><span className="font-medium">Vendor:</span> {selectedItem.vendor || "-"}</p>
-                <p><span className="font-medium">Code:</span> {selectedItem.item_code || "-"}</p>
-                <p><span className="font-medium">UOM:</span> {selectedItem.uom || "-"}</p> {/* ✅ NEW */}
+              <div className="grid grid-cols-2 gap-2 text-sm mt-3">
+                <p><b>Vendor:</b> {selectedItem.vendor || "-"}</p>
+                <p><b>Code:</b> {selectedItem.item_code || "-"}</p>
+                <p><b>UOM:</b> {selectedItem.uom || "-"}</p>
               </div>
 
-              {/* PRICE */}
               <p className="text-green-600 text-2xl font-bold mt-4">
                 Rp {formatRupiah(selectedItem.price)}
               </p>
 
-              {/* DESCRIPTION */}
               <div className="mt-4">
-                <h3 className="font-semibold text-black mb-2">
-                  Description
-                </h3>
+                <h3 className="font-semibold mb-2">Description</h3>
 
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line break-words">
+                <p className="text-sm text-gray-700 whitespace-pre-line">
                   {selectedItem.description || "Tidak ada deskripsi"}
                 </p>
               </div>
