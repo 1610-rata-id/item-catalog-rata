@@ -10,7 +10,6 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 console.log("SUPABASE URL:", supabaseUrl);
 console.log("SUPABASE KEY:", supabaseKey);
 
-// ❗ kalau undefined, langsung kelihatan di UI juga
 if (!supabaseUrl || !supabaseKey) {
   console.error("ENV ERROR: Supabase URL / KEY tidak terbaca");
 }
@@ -24,7 +23,7 @@ function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
 }
 
-// 🔥 TYPE (biar lebih jelas)
+// 🔥 TYPE (UPDATED)
 type Item = {
   id: number;
   item_name: string;
@@ -33,7 +32,7 @@ type Item = {
   price: number;
   vendor?: string;
   item_code?: string;
-  stock?: number;
+  uom?: string; // ✅ NEW FIELD
   description?: string;
 };
 
@@ -83,7 +82,7 @@ export default function Home() {
   return (
     <main className="bg-gray-100 min-h-screen">
 
-      {/* 🔥 DEBUG INFO DI UI */}
+      {/* 🔥 DEBUG */}
       <div className="p-4 text-xs text-red-500">
         <p>ENV URL: {supabaseUrl || "❌ undefined"}</p>
         <p>ENV KEY: {supabaseKey ? "✅ loaded" : "❌ undefined"}</p>
@@ -92,6 +91,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto flex gap-6 p-4 md:p-6">
 
+        {/* SIDEBAR */}
         <aside className="hidden md:block w-64 bg-white rounded-2xl p-4 shadow-sm h-fit sticky top-6">
           <h2 className="font-bold text-lg mb-4">Kategori</h2>
 
@@ -110,6 +110,7 @@ export default function Home() {
           ))}
         </aside>
 
+        {/* CONTENT */}
         <div className="flex-1">
 
           <div className="mb-6">
@@ -118,6 +119,7 @@ export default function Home() {
             </h1>
           </div>
 
+          {/* SEARCH */}
           <div className="sticky top-0 z-40 bg-gray-100 pb-4">
             <div className="relative max-w-xl">
               <span className="absolute left-4 top-3 text-gray-400">🔍</span>
@@ -141,6 +143,7 @@ export default function Home() {
             </div>
           </div>
 
+          {/* MOBILE CATEGORY */}
           <div className="md:hidden mb-4">
             <select
               value={selectedCategory}
@@ -153,13 +156,14 @@ export default function Home() {
             </select>
           </div>
 
-          {/* 🔥 EMPTY STATE */}
+          {/* EMPTY */}
           {filteredItems.length === 0 && (
             <div className="text-center text-gray-500 mt-10">
               Tidak ada item ditemukan
             </div>
           )}
 
+          {/* GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
             {filteredItems.map((item) => (
@@ -193,24 +197,31 @@ export default function Home() {
         </div>
       </div>
 
+      {/* 🔥 POPUP FIXED */}
       {selectedItem && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full md:max-w-xl rounded-2xl overflow-hidden relative">
+          <div className="bg-white w-full md:max-w-2xl rounded-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
 
+            {/* CLOSE */}
             <button
               onClick={() => setSelectedItem(null)}
-              className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 shadow"
+              className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 shadow z-10"
             >
               ✖
             </button>
 
-            <img
-              src={selectedItem.image_url}
-              className="w-full h-64 object-cover"
-            />
+            {/* IMAGE */}
+            <div className="w-full h-64 md:h-72 bg-gray-100">
+              <img
+                src={selectedItem.image_url}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-            <div className="p-5">
-              <h2 className="text-xl font-bold text-black">
+            {/* CONTENT */}
+            <div className="p-5 overflow-y-auto">
+
+              <h2 className="text-xl md:text-2xl font-bold text-black">
                 {selectedItem.item_name}
               </h2>
 
@@ -218,25 +229,29 @@ export default function Home() {
                 {selectedItem.category}
               </p>
 
-              <p className="text-sm text-gray-600 mt-2">
-                Vendor: {selectedItem.vendor || "-"}
-              </p>
+              {/* INFO */}
+              <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-600">
+                <p><span className="font-medium">Vendor:</span> {selectedItem.vendor || "-"}</p>
+                <p><span className="font-medium">Code:</span> {selectedItem.item_code || "-"}</p>
+                <p><span className="font-medium">UOM:</span> {selectedItem.uom || "-"}</p> {/* ✅ NEW */}
+              </div>
 
-              <p className="text-sm text-gray-600">
-                Code: {selectedItem.item_code || "-"}
-              </p>
-
-              <p className="text-sm text-gray-600">
-                Stock: {selectedItem.stock ?? "-"}
-              </p>
-
+              {/* PRICE */}
               <p className="text-green-600 text-2xl font-bold mt-4">
                 Rp {formatRupiah(selectedItem.price)}
               </p>
 
-              <p className="text-gray-700 mt-4 text-sm">
-                {selectedItem.description || "Tidak ada deskripsi"}
-              </p>
+              {/* DESCRIPTION */}
+              <div className="mt-4">
+                <h3 className="font-semibold text-black mb-2">
+                  Description
+                </h3>
+
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line break-words">
+                  {selectedItem.description || "Tidak ada deskripsi"}
+                </p>
+              </div>
+
             </div>
           </div>
         </div>
