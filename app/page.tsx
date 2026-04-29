@@ -30,7 +30,6 @@ export default function Home() {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // 🔥 ZOOM STATE
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const dragging = useRef(false);
@@ -70,14 +69,13 @@ export default function Home() {
     return matchSearch && matchCategory;
   });
 
-  // 🔥 HANDLE ZOOM SCROLL
+  // ZOOM
   const handleWheel = (e: any) => {
     e.preventDefault();
     const delta = e.deltaY * -0.001;
     setZoom((z) => Math.min(3, Math.max(1, z + delta)));
   };
 
-  // 🔥 DRAG START
   const handleMouseDown = (e: any) => {
     dragging.current = true;
     start.current = {
@@ -86,7 +84,6 @@ export default function Home() {
     };
   };
 
-  // 🔥 DRAG MOVE
   const handleMouseMove = (e: any) => {
     if (!dragging.current) return;
 
@@ -96,18 +93,15 @@ export default function Home() {
     });
   };
 
-  // 🔥 DRAG END
   const handleMouseUp = () => {
     dragging.current = false;
   };
 
-  // 🔥 DOUBLE CLICK RESET
   const handleDoubleClick = () => {
     setZoom(1);
     setPosition({ x: 0, y: 0 });
   };
 
-  // 🔥 RESET SAAT CLOSE
   const closePopup = () => {
     setSelectedItem(null);
     setZoom(1);
@@ -115,13 +109,43 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-gray-100 min-h-screen">
+    <main className="bg-gray-100 min-h-screen text-black">
+
+      {/* 🔥 HEADER WITH LOGO */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm px-6 py-3 flex items-center justify-between">
+
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" className="h-8 object-contain" />
+          <span className="font-semibold text-lg">
+            VM Dental Product Database
+          </span>
+        </div>
+
+        <div className="relative w-72">
+          <input
+            type="text"
+            placeholder="Cari item..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full p-2 pl-4 pr-10 rounded-lg border text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-2 text-gray-400"
+            >
+              ✖
+            </button>
+          )}
+        </div>
+
+      </div>
 
       <div className="max-w-7xl mx-auto flex gap-6 p-4 md:p-6">
 
         {/* SIDEBAR */}
-        <aside className="hidden md:block w-64 bg-white rounded-2xl p-4 shadow-sm h-fit sticky top-6">
-          <h2 className="font-bold text-lg mb-4">Kategori</h2>
+        <aside className="hidden md:block w-64 bg-white rounded-2xl p-4 shadow-sm h-fit sticky top-20">
+          <h2 className="font-bold text-lg mb-4 text-black">Kategori</h2>
 
           {categories.map((cat) => (
             <button
@@ -130,7 +154,7 @@ export default function Home() {
               className={`block w-full text-left px-3 py-2 rounded-lg mb-1 text-sm ${
                 selectedCategory === cat
                   ? "bg-black text-white"
-                  : "hover:bg-gray-100"
+                  : "hover:bg-gray-100 text-gray-700"
               }`}
             >
               {cat}
@@ -141,55 +165,28 @@ export default function Home() {
         {/* CONTENT */}
         <div className="flex-1">
 
-  {/* 🔥 TEST VERSION */}
-  <h1 className="text-red-500 text-xl">
-    VERSION: FINAL-TEST-123
-  </h1>
-
-  <h1 className="text-2xl md:text-3xl font-bold text-black mb-6">
-    Item Catalog
-  </h1>
-
-          {/* SEARCH */}
-          <div className="sticky top-0 z-40 bg-gray-100 pb-4">
-            <div className="relative max-w-xl">
-              <span className="absolute left-4 top-3 text-gray-400">🔍</span>
-
-              <input
-                type="text"
-                placeholder="Cari item..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full p-3 pl-10 pr-10 rounded-full border bg-white"
-              />
-
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-4 top-3 text-gray-400"
-                >
-                  ✖
-                </button>
-              )}
-            </div>
-          </div>
+          <h1 className="text-2xl md:text-3xl font-bold mb-6">
+            Item Catalog
+          </h1>
 
           {/* GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
             {filteredItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition cursor-pointer overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer overflow-hidden"
               >
-                <img
-                  src={item.image_url}
-                  className="w-full h-44 object-contain bg-white"
-                />
+                <div className="h-44 flex items-center justify-center bg-gray-50">
+                  <img
+                    src={item.image_url}
+                    className="max-h-full object-contain"
+                  />
+                </div>
 
                 <div className="p-4">
-                  <h2 className="text-sm font-semibold text-black line-clamp-2">
+                  <h2 className="text-sm font-semibold line-clamp-2">
                     {item.item_name}
                   </h2>
 
@@ -215,7 +212,7 @@ export default function Home() {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
-          <div className="bg-white w-full md:max-w-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col">
+          <div className="bg-white w-full md:max-w-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col relative">
 
             <button
               onClick={closePopup}
@@ -224,7 +221,6 @@ export default function Home() {
               ✖
             </button>
 
-            {/* 🔥 ADVANCED IMAGE */}
             <div
               className="w-full h-64 bg-gray-100 overflow-hidden cursor-grab flex items-center justify-center"
               onWheel={handleWheel}
@@ -236,7 +232,7 @@ export default function Home() {
                 style={{
                   transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
                 }}
-                className="max-h-full object-contain select-none pointer-events-none transition-transform duration-100"
+                className="max-h-full object-contain select-none pointer-events-none"
               />
             </div>
 
@@ -250,7 +246,7 @@ export default function Home() {
                 {selectedItem.category}
               </p>
 
-              <div className="grid grid-cols-2 gap-2 text-sm mt-3">
+              <div className="grid grid-cols-2 gap-2 text-sm mt-3 text-gray-700">
                 <p><b>Vendor:</b> {selectedItem.vendor || "-"}</p>
                 <p><b>Code:</b> {selectedItem.item_code || "-"}</p>
                 <p><b>UOM:</b> {selectedItem.uom || "-"}</p>
