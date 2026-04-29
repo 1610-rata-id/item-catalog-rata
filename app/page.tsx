@@ -3,31 +3,69 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
+// 🔥 DEBUG ENV
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+console.log("SUPABASE URL:", supabaseUrl);
+console.log("SUPABASE KEY:", supabaseKey);
+
+// ❗ kalau undefined, langsung kelihatan di UI juga
+if (!supabaseUrl || !supabaseKey) {
+  console.error("ENV ERROR: Supabase URL / KEY tidak terbaca");
+}
+
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  supabaseUrl || "",
+  supabaseKey || ""
 );
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
 }
 
+// 🔥 TYPE (biar lebih jelas)
+type Item = {
+  id: number;
+  item_name: string;
+  category: string;
+  image_url: string;
+  price: number;
+  vendor?: string;
+  item_code?: string;
+  stock?: number;
+  description?: string;
+};
+
 export default function Home() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     getItems();
   }, []);
 
   async function getItems() {
-    const { data } = await supabase.from("items").select("*");
+    const { data, error } = await supabase.from("items").select("*");
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+
+    if (error) {
+      setErrorMsg(error.message);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      setErrorMsg("Data kosong dari Supabase");
+    }
+
     setItems(data || []);
   }
 
-  // ambil kategori unik
   const categories = ["All", ...new Set(items.map((i) => i.category))];
 
   const filteredItems = items.filter((item) => {
@@ -45,10 +83,15 @@ export default function Home() {
   return (
     <main className="bg-gray-100 min-h-screen">
 
-      {/* LAYOUT */}
+      {/* 🔥 DEBUG INFO DI UI */}
+      <div className="p-4 text-xs text-red-500">
+        <p>ENV URL: {supabaseUrl || "❌ undefined"}</p>
+        <p>ENV KEY: {supabaseKey ? "✅ loaded" : "❌ undefined"}</p>
+        {errorMsg && <p>ERROR: {errorMsg}</p>}
+      </div>
+
       <div className="max-w-7xl mx-auto flex gap-6 p-4 md:p-6">
 
-        {/* SIDEBAR (DESKTOP ONLY) */}
         <aside className="hidden md:block w-64 bg-white rounded-2xl p-4 shadow-sm h-fit sticky top-6">
           <h2 className="font-bold text-lg mb-4">Kategori</h2>
 
@@ -67,17 +110,14 @@ export default function Home() {
           ))}
         </aside>
 
-        {/* CONTENT */}
         <div className="flex-1">
 
-          {/* HEADER */}
           <div className="mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-black">
               Item Catalog
             </h1>
           </div>
 
-          {/* SEARCH */}
           <div className="sticky top-0 z-40 bg-gray-100 pb-4">
             <div className="relative max-w-xl">
               <span className="absolute left-4 top-3 text-gray-400">🔍</span>
@@ -101,7 +141,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* MOBILE CATEGORY (DROPDOWN STYLE) */}
           <div className="md:hidden mb-4">
             <select
               value={selectedCategory}
@@ -114,7 +153,13 @@ export default function Home() {
             </select>
           </div>
 
-          {/* GRID */}
+          {/* 🔥 EMPTY STATE */}
+          {filteredItems.length === 0 && (
+            <div className="text-center text-gray-500 mt-10">
+              Tidak ada item ditemukan
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
             {filteredItems.map((item) => (
@@ -148,7 +193,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* POPUP */}
       {selectedItem && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full md:max-w-xl rounded-2xl overflow-hidden relative">
