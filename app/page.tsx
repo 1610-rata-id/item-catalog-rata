@@ -34,6 +34,16 @@ export default function Home() {
     getItems();
   }, []);
 
+  // 🔥 ESC CLOSE
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedItem(null);
+    };
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
   async function getItems() {
     const { data, error } = await supabase.from("items").select("*");
 
@@ -48,11 +58,6 @@ export default function Home() {
     }));
 
     setItems(mapped);
-
-    // auto select pertama
-    if (mapped.length > 0) {
-      setSelectedItem(mapped[0]);
-    }
   }
 
   const categories = ["All", ...new Set(items.map((i) => i.category))];
@@ -123,95 +128,106 @@ export default function Home() {
           ))}
         </aside>
 
-        {/* LIST + DETAIL */}
-        <div className="flex-1 flex gap-6">
+        {/* GRID */}
+        <div className="flex-1">
 
-          {/* LIST ITEM */}
-          <div className="w-full lg:w-2/3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-
-              {filteredItems.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedItem(item)}
-                  className={`bg-white rounded-2xl shadow-sm hover:shadow-lg transition cursor-pointer overflow-hidden ${
-                    selectedItem?.id === item.id ? "ring-2 ring-black" : ""
-                  }`}
-                >
-                  <div className="h-40 flex items-center justify-center bg-gray-50">
-                    <img
-                      src={item.image_url}
-                      className="max-h-full object-contain"
-                    />
-                  </div>
-
-                  <div className="p-4">
-                    <h2 className="text-sm font-semibold line-clamp-2">
-                      {item.item_name}
-                    </h2>
-
-                    <p className="text-xs text-gray-500 mt-1">
-                      {item.category}
-                    </p>
-
-                    <p className="text-green-600 font-bold mt-2">
-                      Rp {formatRupiah(item.price)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-
-            </div>
-          </div>
-
-          {/* DETAIL PANEL */}
-          <div className="hidden lg:block w-1/3">
-            {selectedItem ? (
-              <div className="bg-white rounded-2xl shadow-sm p-5 sticky top-20">
-
-                <div className="h-52 flex items-center justify-center bg-gray-50 mb-4">
+            {filteredItems.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setSelectedItem(item)}
+                className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer overflow-hidden"
+              >
+                <div className="h-44 flex items-center justify-center bg-gray-50">
                   <img
-                    src={selectedItem.image_url}
+                    src={item.image_url}
                     className="max-h-full object-contain"
                   />
                 </div>
 
-                <h2 className="text-xl font-bold">
-                  {selectedItem.item_name}
-                </h2>
+                <div className="p-4">
+                  <h2 className="text-sm font-semibold line-clamp-2">
+                    {item.item_name}
+                  </h2>
 
-                <p className="text-gray-500">
-                  {selectedItem.category}
-                </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {item.category}
+                  </p>
 
-                <div className="mt-3 text-sm space-y-1">
-                  <p><b>Vendor:</b> {selectedItem.vendor || "-"}</p>
-                  <p><b>Code:</b> {selectedItem.item_code || "-"}</p>
-                  <p><b>UOM:</b> {selectedItem.uom || "-"}</p>
-                </div>
-
-                <p className="text-green-600 text-2xl font-bold mt-4">
-                  Rp {formatRupiah(selectedItem.price)}
-                </p>
-
-                <div className="mt-4">
-                  <h3 className="font-semibold mb-2">Description</h3>
-                  <p className="text-sm text-gray-700 whitespace-pre-line">
-                    {selectedItem.description || "Tidak ada deskripsi"}
+                  <p className="text-green-600 font-bold mt-2">
+                    Rp {formatRupiah(item.price)}
                   </p>
                 </div>
+              </div>
+            ))}
 
+          </div>
+        </div>
+      </div>
+
+      {/* 🔥 FULLSCREEN VIEW */}
+      {selectedItem && (
+        <div className="fixed inset-0 bg-white z-50 flex flex-col">
+
+          {/* HEADER */}
+          <div className="flex items-center justify-between px-6 py-4 border-b">
+
+            <h2 className="font-semibold text-lg truncate">
+              {selectedItem.item_name}
+            </h2>
+
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="text-2xl"
+            >
+              ✖
+            </button>
+
+          </div>
+
+          {/* CONTENT */}
+          <div className="flex flex-col md:flex-row gap-6 p-6 overflow-y-auto">
+
+            {/* IMAGE */}
+            <div className="md:w-1/2 flex items-center justify-center bg-gray-100 rounded-xl p-4">
+              <img
+                src={selectedItem.image_url}
+                className="max-h-[500px] object-contain"
+              />
+            </div>
+
+            {/* DETAIL */}
+            <div className="md:w-1/2">
+
+              <p className="text-gray-500 mb-2">
+                {selectedItem.category}
+              </p>
+
+              <div className="grid grid-cols-2 gap-2 text-sm mb-4">
+                <p><b>Vendor:</b> {selectedItem.vendor || "-"}</p>
+                <p><b>Code:</b> {selectedItem.item_code || "-"}</p>
+                <p><b>UOM:</b> {selectedItem.uom || "-"}</p>
               </div>
-            ) : (
-              <div className="text-gray-400 text-center mt-20">
-                Pilih item untuk melihat detail
+
+              <p className="text-green-600 text-2xl font-bold mb-4">
+                Rp {formatRupiah(selectedItem.price)}
+              </p>
+
+              <div>
+                <h3 className="font-semibold mb-2">Description</h3>
+
+                <p className="text-gray-700 text-sm whitespace-pre-line leading-relaxed">
+                  {selectedItem.description || "Tidak ada deskripsi"}
+                </p>
               </div>
-            )}
+
+            </div>
+
           </div>
 
         </div>
-      </div>
+      )}
 
     </main>
   );
