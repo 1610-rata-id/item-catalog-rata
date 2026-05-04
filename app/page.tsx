@@ -5,7 +5,6 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 function formatRupiah(number: number) {
@@ -23,9 +22,9 @@ type Item = {
   uom?: string;
   description?: string;
   manufacture?: string;
+  type?: string;
   term?: string;
   remarks?: string;
-  type?: string;
 };
 
 export default function Home() {
@@ -33,17 +32,10 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showCategory, setShowCategory] = useState(false);
 
   useEffect(() => {
     getItems();
-  }, []);
-
-  useEffect(() => {
-    const handleEsc = (e: any) => {
-      if (e.key === "Escape") setSelectedItem(null);
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   async function getItems() {
@@ -76,19 +68,69 @@ export default function Home() {
     return matchSearch && matchCategory;
   });
 
+  // ESC close popup
+  useEffect(() => {
+    const handleEsc = (e: any) => {
+      if (e.key === "Escape") {
+        setSelectedItem(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
   return (
     <main className="bg-gray-100 min-h-screen text-black">
 
       {/* HEADER */}
       <div className="sticky top-0 z-50 bg-white shadow-sm px-6 py-3 flex items-center justify-between">
 
-        <div className="flex items-center gap-3">
+        {/* LEFT */}
+        <div className="flex items-center gap-4">
+
           <img src="/logo.png" className="h-8 object-contain" />
+
           <span className="font-semibold text-lg">
             Item Catalog
           </span>
+
+          {/* CATEGORY */}
+          <div className="relative">
+            <button
+              onClick={() => setShowCategory(!showCategory)}
+              className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-100"
+            >
+              {selectedCategory} ▾
+            </button>
+
+            {showCategory && (
+              <div className="absolute top-12 left-0 bg-white shadow-lg rounded-lg w-52 max-h-64 overflow-y-auto z-50">
+
+                {categories.map((cat) => (
+                  <div
+                    key={cat}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setShowCategory(false);
+                    }}
+                    className={`px-4 py-2 cursor-pointer text-sm ${
+                      selectedCategory === cat
+                        ? "bg-black text-white"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    {cat}
+                  </div>
+                ))}
+
+              </div>
+            )}
+          </div>
+
         </div>
 
+        {/* SEARCH */}
         <div className="relative w-72">
           <input
             type="text"
@@ -109,89 +151,78 @@ export default function Home() {
 
       </div>
 
-      <div className="max-w-7xl mx-auto flex gap-6 p-4 md:p-6">
-
-        {/* SIDEBAR */}
-        <aside className="hidden md:block w-64 bg-white rounded-2xl p-4 shadow-sm h-fit sticky top-20">
-          <h2 className="font-bold text-lg mb-4">Kategori</h2>
-
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`block w-full text-left px-3 py-2 rounded-lg mb-1 text-sm ${
-                selectedCategory === cat
-                  ? "bg-black text-white"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </aside>
+      {/* CONTENT */}
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
 
         {/* GRID */}
-        <div className="flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setSelectedItem(item)}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition cursor-pointer overflow-hidden"
-              >
-                <div className="h-44 flex items-center justify-center bg-gray-50">
-                  <img
-                    src={item.image_url}
-                    className="max-h-full object-contain"
-                  />
-                </div>
-
-                <div className="p-4">
-                  <h2 className="text-sm font-semibold line-clamp-2">
-                    {item.item_name}
-                  </h2>
-
-                  <p className="text-xs text-gray-500 mt-1">
-                    {item.category}
-                  </p>
-
-                  {/* 🔥 NEW: VENDOR */}
-                  <p className="text-xs text-gray-400">
-                    {item.vendor || "-"}
-                  </p>
-
-                  <p className="text-green-600 font-bold mt-2">
-                    Rp {formatRupiah(item.price)}
-                  </p>
-                </div>
+          {filteredItems.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setSelectedItem(item)}
+              className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer overflow-hidden"
+            >
+              <div className="h-44 flex items-center justify-center bg-gray-50">
+                <img
+                  src={item.image_url}
+                  className="max-h-full object-contain"
+                />
               </div>
-            ))}
 
-          </div>
+              <div className="p-4">
+
+                <h2 className="text-sm font-semibold line-clamp-2">
+                  {item.item_name}
+                </h2>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  {item.category}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  {item.vendor || "-"}
+                </p>
+
+                <p className="text-green-600 font-bold mt-2">
+                  Rp {formatRupiah(item.price)}
+                </p>
+
+              </div>
+            </div>
+          ))}
+
         </div>
       </div>
 
-      {/* 🔥 FULLSCREEN DETAIL */}
+      {/* FULLSCREEN POPUP */}
       {selectedItem && (
         <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
 
-          {/* CLOSE */}
-          <button
-            onClick={() => setSelectedItem(null)}
-            className="fixed top-4 right-6 text-2xl"
-          >
-            ✖
-          </button>
+          {/* TOP BAR */}
+          <div className="sticky top-0 bg-white border-b px-6 py-3 flex justify-between items-center">
 
-          <div className="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-10">
+            <div className="font-semibold">
+              Detail Item
+            </div>
+
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="text-xl"
+            >
+              ✖
+            </button>
+
+          </div>
+
+          {/* CONTENT */}
+          <div className="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-8">
 
             {/* IMAGE */}
-            <div className="bg-gray-100 rounded-xl flex items-center justify-center p-6">
+            <div className="bg-gray-50 rounded-xl flex items-center justify-center p-6">
               <img
                 src={selectedItem.image_url}
-                className="max-h-[500px] object-contain"
+                className="max-h-[400px] object-contain"
               />
             </div>
 
@@ -210,33 +241,30 @@ export default function Home() {
                 Rp {formatRupiah(selectedItem.price)}
               </p>
 
-              <div className="grid grid-cols-2 gap-3 text-sm mb-6">
+              <div className="space-y-2 text-sm">
 
                 <p><b>Vendor:</b> {selectedItem.vendor || "-"}</p>
                 <p><b>Code:</b> {selectedItem.item_code || "-"}</p>
                 <p><b>UOM:</b> {selectedItem.uom || "-"}</p>
-                <p><b>Type:</b> {selectedItem.type || "-"}</p>
                 <p><b>Manufacture:</b> {selectedItem.manufacture || "-"}</p>
+                <p><b>Type:</b> {selectedItem.type || "-"}</p>
                 <p><b>Term:</b> {selectedItem.term || "-"}</p>
+                <p><b>Remarks:</b> {selectedItem.remarks || "-"}</p>
 
               </div>
 
-              <div className="mb-6">
-                <h3 className="font-semibold mb-1">Remarks</h3>
-                <p className="text-sm text-gray-700">
-                  {selectedItem.remarks || "-"}
-                </p>
-              </div>
+              <div className="mt-6">
+                <h3 className="font-semibold mb-2">Description</h3>
 
-              <div>
-                <h3 className="font-semibold mb-1">Description</h3>
                 <p className="text-sm text-gray-700 whitespace-pre-line">
                   {selectedItem.description || "Tidak ada deskripsi"}
                 </p>
               </div>
 
             </div>
+
           </div>
+
         </div>
       )}
 
