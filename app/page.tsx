@@ -32,8 +32,11 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [showCategory, setShowCategory] = useState(false);
 
+  const [showCategory, setShowCategory] = useState(false);
+  const [showVendor, setShowVendor] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const catalogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,6 +60,7 @@ export default function Home() {
   }
 
   const categories = ["All", ...new Set(items.map((i) => i.category))];
+  const vendors = [...new Set(items.map((i) => i.vendor).filter(Boolean))];
 
   const filteredItems = items.filter((item) => {
     const matchSearch = item.item_name
@@ -70,6 +74,19 @@ export default function Home() {
     return matchSearch && matchCategory;
   });
 
+  // 🔥 CLOSE DROPDOWN CLICK OUTSIDE
+  useEffect(() => {
+    const handleClick = (e: any) => {
+      if (!dropdownRef.current?.contains(e.target)) {
+        setShowCategory(false);
+        setShowVendor(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   // ESC CLOSE
   useEffect(() => {
     const esc = (e: any) => {
@@ -80,37 +97,47 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="text-black">
+    <main className="font-sans text-black">
 
-      {/* 🔥 HERO SECTION */}
+      {/* 🔥 HERO */}
       <div className="relative h-screen">
 
-        {/* BACKGROUND */}
-        <img
-          src="/hero.jpg" // 🔥 GANTI nama file kamu (gambar merah tadi)
-          className="absolute inset-0 w-full h-full object-cover"
+        {/* BACKGROUND FIX (ANTI PECAH) */}
+        <div
+          className="absolute inset-0 bg-center bg-cover"
+          style={{
+            backgroundImage: "url('/hero.jpg')",
+          }}
         />
 
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-black/40" />
 
         {/* HEADER */}
         <div className="absolute top-0 w-full z-50 flex justify-between items-center px-8 py-4 text-white">
 
+          {/* LOGO */}
           <img src="/logo.png" className="h-10" />
 
-          <div className="flex items-center gap-6">
+          {/* MENU */}
+          <div
+            ref={dropdownRef}
+            className="flex items-center gap-6 text-sm font-medium"
+          >
 
             {/* CATEGORY */}
             <div className="relative">
               <button
-                onClick={() => setShowCategory(!showCategory)}
-                className="hover:underline"
+                onClick={() => {
+                  setShowCategory(!showCategory);
+                  setShowVendor(false);
+                }}
+                className="hover:opacity-80"
               >
                 Category
               </button>
 
               {showCategory && (
-                <div className="absolute top-10 left-0 bg-white text-black rounded-lg shadow-lg w-52 max-h-64 overflow-y-auto">
+                <div className="absolute top-10 left-0 bg-white text-black rounded-xl shadow-xl w-52 max-h-64 overflow-y-auto">
 
                   {categories.map((cat) => (
                     <div
@@ -129,7 +156,33 @@ export default function Home() {
               )}
             </div>
 
-            <button className="hover:underline">Vendor</button>
+            {/* VENDOR */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowVendor(!showVendor);
+                  setShowCategory(false);
+                }}
+                className="hover:opacity-80"
+              >
+                Vendor
+              </button>
+
+              {showVendor && (
+                <div className="absolute top-10 left-0 bg-white text-black rounded-xl shadow-xl w-52 max-h-48 overflow-y-auto">
+
+                  {vendors.map((v, i) => (
+                    <div
+                      key={i}
+                      className="px-4 py-2 hover:bg-gray-100 text-sm"
+                    >
+                      {v}
+                    </div>
+                  ))}
+
+                </div>
+              )}
+            </div>
 
             {/* SEARCH */}
             <input
@@ -137,7 +190,7 @@ export default function Home() {
               placeholder="Cari item..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="px-4 py-2 rounded-full text-black w-56"
+              className="px-4 py-2 rounded-full bg-white/90 text-black placeholder-gray-500 w-56 outline-none"
             />
 
           </div>
@@ -146,11 +199,11 @@ export default function Home() {
         {/* HERO TEXT */}
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-white text-center">
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-4">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-wide">
             ITEM CATALOG
           </h1>
 
-          <p className="text-lg mb-6">
+          <p className="mt-3 text-lg opacity-90">
             By Procurement
           </p>
 
@@ -158,13 +211,12 @@ export default function Home() {
             onClick={() =>
               catalogRef.current?.scrollIntoView({ behavior: "smooth" })
             }
-            className="bg-white text-black px-6 py-3 rounded-full font-semibold hover:scale-105 transition"
+            className="mt-6 bg-white text-black px-6 py-3 rounded-full font-semibold hover:scale-105 transition"
           >
             Explore Catalog →
           </button>
 
         </div>
-
       </div>
 
       {/* 🔥 CATALOG */}
@@ -182,7 +234,7 @@ export default function Home() {
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className="bg-white rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition cursor-pointer overflow-hidden"
+                className="bg-white rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition cursor-pointer overflow-hidden"
               >
                 <div className="h-44 flex items-center justify-center bg-gray-50">
                   <img
@@ -218,7 +270,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔥 FULL PAGE DETAIL */}
+      {/* 🔥 FULL DETAIL */}
       {selectedItem && (
         <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
 
