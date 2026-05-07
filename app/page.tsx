@@ -30,7 +30,7 @@ export default function Home() {
       {/* HEADER */}
       <div className="absolute top-0 w-full flex justify-between items-center px-10 py-5 z-50">
 
-        <img src="/logo.png" className="h-10" />
+        <img src="/logo.png" className="h-20" />
 
         <div className="flex items-center gap-8 text-sm">
 
