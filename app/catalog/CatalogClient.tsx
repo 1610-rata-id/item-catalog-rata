@@ -19,6 +19,7 @@ export default function Catalog() {
 
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [activeImage, setActiveImage] = useState("");
 
   const [search, setSearch] = useState(params.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -38,18 +39,18 @@ export default function Catalog() {
   }, []);
 
   async function getItems() {
-  const { data, error } = await supabase
-    .from("items")
-    .select("*")
-    .order("item_name", { ascending: true });
+    const { data, error } = await supabase
+      .from("items")
+      .select("*")
+      .order("item_name", { ascending: true });
 
-  if (error) {
-    console.error(error);
-    return;
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setItems(data || []);
   }
-
-  setItems(data || []);
-}
 
   // CLOSE DROPDOWN WHEN CLICK OUTSIDE
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function Catalog() {
             </button>
 
             {showCategory && (
-              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border">
+              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
 
                 <input
                   placeholder="Search..."
@@ -165,7 +166,7 @@ export default function Catalog() {
             </button>
 
             {showVendor && (
-              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border">
+              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
 
                 <input
                   placeholder="Search..."
@@ -222,7 +223,18 @@ export default function Catalog() {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            onClick={() => setSelectedItem(item)}
+            onClick={() => {
+              setSelectedItem(item);
+
+              if (
+                item.image_urls &&
+                item.image_urls.length > 0
+              ) {
+                setActiveImage(item.image_urls[0]);
+              } else {
+                setActiveImage(item.image_url);
+              }
+            }}
             className="
               bg-white rounded-2xl overflow-hidden
               shadow-sm cursor-pointer
@@ -306,18 +318,53 @@ export default function Catalog() {
 
             <div className="grid md:grid-cols-2 gap-10 p-8 md:p-12">
 
-              {/* IMAGE */}
-              <div className="flex items-center justify-center bg-gray-100 rounded-2xl p-10">
+              {/* IMAGE SECTION */}
+              <div>
 
-                <img
-                  src={selectedItem.image_url}
-                  className="
-                    max-h-[500px]
-                    object-contain
-                    transition-transform duration-500
-                    hover:scale-105
-                  "
-                />
+                {/* MAIN IMAGE */}
+                <div className="flex items-center justify-center bg-gray-100 rounded-2xl p-10">
+
+                  <img
+                    src={activeImage}
+                    className="
+                      max-h-[500px]
+                      object-contain
+                      transition-all duration-300
+                      hover:scale-105
+                    "
+                  />
+
+                </div>
+
+                {/* THUMBNAIL */}
+                <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
+
+                  {(
+                    selectedItem.image_urls &&
+                    selectedItem.image_urls.length > 0
+                      ? selectedItem.image_urls
+                      : [selectedItem.image_url]
+                  ).map((img: string, index: number) => (
+
+                    <img
+                      key={index}
+                      src={img}
+                      onClick={() => setActiveImage(img)}
+                      className={`
+                        w-20 h-20 object-cover rounded-xl
+                        border-2 cursor-pointer transition-all duration-300
+                        hover:scale-105 flex-shrink-0
+                        ${
+                          activeImage === img
+                            ? "border-red-500"
+                            : "border-gray-200"
+                        }
+                      `}
+                    />
+
+                  ))}
+
+                </div>
 
               </div>
 
