@@ -38,17 +38,18 @@ export default function Catalog() {
   }, []);
 
   async function getItems() {
-    const { data, error } = await supabase
-      .from("items")
-      .select("*");
+  const { data, error } = await supabase
+    .from("items")
+    .select("*")
+    .order("item_name", { ascending: true });
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setItems(data || []);
+  if (error) {
+    console.error(error);
+    return;
   }
+
+  setItems(data || []);
+}
 
   // CLOSE DROPDOWN WHEN CLICK OUTSIDE
   useEffect(() => {
@@ -98,7 +99,7 @@ export default function Catalog() {
         {/* LOGO */}
         <img
           src="/logo.png"
-          className="h-14 cursor-pointer transition-transform duration-300 hover:scale-105"
+          className="h-28 cursor-pointer transition-transform duration-300 hover:scale-105"
           onClick={() => router.push("/")}
         />
 
