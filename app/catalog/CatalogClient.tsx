@@ -32,6 +32,10 @@ export default function Catalog() {
   const [totalItems, setTotalItems] =
     useState(0);
 
+  // LOADING
+  const [loading, setLoading] =
+    useState(false);
+
   const [selectedItem, setSelectedItem] =
     useState<any | null>(null);
 
@@ -43,7 +47,7 @@ export default function Catalog() {
     Number(searchParams.get("page")) || 1
   );
 
-  // CHANGED TO 100
+  // 100 ITEMS
   const ITEMS_PER_PAGE = 100;
 
   // URL STATE
@@ -121,6 +125,8 @@ export default function Catalog() {
 
   // GET ITEMS
   async function getItems() {
+    setLoading(true);
+
     const from =
       (page - 1) * ITEMS_PER_PAGE;
 
@@ -166,12 +172,21 @@ export default function Catalog() {
 
     if (error) {
       console.error(error);
+      setLoading(false);
       return;
     }
 
     setItems(data || []);
 
     setTotalItems(count || 0);
+
+    setLoading(false);
+
+    // AUTO SCROLL TOP
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   // LOAD FILTERS ONCE
@@ -305,7 +320,7 @@ export default function Catalog() {
           }
         />
 
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-6 text-sm flex-wrap justify-end">
 
           <button
             onClick={() =>
@@ -367,7 +382,15 @@ export default function Catalog() {
                           false
                         );
                       }}
-                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
+                      className={`
+                        px-4 py-3 cursor-pointer transition
+                        hover:bg-gray-100
+                        ${
+                          selectedCategory === cat
+                            ? "bg-red-50 text-red-600 font-semibold"
+                            : ""
+                        }
+                      `}
                     >
                       {cat}
                     </div>
@@ -427,7 +450,15 @@ export default function Catalog() {
                           false
                         );
                       }}
-                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
+                      className={`
+                        px-4 py-3 cursor-pointer transition
+                        hover:bg-gray-100
+                        ${
+                          selectedVendor === v
+                            ? "bg-red-50 text-red-600 font-semibold"
+                            : ""
+                        }
+                      `}
                     >
                       {v}
                     </div>
@@ -458,7 +489,7 @@ export default function Catalog() {
       </div>
 
       {/* TOTAL RESULT */}
-      <div className="max-w-7xl mx-auto px-6 pt-6">
+      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center flex-wrap gap-3">
 
         <p className="text-sm text-gray-500">
           Menampilkan{" "}
@@ -472,84 +503,153 @@ export default function Catalog() {
           item
         </p>
 
+        {/* ACTIVE FILTER */}
+        <div className="flex gap-2 flex-wrap">
+
+          {selectedCategory !== "All" && (
+            <button
+              onClick={() =>
+                handleCategoryChange("All")
+              }
+              className="
+                px-3 py-1 rounded-full
+                bg-red-100 text-red-600
+                text-xs font-medium
+              "
+            >
+              {selectedCategory} ✕
+            </button>
+          )}
+
+          {selectedVendor !== "All" && (
+            <button
+              onClick={() =>
+                handleVendorChange("All")
+              }
+              className="
+                px-3 py-1 rounded-full
+                bg-blue-100 text-blue-600
+                text-xs font-medium
+              "
+            >
+              {selectedVendor} ✕
+            </button>
+          )}
+
+        </div>
+
       </div>
+
+      {/* LOADING */}
+      {loading && (
+        <div className="flex justify-center py-20">
+
+          <div
+            className="
+              w-14 h-14 rounded-full
+              border-4 border-gray-300
+              border-t-red-500
+              animate-spin
+            "
+          />
+
+        </div>
+      )}
 
       {/* GRID */}
-      <div className="max-w-7xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      {!loading && (
+        <div className="max-w-7xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
 
-        {items.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => {
-              setSelectedItem(item);
+          {items.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => {
+                setSelectedItem(item);
 
-              if (
-                item.image_urls &&
-                item.image_urls.length > 0
-              ) {
-                setActiveImage(
-                  item.image_urls[0]
-                );
-              } else {
-                setActiveImage(
-                  item.image_url
-                );
-              }
-            }}
-            className="
-              bg-white rounded-2xl overflow-hidden
-              shadow-sm cursor-pointer
-              transition-all duration-300
-              hover:-translate-y-2
-              hover:shadow-2xl
-            "
-          >
+                if (
+                  item.image_urls &&
+                  item.image_urls.length > 0
+                ) {
+                  setActiveImage(
+                    item.image_urls[0]
+                  );
+                } else {
+                  setActiveImage(
+                    item.image_url
+                  );
+                }
+              }}
+              className="
+                bg-white rounded-2xl overflow-hidden
+                shadow-sm cursor-pointer
+                transition-all duration-300
+                hover:-translate-y-2
+                hover:shadow-2xl
+              "
+            >
 
-            {/* IMAGE */}
-            <div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
+              {/* IMAGE */}
+              <div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
 
-              <img
-                src={item.image_url}
-                className="
-                  h-40 object-contain
-                  transition-transform duration-500
-                  hover:scale-110
-                "
-              />
+                <img
+                  src={item.image_url}
+                  loading="lazy"
+                  className="
+                    h-40 object-contain
+                    transition-transform duration-500
+                    hover:scale-110
+                  "
+                />
+
+              </div>
+
+              {/* CONTENT */}
+              <div className="p-4">
+
+                <h2 className="text-sm font-semibold line-clamp-2 min-h-[40px]">
+                  {item.item_name}
+                </h2>
+
+                <p className="text-xs text-gray-500 mt-2">
+                  {item.category}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  {item.vendor}
+                </p>
+
+                <p className="text-green-600 font-bold mt-3 text-lg">
+                  Rp{" "}
+                  {formatRupiah(
+                    item.price
+                  )}
+                </p>
+
+              </div>
 
             </div>
+          ))}
 
-            {/* CONTENT */}
-            <div className="p-4">
+        </div>
+      )}
 
-              <h2 className="text-sm font-semibold line-clamp-2 min-h-[40px]">
-                {item.item_name}
-              </h2>
+      {/* EMPTY */}
+      {!loading && items.length === 0 && (
+        <div className="text-center py-20">
 
-              <p className="text-xs text-gray-500 mt-2">
-                {item.category}
-              </p>
+          <h2 className="text-2xl font-bold">
+            Item tidak ditemukan
+          </h2>
 
-              <p className="text-xs text-gray-400">
-                {item.vendor}
-              </p>
+          <p className="text-gray-500 mt-2">
+            Coba keyword atau filter lain
+          </p>
 
-              <p className="text-green-600 font-bold mt-3 text-lg">
-                Rp{" "}
-                {formatRupiah(
-                  item.price
-                )}
-              </p>
-
-            </div>
-
-          </div>
-        ))}
-
-      </div>
+        </div>
+      )}
 
       {/* PAGINATION */}
-      <div className="flex justify-center items-center gap-4 pb-10">
+      <div className="flex justify-center items-center gap-4 pb-10 flex-wrap">
 
         <button
           disabled={page === 1}
