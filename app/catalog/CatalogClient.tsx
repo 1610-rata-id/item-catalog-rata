@@ -18,10 +18,21 @@ export default function Catalog() {
   const searchParams = useSearchParams();
 
   const [items, setItems] = useState<any[]>([]);
+
+  // NEW
+  const [categories, setCategories] = useState<
+    string[]
+  >([]);
+
+  const [vendors, setVendors] = useState<
+    string[]
+  >([]);
+
   const [selectedItem, setSelectedItem] =
     useState<any | null>(null);
 
-  const [activeImage, setActiveImage] = useState("");
+  const [activeImage, setActiveImage] =
+    useState("");
 
   // PAGINATION
   const [page, setPage] = useState(
@@ -63,6 +74,40 @@ export default function Catalog() {
 
   const catRef = useRef<any>(null);
   const vendorRef = useRef<any>(null);
+
+  // GET FILTERS
+  async function getFilters() {
+    const { data, error } = await supabase
+      .from("items")
+      .select("category, vendor");
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const uniqueCategories = [
+      "All",
+      ...new Set(
+        data
+          ?.map((i) => i.category)
+          .filter(Boolean)
+      ),
+    ];
+
+    const uniqueVendors = [
+      "All",
+      ...new Set(
+        data
+          ?.map((i) => i.vendor)
+          .filter(Boolean)
+      ),
+    ];
+
+    setCategories(uniqueCategories as string[]);
+
+    setVendors(uniqueVendors as string[]);
+  }
 
   // GET ITEMS
   async function getItems() {
@@ -113,6 +158,11 @@ export default function Catalog() {
 
     setItems(data || []);
   }
+
+  // LOAD FILTERS ONCE
+  useEffect(() => {
+    getFilters();
+  }, []);
 
   // UPDATE URL
   function updateURL(
@@ -224,20 +274,6 @@ export default function Catalog() {
         close
       );
   }, []);
-
-  const categories = [
-    "All",
-    ...new Set(
-      items.map((i) => i.category)
-    ),
-  ];
-
-  const vendors = [
-    "All",
-    ...new Set(
-      items.map((i) => i.vendor)
-    ),
-  ];
 
   return (
     <main className="bg-gray-100 min-h-screen font-[Poppins] text-black">
