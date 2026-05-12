@@ -26,6 +26,10 @@ export default function Catalog() {
     searchParams.get("search") || ""
   );
 
+  // DEBOUNCED SEARCH
+  const [debouncedSearch, setDebouncedSearch] =
+    useState(search);
+
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "All"
   );
@@ -87,33 +91,37 @@ export default function Catalog() {
   // HANDLERS
   function handleSearch(value: string) {
     setSearch(value);
-
-    updateURL(
-      value,
-      selectedCategory,
-      selectedVendor
-    );
   }
 
   function handleCategoryChange(value: string) {
     setSelectedCategory(value);
-
-    updateURL(
-      search,
-      value,
-      selectedVendor
-    );
   }
 
   function handleVendorChange(value: string) {
     setSelectedVendor(value);
-
-    updateURL(
-      search,
-      selectedCategory,
-      value
-    );
   }
+
+  // DEBOUNCE EFFECT
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  // UPDATE URL WHEN STATE CHANGES
+  useEffect(() => {
+    updateURL(
+      debouncedSearch,
+      selectedCategory,
+      selectedVendor
+    );
+  }, [
+    debouncedSearch,
+    selectedCategory,
+    selectedVendor
+  ]);
 
   // CLOSE DROPDOWN WHEN CLICK OUTSIDE
   useEffect(() => {
