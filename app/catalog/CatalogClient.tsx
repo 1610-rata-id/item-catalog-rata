@@ -18,8 +18,17 @@ export default function Catalog() {
   const searchParams = useSearchParams();
 
   const [items, setItems] = useState<any[]>([]);
-  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedItem, setSelectedItem] =
+    useState<any | null>(null);
+
   const [activeImage, setActiveImage] = useState("");
+
+  // PAGINATION
+  const [page, setPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
+
+  const ITEMS_PER_PAGE = 20;
 
   // URL STATE
   const [search, setSearch] = useState(
@@ -30,32 +39,72 @@ export default function Catalog() {
   const [debouncedSearch, setDebouncedSearch] =
     useState(search);
 
-  const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || "All"
-  );
+  const [selectedCategory, setSelectedCategory] =
+    useState(
+      searchParams.get("category") || "All"
+    );
 
-  const [selectedVendor, setSelectedVendor] = useState(
-    searchParams.get("vendor") || "All"
-  );
+  const [selectedVendor, setSelectedVendor] =
+    useState(
+      searchParams.get("vendor") || "All"
+    );
 
-  const [showCategory, setShowCategory] = useState(false);
-  const [showVendor, setShowVendor] = useState(false);
+  const [showCategory, setShowCategory] =
+    useState(false);
 
-  const [catSearch, setCatSearch] = useState("");
-  const [vendorSearch, setVendorSearch] = useState("");
+  const [showVendor, setShowVendor] =
+    useState(false);
+
+  const [catSearch, setCatSearch] =
+    useState("");
+
+  const [vendorSearch, setVendorSearch] =
+    useState("");
 
   const catRef = useRef<any>(null);
   const vendorRef = useRef<any>(null);
 
-  useEffect(() => {
-    getItems();
-  }, []);
-
+  // GET ITEMS
   async function getItems() {
-    const { data, error } = await supabase
+    const from =
+      (page - 1) * ITEMS_PER_PAGE;
+
+    const to =
+      from + ITEMS_PER_PAGE - 1;
+
+    let query = supabase
       .from("items")
       .select("*")
-      .order("item_name", { ascending: true });
+      .order("item_name", {
+        ascending: true,
+      });
+
+    // SEARCH
+    if (debouncedSearch) {
+      query = query.ilike(
+        "item_name",
+        `%${debouncedSearch}%`
+      );
+    }
+
+    // CATEGORY
+    if (selectedCategory !== "All") {
+      query = query.eq(
+        "category",
+        selectedCategory
+      );
+    }
+
+    // VENDOR
+    if (selectedVendor !== "All") {
+      query = query.eq(
+        "vendor",
+        selectedVendor
+      );
+    }
+
+    const { data, error } =
+      await query.range(from, to);
 
     if (error) {
       console.error(error);
@@ -78,27 +127,41 @@ export default function Catalog() {
     }
 
     if (categoryValue !== "All") {
-      params.set("category", categoryValue);
+      params.set(
+        "category",
+        categoryValue
+      );
     }
 
     if (vendorValue !== "All") {
       params.set("vendor", vendorValue);
     }
 
-    router.replace(`/catalog?${params.toString()}`);
+    params.set("page", String(page));
+
+    router.replace(
+      `/catalog?${params.toString()}`
+    );
   }
 
   // HANDLERS
   function handleSearch(value: string) {
     setSearch(value);
+    setPage(1);
   }
 
-  function handleCategoryChange(value: string) {
+  function handleCategoryChange(
+    value: string
+  ) {
     setSelectedCategory(value);
+    setPage(1);
   }
 
-  function handleVendorChange(value: string) {
+  function handleVendorChange(
+    value: string
+  ) {
     setSelectedVendor(value);
+    setPage(1);
   }
 
   // DEBOUNCE EFFECT
@@ -110,7 +173,17 @@ export default function Catalog() {
     return () => clearTimeout(timeout);
   }, [search]);
 
-  // UPDATE URL WHEN STATE CHANGES
+  // FETCH ITEMS
+  useEffect(() => {
+    getItems();
+  }, [
+    debouncedSearch,
+    selectedCategory,
+    selectedVendor,
+    page,
+  ]);
+
+  // UPDATE URL
   useEffect(() => {
     updateURL(
       debouncedSearch,
@@ -120,47 +193,51 @@ export default function Catalog() {
   }, [
     debouncedSearch,
     selectedCategory,
-    selectedVendor
+    selectedVendor,
+    page,
   ]);
 
   // CLOSE DROPDOWN WHEN CLICK OUTSIDE
   useEffect(() => {
     const close = (e: any) => {
-      if (!catRef.current?.contains(e.target)) {
+      if (
+        !catRef.current?.contains(e.target)
+      ) {
         setShowCategory(false);
       }
 
-      if (!vendorRef.current?.contains(e.target)) {
+      if (
+        !vendorRef.current?.contains(e.target)
+      ) {
         setShowVendor(false);
       }
     };
 
-    window.addEventListener("click", close);
+    window.addEventListener(
+      "click",
+      close
+    );
 
-    return () => window.removeEventListener("click", close);
+    return () =>
+      window.removeEventListener(
+        "click",
+        close
+      );
   }, []);
 
   const categories = [
     "All",
-    ...new Set(items.map((i) => i.category)),
+    ...new Set(
+      items.map((i) => i.category)
+    ),
   ];
 
   const vendors = [
     "All",
-    ...new Set(items.map((i) => i.vendor)),
+    ...new Set(
+      items.map((i) => i.vendor)
+    ),
   ];
-
-  const filteredItems = items.filter((item) => {
-    return (
-      item.item_name
-        ?.toLowerCase()
-        .includes(search.toLowerCase()) &&
-      (selectedCategory === "All" ||
-        item.category === selectedCategory) &&
-      (selectedVendor === "All" ||
-        item.vendor === selectedVendor)
-    );
-  });
 
   return (
     <main className="bg-gray-100 min-h-screen font-[Poppins] text-black">
@@ -172,23 +249,34 @@ export default function Catalog() {
         <img
           src="/logo.png"
           className="h-28 cursor-pointer transition-transform duration-300 hover:scale-105"
-          onClick={() => router.push("/")}
+          onClick={() =>
+            router.push("/")
+          }
         />
 
         <div className="flex items-center gap-6 text-sm">
 
           <button
-            onClick={() => router.push("/")}
+            onClick={() =>
+              router.push("/")
+            }
             className="hover:text-red-600 transition"
           >
             Beranda
           </button>
 
           {/* CATEGORY */}
-          <div ref={catRef} className="relative">
+          <div
+            ref={catRef}
+            className="relative"
+          >
 
             <button
-              onClick={() => setShowCategory(!showCategory)}
+              onClick={() =>
+                setShowCategory(
+                  !showCategory
+                )
+              }
               className="hover:text-red-600 transition"
             >
               Category ▾
@@ -200,22 +288,33 @@ export default function Catalog() {
                 <input
                   placeholder="Search..."
                   value={catSearch}
-                  onChange={(e) => setCatSearch(e.target.value)}
+                  onChange={(e) =>
+                    setCatSearch(
+                      e.target.value
+                    )
+                  }
                   className="w-full p-3 border-b outline-none"
                 />
 
                 {categories
                   .filter((c) =>
-                    c?.toLowerCase().includes(
-                      catSearch.toLowerCase()
-                    )
+                    c
+                      ?.toLowerCase()
+                      .includes(
+                        catSearch.toLowerCase()
+                      )
                   )
                   .map((cat) => (
                     <div
                       key={cat}
                       onClick={() => {
-                        handleCategoryChange(cat);
-                        setShowCategory(false);
+                        handleCategoryChange(
+                          cat
+                        );
+
+                        setShowCategory(
+                          false
+                        );
                       }}
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
                     >
@@ -227,10 +326,17 @@ export default function Catalog() {
           </div>
 
           {/* VENDOR */}
-          <div ref={vendorRef} className="relative">
+          <div
+            ref={vendorRef}
+            className="relative"
+          >
 
             <button
-              onClick={() => setShowVendor(!showVendor)}
+              onClick={() =>
+                setShowVendor(
+                  !showVendor
+                )
+              }
               className="hover:text-red-600 transition"
             >
               Vendor ▾
@@ -243,7 +349,9 @@ export default function Catalog() {
                   placeholder="Search..."
                   value={vendorSearch}
                   onChange={(e) =>
-                    setVendorSearch(e.target.value)
+                    setVendorSearch(
+                      e.target.value
+                    )
                   }
                   className="w-full p-3 border-b outline-none"
                 />
@@ -252,15 +360,22 @@ export default function Catalog() {
                   .filter((v) =>
                     v
                       ?.toLowerCase()
-                      .includes(vendorSearch.toLowerCase())
+                      .includes(
+                        vendorSearch.toLowerCase()
+                      )
                   )
                   .slice(0, 10)
                   .map((v) => (
                     <div
                       key={v}
                       onClick={() => {
-                        handleVendorChange(v);
-                        setShowVendor(false);
+                        handleVendorChange(
+                          v
+                        );
+
+                        setShowVendor(
+                          false
+                        );
                       }}
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
                     >
@@ -274,7 +389,11 @@ export default function Catalog() {
           {/* SEARCH */}
           <input
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) =>
+              handleSearch(
+                e.target.value
+              )
+            }
             placeholder="Cari item..."
             className="
               px-5 py-2 rounded-full
@@ -291,7 +410,7 @@ export default function Catalog() {
       {/* GRID */}
       <div className="max-w-7xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
 
-        {filteredItems.map((item) => (
+        {items.map((item) => (
           <div
             key={item.id}
             onClick={() => {
@@ -301,9 +420,13 @@ export default function Catalog() {
                 item.image_urls &&
                 item.image_urls.length > 0
               ) {
-                setActiveImage(item.image_urls[0]);
+                setActiveImage(
+                  item.image_urls[0]
+                );
               } else {
-                setActiveImage(item.image_url);
+                setActiveImage(
+                  item.image_url
+                );
               }
             }}
             className="
@@ -345,7 +468,10 @@ export default function Catalog() {
               </p>
 
               <p className="text-green-600 font-bold mt-3 text-lg">
-                Rp {formatRupiah(item.price)}
+                Rp{" "}
+                {formatRupiah(
+                  item.price
+                )}
               </p>
 
             </div>
@@ -355,10 +481,47 @@ export default function Catalog() {
 
       </div>
 
+      {/* PAGINATION */}
+      <div className="flex justify-center gap-4 pb-10">
+
+        <button
+          disabled={page === 1}
+          onClick={() =>
+            setPage(page - 1)
+          }
+          className="
+            px-5 py-2 rounded-xl border
+            bg-white hover:bg-gray-100
+            disabled:opacity-50
+          "
+        >
+          Previous
+        </button>
+
+        <div className="px-4 py-2 font-semibold">
+          Page {page}
+        </div>
+
+        <button
+          onClick={() =>
+            setPage(page + 1)
+          }
+          className="
+            px-5 py-2 rounded-xl border
+            bg-white hover:bg-gray-100
+          "
+        >
+          Next
+        </button>
+
+      </div>
+
       {/* MODAL DETAIL */}
       {selectedItem && (
         <div
-          onClick={() => setSelectedItem(null)}
+          onClick={() =>
+            setSelectedItem(null)
+          }
           className="
             fixed inset-0 bg-black/60 backdrop-blur-sm
             z-50 flex items-center justify-center p-6
@@ -366,7 +529,9 @@ export default function Catalog() {
         >
 
           <div
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
             className="
               bg-white w-full max-w-6xl rounded-3xl
               overflow-hidden relative
@@ -377,7 +542,9 @@ export default function Catalog() {
 
             {/* CLOSE */}
             <button
-              onClick={() => setSelectedItem(null)}
+              onClick={() =>
+                setSelectedItem(null)
+              }
               className="
                 absolute top-4 right-5 z-50
                 text-4xl font-light
@@ -412,28 +579,39 @@ export default function Catalog() {
 
                   {(
                     selectedItem.image_urls &&
-                    selectedItem.image_urls.length > 0
+                    selectedItem.image_urls
+                      .length > 0
                       ? selectedItem.image_urls
-                      : [selectedItem.image_url]
-                  ).map((img: string, index: number) => (
-
-                    <img
-                      key={index}
-                      src={img}
-                      onClick={() => setActiveImage(img)}
-                      className={`
-                        w-20 h-20 object-cover rounded-xl
-                        border-2 cursor-pointer transition-all duration-300
-                        hover:scale-105 flex-shrink-0
-                        ${
-                          activeImage === img
-                            ? "border-red-500"
-                            : "border-gray-200"
+                      : [
+                          selectedItem.image_url,
+                        ]
+                  ).map(
+                    (
+                      img: string,
+                      index: number
+                    ) => (
+                      <img
+                        key={index}
+                        src={img}
+                        onClick={() =>
+                          setActiveImage(
+                            img
+                          )
                         }
-                      `}
-                    />
-
-                  ))}
+                        className={`
+                          w-20 h-20 object-cover rounded-xl
+                          border-2 cursor-pointer transition-all duration-300
+                          hover:scale-105 flex-shrink-0
+                          ${
+                            activeImage ===
+                            img
+                              ? "border-red-500"
+                              : "border-gray-200"
+                          }
+                        `}
+                      />
+                    )
+                  )}
 
                 </div>
 
@@ -443,15 +621,22 @@ export default function Catalog() {
               <div>
 
                 <h1 className="text-4xl font-bold leading-tight">
-                  {selectedItem.item_name}
+                  {
+                    selectedItem.item_name
+                  }
                 </h1>
 
                 <p className="text-gray-500 mt-3 text-lg">
-                  {selectedItem.category}
+                  {
+                    selectedItem.category
+                  }
                 </p>
 
                 <p className="text-green-600 text-5xl font-bold mt-6">
-                  Rp {formatRupiah(selectedItem.price)}
+                  Rp{" "}
+                  {formatRupiah(
+                    selectedItem.price
+                  )}
                 </p>
 
                 {/* INFO */}
@@ -461,49 +646,56 @@ export default function Catalog() {
                     <span className="font-bold">
                       Vendor:
                     </span>{" "}
-                    {selectedItem.vendor || "-"}
+                    {selectedItem.vendor ||
+                      "-"}
                   </p>
 
                   <p>
                     <span className="font-bold">
                       Code:
                     </span>{" "}
-                    {selectedItem.item_code || "-"}
+                    {selectedItem.item_code ||
+                      "-"}
                   </p>
 
                   <p>
                     <span className="font-bold">
                       UOM:
                     </span>{" "}
-                    {selectedItem.UOM || "-"}
+                    {selectedItem.UOM ||
+                      "-"}
                   </p>
 
                   <p>
                     <span className="font-bold">
                       Manufacture:
                     </span>{" "}
-                    {selectedItem.Manufacture || "-"}
+                    {selectedItem.Manufacture ||
+                      "-"}
                   </p>
 
                   <p>
                     <span className="font-bold">
                       Type:
                     </span>{" "}
-                    {selectedItem.type || "-"}
+                    {selectedItem.type ||
+                      "-"}
                   </p>
 
                   <p>
                     <span className="font-bold">
                       Term:
                     </span>{" "}
-                    {selectedItem.Term || "-"}
+                    {selectedItem.Term ||
+                      "-"}
                   </p>
 
                   <p>
                     <span className="font-bold">
                       Remarks:
                     </span>{" "}
-                    {selectedItem.Remarks || "-"}
+                    {selectedItem.Remarks ||
+                      "-"}
                   </p>
 
                 </div>
@@ -516,7 +708,8 @@ export default function Catalog() {
                   </h2>
 
                   <div className="whitespace-pre-line text-gray-700 leading-8">
-                    {selectedItem.description || "-"}
+                    {selectedItem.description ||
+                      "-"}
                   </div>
 
                 </div>
