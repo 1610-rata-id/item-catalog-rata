@@ -15,15 +15,24 @@ function formatRupiah(number: number) {
 
 export default function Catalog() {
   const router = useRouter();
-  const params = useSearchParams();
+  const searchParams = useSearchParams();
 
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [activeImage, setActiveImage] = useState("");
 
-  const [search, setSearch] = useState(params.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedVendor, setSelectedVendor] = useState("All");
+  // URL STATE
+  const [search, setSearch] = useState(
+    searchParams.get("search") || ""
+  );
+
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("category") || "All"
+  );
+
+  const [selectedVendor, setSelectedVendor] = useState(
+    searchParams.get("vendor") || "All"
+  );
 
   const [showCategory, setShowCategory] = useState(false);
   const [showVendor, setShowVendor] = useState(false);
@@ -50,6 +59,60 @@ export default function Catalog() {
     }
 
     setItems(data || []);
+  }
+
+  // UPDATE URL
+  function updateURL(
+    searchValue: string,
+    categoryValue: string,
+    vendorValue: string
+  ) {
+    const params = new URLSearchParams();
+
+    if (searchValue) {
+      params.set("search", searchValue);
+    }
+
+    if (categoryValue !== "All") {
+      params.set("category", categoryValue);
+    }
+
+    if (vendorValue !== "All") {
+      params.set("vendor", vendorValue);
+    }
+
+    router.replace(`/catalog?${params.toString()}`);
+  }
+
+  // HANDLERS
+  function handleSearch(value: string) {
+    setSearch(value);
+
+    updateURL(
+      value,
+      selectedCategory,
+      selectedVendor
+    );
+  }
+
+  function handleCategoryChange(value: string) {
+    setSelectedCategory(value);
+
+    updateURL(
+      search,
+      value,
+      selectedVendor
+    );
+  }
+
+  function handleVendorChange(value: string) {
+    setSelectedVendor(value);
+
+    updateURL(
+      search,
+      selectedCategory,
+      value
+    );
   }
 
   // CLOSE DROPDOWN WHEN CLICK OUTSIDE
@@ -143,7 +206,7 @@ export default function Catalog() {
                     <div
                       key={cat}
                       onClick={() => {
-                        setSelectedCategory(cat);
+                        handleCategoryChange(cat);
                         setShowCategory(false);
                       }}
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
@@ -188,7 +251,7 @@ export default function Catalog() {
                     <div
                       key={v}
                       onClick={() => {
-                        setSelectedVendor(v);
+                        handleVendorChange(v);
                         setShowVendor(false);
                       }}
                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
@@ -203,7 +266,7 @@ export default function Catalog() {
           {/* SEARCH */}
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
             placeholder="Cari item..."
             className="
               px-5 py-2 rounded-full
