@@ -306,7 +306,7 @@ export default function Catalog() {
   }, []);
 
   return (
-    <main className="bg-gray-100 min-h-screen font-[Poppins] text-black">
+    <main className="bg-[#f8f8f7] min-h-screen font-[Poppins] text-black">
 
       {/* HEADER */}
       <div className="sticky top-0 bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center z-50">
@@ -488,8 +488,32 @@ export default function Catalog() {
         </div>
       </div>
 
+      {/* HERO BANNER */}
+<div className="max-w-7xl mx-auto px-6 pt-6">
+
+  <div
+    className="
+      relative overflow-hidden rounded-[32px]
+      shadow-sm border border-gray-100
+      bg-white
+    "
+  >
+
+    <img
+      src="/banner-catalog.png"
+      alt="Catalog Banner"
+      className="
+        w-full
+        h-[220px] md:h-[300px]
+        object-cover
+      "
+    />
+
+  </div>
+
+</div>
       {/* TOTAL RESULT */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-between items-center flex-wrap gap-3">
+      <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
         <p className="text-sm text-gray-500">
           Menampilkan{" "}
