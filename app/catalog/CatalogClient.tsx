@@ -28,6 +28,10 @@ export default function Catalog() {
     string[]
   >([]);
 
+  // TOTAL COUNT
+  const [totalItems, setTotalItems] =
+    useState(0);
+
   const [selectedItem, setSelectedItem] =
     useState<any | null>(null);
 
@@ -39,7 +43,8 @@ export default function Catalog() {
     Number(searchParams.get("page")) || 1
   );
 
-  const ITEMS_PER_PAGE = 20;
+  // CHANGED TO 100
+  const ITEMS_PER_PAGE = 100;
 
   // URL STATE
   const [search, setSearch] = useState(
@@ -74,6 +79,11 @@ export default function Catalog() {
 
   const catRef = useRef<any>(null);
   const vendorRef = useRef<any>(null);
+
+  // TOTAL PAGE
+  const totalPages = Math.ceil(
+    totalItems / ITEMS_PER_PAGE
+  );
 
   // GET FILTERS
   async function getFilters() {
@@ -119,7 +129,7 @@ export default function Catalog() {
 
     let query = supabase
       .from("items")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("item_name", {
         ascending: true,
       });
@@ -148,8 +158,11 @@ export default function Catalog() {
       );
     }
 
-    const { data, error } =
-      await query.range(from, to);
+    const {
+      data,
+      error,
+      count,
+    } = await query.range(from, to);
 
     if (error) {
       console.error(error);
@@ -157,6 +170,8 @@ export default function Catalog() {
     }
 
     setItems(data || []);
+
+    setTotalItems(count || 0);
   }
 
   // LOAD FILTERS ONCE
@@ -400,7 +415,6 @@ export default function Catalog() {
                         vendorSearch.toLowerCase()
                       )
                   )
-                  .slice(0, 10)
                   .map((v) => (
                     <div
                       key={v}
@@ -441,6 +455,23 @@ export default function Catalog() {
           />
 
         </div>
+      </div>
+
+      {/* TOTAL RESULT */}
+      <div className="max-w-7xl mx-auto px-6 pt-6">
+
+        <p className="text-sm text-gray-500">
+          Menampilkan{" "}
+          <span className="font-semibold">
+            {items.length}
+          </span>{" "}
+          dari{" "}
+          <span className="font-semibold">
+            {totalItems}
+          </span>{" "}
+          item
+        </p>
+
       </div>
 
       {/* GRID */}
@@ -518,7 +549,7 @@ export default function Catalog() {
       </div>
 
       {/* PAGINATION */}
-      <div className="flex justify-center gap-4 pb-10">
+      <div className="flex justify-center items-center gap-4 pb-10">
 
         <button
           disabled={page === 1}
@@ -535,16 +566,20 @@ export default function Catalog() {
         </button>
 
         <div className="px-4 py-2 font-semibold">
-          Page {page}
+          Page {page} / {totalPages || 1}
         </div>
 
         <button
+          disabled={
+            page >= totalPages
+          }
           onClick={() =>
             setPage(page + 1)
           }
           className="
             px-5 py-2 rounded-xl border
             bg-white hover:bg-gray-100
+            disabled:opacity-50
           "
         >
           Next
