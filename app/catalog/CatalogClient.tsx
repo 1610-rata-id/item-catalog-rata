@@ -140,13 +140,17 @@ export default function Catalog() {
         ascending: true,
       });
 
-    // SEARCH
-    if (debouncedSearch) {
-      query = query.ilike(
-        "item_name",
-        `%${debouncedSearch}%`
-      );
+    // FULL TEXT SEARCH
+if (debouncedSearch) {
+  query = query.textSearch(
+    "search_vector",
+    debouncedSearch,
+    {
+      type: "websearch",
+      config: "simple",
     }
+  );
+}
 
     // CATEGORY
     if (selectedCategory !== "All") {
