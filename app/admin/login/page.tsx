@@ -98,16 +98,17 @@ export default function AdminLoginPage() {
       >
 
         {/* LOGO */}
-        <div className="text-center">
-
-          <img
-            src="/logo-red.png"
-            alt="Logo"
-            className="
-              h-20 mx-auto
-              object-contain
-            "
-          />
+        <div className="mb-10 flex justify-center">
+  <img
+    src="/logo.png"
+    alt="Logo"
+    className="
+      w-full
+      max-w-[420px]
+      object-contain
+    "
+  />
+</div>
 
           <p
             className="
