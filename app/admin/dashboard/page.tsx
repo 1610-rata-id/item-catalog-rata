@@ -53,9 +53,19 @@ const ITEMS_PER_PAGE = 100;
   })
   .range(from, to);
 
-query = query.or(
-  `item_name.ilike.%${search}%,vendor.ilike.%${search}%,category.ilike.%${search}%,description.ilike.%${search}%,item_code.ilike.%${search}%,type.ilike.%${search}%,Manufacture.ilike.%${search}%`
-);
+if (search.trim()) {
+  query = query.or(
+    `item_name.ilike.%${search}%,
+    vendor.ilike.%${search}%,
+    category.ilike.%${search}%,
+    description.ilike.%${search}%,
+    item_code.ilike.%${search}%,
+    type.ilike.%${search}%,
+    Manufacture.ilike.%${search}%,
+    Term.ilike.%${search}%,
+    Remarks.ilike.%${search}%`
+  );
+}
 
   const { data, error } =
     await query;

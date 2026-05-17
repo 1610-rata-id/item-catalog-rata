@@ -141,15 +141,19 @@ export default function Catalog() {
       });
 
     // FULL TEXT SEARCH
-if (debouncedSearch) {
-  query = query.textSearch(
-    "search_vector",
-    debouncedSearch,
-    {
-      type: "websearch",
-      config: "simple",
-    }
-  );
+// SEARCH
+if (debouncedSearch.trim()) {
+  query = query.or(`
+    item_name.ilike.%${debouncedSearch}%,
+    vendor.ilike.%${debouncedSearch}%,
+    category.ilike.%${debouncedSearch}%,
+    description.ilike.%${debouncedSearch}%,
+    item_code.ilike.%${debouncedSearch}%,
+    Manufacture.ilike.%${debouncedSearch}%,
+    type.ilike.%${debouncedSearch}%,
+    Term.ilike.%${debouncedSearch}%,
+    Remarks.ilike.%${debouncedSearch}%
+  `);
 }
 
     // CATEGORY
