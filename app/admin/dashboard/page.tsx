@@ -55,15 +55,15 @@ const ITEMS_PER_PAGE = 100;
 
 if (search.trim()) {
   query = query.or(
-    `item_name.ilike.%${search}%,
+    `
+    item_name.ilike.%${search}%,
     vendor.ilike.%${search}%,
     category.ilike.%${search}%,
     description.ilike.%${search}%,
     item_code.ilike.%${search}%,
     type.ilike.%${search}%,
-    Manufacture.ilike.%${search}%,
-    Term.ilike.%${search}%,
-    Remarks.ilike.%${search}%`
+    Manufacture.ilike.%${search}%
+    `
   );
 }
 
