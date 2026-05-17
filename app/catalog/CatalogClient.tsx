@@ -260,6 +260,30 @@ if (debouncedSearch) {
   // FETCH ITEMS
   useEffect(() => {
     getItems();
+
+// REALTIME
+  const channel = supabase
+    .channel("catalog-realtime")
+
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "items",
+      },
+      () => {
+        getItems();
+      }
+    )
+
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(
+      channel
+    );
+  };
   }, [
     debouncedSearch,
     selectedCategory,
