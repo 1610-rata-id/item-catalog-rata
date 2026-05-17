@@ -142,18 +142,10 @@ export default function Catalog() {
 
   // SEARCH
   if (debouncedSearch.trim()) {
-    query = query.or(`
-      item_name.ilike.%${debouncedSearch}%,
-      vendor.ilike.%${debouncedSearch}%,
-      category.ilike.%${debouncedSearch}%,
-      description.ilike.%${debouncedSearch}%,
-      item_code.ilike.%${debouncedSearch}%,
-      Manufacture.ilike.%${debouncedSearch}%,
-      type.ilike.%${debouncedSearch}%,
-      Term.ilike.%${debouncedSearch}%,
-      Remarks.ilike.%${debouncedSearch}%
-    `);
-  }
+  query = query.or(
+    `item_name.ilike.%${debouncedSearch}%,vendor.ilike.%${debouncedSearch}%,category.ilike.%${debouncedSearch}%,description.ilike.%${debouncedSearch}%,item_code.ilike.%${debouncedSearch}%,Manufacture.ilike.%${debouncedSearch}%,type.ilike.%${debouncedSearch}%,Term.ilike.%${debouncedSearch}%,Remarks.ilike.%${debouncedSearch}%`
+  );
+}
 
   // CATEGORY
   if (selectedCategory !== "All") {
