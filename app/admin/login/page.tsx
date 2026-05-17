@@ -91,25 +91,49 @@ export default function AdminLoginPage() {
           shadow-[0_20px_80px_rgba(0,0,0,0.08)]
         "
       >
-        {/* TOP IMAGE */}
-        <div className="p-5 pb-0">
-          <div
-            className="
-              overflow-hidden
-              rounded-[28px]
-            "
-          >
-            <img
-              src="/banner-catalog.png"
-              alt="Banner"
-              className="
-                h-[180px]
-                w-full
-                object-cover
-              "
-            />
-          </div>
-        </div>
+        {/* TOP LOGO */}
+<div className="p-5 pb-0">
+  <div
+    className="
+      flex
+      items-center
+      justify-center
+      rounded-[28px]
+      bg-gradient-to-br
+      from-[#fafafa]
+      via-white
+      to-[#f3f6ff]
+      border
+      border-[#f0f0f0]
+      h-[180px]
+      overflow-hidden
+      relative
+    "
+  >
+    {/* SOFT GLOW */}
+    <div
+      className="
+        absolute
+        w-[280px]
+        h-[280px]
+        bg-red-100/40
+        rounded-full
+        blur-3xl
+      "
+    />
+
+    <img
+      src="/logo-red.png"
+      alt="Logo"
+      className="
+        relative
+        z-10
+        w-[260px]
+        object-contain
+      "
+    />
+  </div>
+</div>
 
         {/* CONTENT */}
         <div className="px-8 pt-10 pb-8">
