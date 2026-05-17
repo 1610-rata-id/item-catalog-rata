@@ -125,77 +125,78 @@ export default function Catalog() {
 
   // GET ITEMS
   async function getItems() {
-    setLoading(true);
+  setLoading(true);
 
-    const from =
-      (page - 1) * ITEMS_PER_PAGE;
+  const from =
+    (page - 1) * ITEMS_PER_PAGE;
 
-    const to =
-      from + ITEMS_PER_PAGE - 1;
+  const to =
+    from + ITEMS_PER_PAGE - 1;
 
-    let query = supabase
-      .from("items")
-      .select("*", { count: "exact" })
-      .order("item_name", {
-        ascending: true,
-      });
-
-    // FULL TEXT SEARCH
-// SEARCH
-if (debouncedSearch.trim()) {
-  query = query.or(`
-    item_name.ilike.%${debouncedSearch}%,
-    vendor.ilike.%${debouncedSearch}%,
-    category.ilike.%${debouncedSearch}%,
-    description.ilike.%${debouncedSearch}%,
-    item_code.ilike.%${debouncedSearch}%,
-    Manufacture.ilike.%${debouncedSearch}%,
-    type.ilike.%${debouncedSearch}%,
-    Term.ilike.%${debouncedSearch}%,
-    Remarks.ilike.%${debouncedSearch}%
-  `);
-}
-
-    // CATEGORY
-    if (selectedCategory !== "All") {
-      query = query.eq(
-        "category",
-        selectedCategory
-      );
-    }
-
-    // VENDOR
-    if (selectedVendor !== "All") {
-      query = query.eq(
-        "vendor",
-        selectedVendor
-      );
-    }
-
-    const {
-      data,
-      error,
-      count,
-    } = await query.range(from, to);
-
-    if (error) {
-      console.error(error);
-      setLoading(false);
-      return;
-    }
-
-    setItems(data || []);
-
-    setTotalItems(count || 0);
-
-    setLoading(false);
-
-    // AUTO SCROLL TOP
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
+  let query = supabase
+    .from("items")
+    .select("*", { count: "exact" })
+    .order("item_name", {
+      ascending: true,
     });
+
+  // SEARCH
+  if (debouncedSearch.trim()) {
+    query = query.or(`
+      item_name.ilike.%${debouncedSearch}%,
+      vendor.ilike.%${debouncedSearch}%,
+      category.ilike.%${debouncedSearch}%,
+      description.ilike.%${debouncedSearch}%,
+      item_code.ilike.%${debouncedSearch}%,
+      Manufacture.ilike.%${debouncedSearch}%,
+      type.ilike.%${debouncedSearch}%,
+      Term.ilike.%${debouncedSearch}%,
+      Remarks.ilike.%${debouncedSearch}%
+    `);
   }
+
+  // CATEGORY
+  if (selectedCategory !== "All") {
+    query = query.eq(
+      "category",
+      selectedCategory
+    );
+  }
+
+  // VENDOR
+  if (selectedVendor !== "All") {
+    query = query.eq(
+      "vendor",
+      selectedVendor
+    );
+  }
+
+  // PAGINATION
+  query = query.range(from, to);
+
+  const {
+    data,
+    error,
+    count,
+  } = await query;
+
+  if (error) {
+    console.error(error);
+    setLoading(false);
+    return;
+  }
+
+  setItems(data || []);
+
+  setTotalItems(count || 0);
+
+  setLoading(false);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+}
 
   // LOAD FILTERS ONCE
   useEffect(() => {
