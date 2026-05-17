@@ -55,15 +55,7 @@ const ITEMS_PER_PAGE = 100;
 
 if (search.trim()) {
   query = query.or(
-    `
-    item_name.ilike.%${search}%,
-    vendor.ilike.%${search}%,
-    category.ilike.%${search}%,
-    description.ilike.%${search}%,
-    item_code.ilike.%${search}%,
-    type.ilike.%${search}%,
-    Manufacture.ilike.%${search}%
-    `
+    `item_name.ilike.%${search}%,vendor.ilike.%${search}%,category.ilike.%${search}%,description.ilike.%${search}%,item_code.ilike.%${search}%,type.ilike.%${search}%`
   );
 }
 
@@ -71,9 +63,13 @@ if (search.trim()) {
     await query;
 
   if (error) {
-    console.error(error);
-    return;
-  }
+  console.log("SUPABASE ERROR");
+  console.log(error.message);
+  console.log(error.details);
+  console.log(error.hint);
+  console.log(error.code);
+  return;
+}
 
   setItems(data || []);
 }
