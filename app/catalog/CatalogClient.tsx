@@ -920,6 +920,107 @@ export default function Catalog() {
 
                 </div>
 
+                {/* BUY BUTTONS */}
+<div className="mt-10">
+
+  <h2
+    className="
+      font-bold
+      text-2xl
+      mb-5
+    "
+  >
+    Purchase Links
+  </h2>
+
+  <div className="flex flex-wrap gap-4">
+
+    {/* TOKOPEDIA */}
+    {selectedItem.tokopedia_url && (
+      <a
+        href={selectedItem.tokopedia_url}
+        target="_blank"
+        className="
+          px-6 py-4 rounded-2xl
+          bg-green-500
+          text-white
+          font-semibold
+          hover:scale-105
+          hover:shadow-xl
+          transition-all
+          duration-300
+        "
+      >
+        Tokopedia
+      </a>
+    )}
+
+    {/* SHOPEE */}
+    {selectedItem.shopee_url && (
+      <a
+        href={selectedItem.shopee_url}
+        target="_blank"
+        className="
+          px-6 py-4 rounded-2xl
+          bg-orange-500
+          text-white
+          font-semibold
+          hover:scale-105
+          hover:shadow-xl
+          transition-all
+          duration-300
+        "
+      >
+        Shopee
+      </a>
+    )}
+
+    {/* WHATSAPP */}
+    {selectedItem.whatsapp_url && (
+      <a
+        href={selectedItem.whatsapp_url}
+        target="_blank"
+        className="
+          px-6 py-4 rounded-2xl
+          bg-black
+          text-white
+          font-semibold
+          hover:scale-105
+          hover:shadow-xl
+          transition-all
+          duration-300
+        "
+      >
+        WhatsApp
+      </a>
+    )}
+
+    {/* OFFICIAL */}
+    {selectedItem.official_url && (
+      <a
+        href={selectedItem.official_url}
+        target="_blank"
+        className="
+          px-6 py-4 rounded-2xl
+          border
+          border-gray-300
+          bg-white
+          text-black
+          font-semibold
+          hover:scale-105
+          hover:shadow-xl
+          transition-all
+          duration-300
+        "
+      >
+        Official Site
+      </a>
+    )}
+
+  </div>
+
+</div>
+
                 {/* DESCRIPTION */}
                 <div className="mt-12">
 
