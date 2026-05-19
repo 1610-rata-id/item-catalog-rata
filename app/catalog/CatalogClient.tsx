@@ -537,6 +537,7 @@ export default function Catalog() {
   </div>
 
 </div>
+
       {/* TOTAL RESULT */}
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
