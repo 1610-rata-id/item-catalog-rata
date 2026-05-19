@@ -17,6 +17,13 @@ export default function AddItemPage() {
     category: "",
     price: "",
     description: "",
+
+    // NEW
+    tokopedia_url: "",
+    shopee_url: "",
+    whatsapp_url: "",
+    official_url: "",
+
     image_urls: [] as string[],
   });
 
@@ -121,6 +128,19 @@ export default function AddItemPage() {
             description:
               form.description,
 
+            // NEW
+            tokopedia_url:
+              form.tokopedia_url,
+
+            shopee_url:
+              form.shopee_url,
+
+            whatsapp_url:
+              form.whatsapp_url,
+
+            official_url:
+              form.official_url,
+
             image_url:
               form.image_urls[0] ||
               null,
@@ -145,6 +165,12 @@ export default function AddItemPage() {
       category: "",
       price: "",
       description: "",
+
+      tokopedia_url: "",
+      shopee_url: "",
+      whatsapp_url: "",
+      official_url: "",
+
       image_urls: [],
     });
   }
@@ -263,6 +289,64 @@ export default function AddItemPage() {
             "
           />
 
+          {/* MARKETPLACE URLS */}
+
+          <input
+            name="tokopedia_url"
+            placeholder="Tokopedia URL"
+            value={form.tokopedia_url}
+            onChange={handleChange}
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+            "
+          />
+
+          <input
+            name="shopee_url"
+            placeholder="Shopee URL"
+            value={form.shopee_url}
+            onChange={handleChange}
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+            "
+          />
+
+          <input
+            name="whatsapp_url"
+            placeholder="WhatsApp URL"
+            value={form.whatsapp_url}
+            onChange={handleChange}
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+            "
+          />
+
+          <input
+            name="official_url"
+            placeholder="Official URL"
+            value={form.official_url}
+            onChange={handleChange}
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+            "
+          />
+
           <div>
 
             <label
@@ -309,18 +393,18 @@ export default function AddItemPage() {
                 ) => (
 
                   <Image
-  key={index}
-  src={url}
-  alt="Preview Image"
-  width={160}
-  height={160}
-  className="
-    w-40 h-40
-    object-cover
-    rounded-2xl
-    border
-  "
-/>
+                    key={index}
+                    src={url}
+                    alt="Preview Image"
+                    width={160}
+                    height={160}
+                    className="
+                      w-40 h-40
+                      object-cover
+                      rounded-2xl
+                      border
+                    "
+                  />
                 )
               )}
 
