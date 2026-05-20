@@ -639,19 +639,42 @@ export default function Catalog() {
             >
 
               {/* IMAGE */}
-              <div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
+<div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
 
-                <img
-                  src={item.image_url}
-                  loading="lazy"
-                  className="
-                    h-40 object-contain
-                    transition-transform duration-500
-                    hover:scale-110
-                  "
-                />
+  {item.image_url ? (
 
-              </div>
+    <img
+      src={item.image_url}
+      alt={item.item_name}
+      loading="lazy"
+      className="
+        h-40
+        object-contain
+        transition-transform
+        duration-500
+        hover:scale-110
+      "
+    />
+
+  ) : (
+
+    <div
+      className="
+        flex
+        items-center
+        justify-center
+        w-full
+        h-full
+        text-sm
+        text-gray-400
+      "
+    >
+      No Image
+    </div>
+
+  )}
+
+</div>
 
               {/* CONTENT */}
               <div className="p-4">

@@ -14,11 +14,15 @@ export default function AddItemPage() {
   const [form, setForm] = useState({
     name: "",
     vendor: "",
-    category: "",
+
+    // NEW HIERARCHY
+    main_category: "",
+    sub_category: "",
+
     price: "",
     description: "",
 
-    // NEW
+    // MARKETPLACE URLS
     tokopedia_url: "",
     shopee_url: "",
     whatsapp_url: "",
@@ -29,8 +33,9 @@ export default function AddItemPage() {
 
   function handleChange(
     e: React.ChangeEvent<
-      HTMLInputElement |
-      HTMLTextAreaElement
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement
     >
   ) {
     setForm({
@@ -118,8 +123,12 @@ export default function AddItemPage() {
             vendor:
               form.vendor,
 
-            category:
-              form.category,
+            // NEW
+            main_category:
+              form.main_category,
+
+            sub_category:
+              form.sub_category,
 
             price: Number(
               form.price
@@ -128,7 +137,7 @@ export default function AddItemPage() {
             description:
               form.description,
 
-            // NEW
+            // MARKETPLACE URLS
             tokopedia_url:
               form.tokopedia_url,
 
@@ -162,7 +171,10 @@ export default function AddItemPage() {
     setForm({
       name: "",
       vendor: "",
-      category: "",
+
+      main_category: "",
+      sub_category: "",
+
       price: "",
       description: "",
 
@@ -202,6 +214,7 @@ export default function AddItemPage() {
           className="space-y-4"
         >
 
+          {/* ITEM NAME */}
           <input
             name="name"
             placeholder="Item Name"
@@ -219,6 +232,7 @@ export default function AddItemPage() {
             "
           />
 
+          {/* VENDOR */}
           <input
             name="vendor"
             placeholder="Vendor"
@@ -236,10 +250,47 @@ export default function AddItemPage() {
             "
           />
 
-          <input
-            name="category"
-            placeholder="Category"
-            value={form.category}
+          {/* MAIN CATEGORY */}
+          <select
+            name="main_category"
+            value={form.main_category}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                main_category:
+                  e.target.value,
+                sub_category: "",
+              })
+            }
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+              outline-none
+              focus:border-black
+            "
+          >
+
+            <option value="">
+              Select Main Category
+            </option>
+
+            <option value="Main Material">
+              Main Material
+            </option>
+
+            <option value="Asset">
+              Asset
+            </option>
+
+          </select>
+
+          {/* SUB CATEGORY */}
+          <select
+            name="sub_category"
+            value={form.sub_category}
             onChange={handleChange}
             className="
               w-full
@@ -247,12 +298,48 @@ export default function AddItemPage() {
               p-4 rounded-xl
               bg-white
               text-black
-              placeholder:text-gray-400
               outline-none
               focus:border-black
             "
-          />
+          >
 
+            <option value="">
+              Select Sub Category
+            </option>
+
+            {form.main_category ===
+              "Main Material" && (
+              <>
+                <option value="Membrane">
+                  Membrane
+                </option>
+
+                <option value="Fixture">
+                  Fixture
+                </option>
+
+                <option value="Bone Graft">
+                  Bone Graft
+                </option>
+              </>
+            )}
+
+            {form.main_category ===
+              "Asset" && (
+              <>
+                <option value="Autoclave">
+                  Autoclave
+                </option>
+
+                <option value="Airmotor">
+                  Airmotor
+                </option>
+              </>
+            )}
+
+          </select>
+
+          {/* PRICE */}
           <input
             name="price"
             placeholder="Price"
@@ -271,6 +358,7 @@ export default function AddItemPage() {
             "
           />
 
+          {/* DESCRIPTION */}
           <textarea
             name="description"
             placeholder="Description"
@@ -289,8 +377,7 @@ export default function AddItemPage() {
             "
           />
 
-          {/* MARKETPLACE URLS */}
-
+          {/* TOKOPEDIA */}
           <input
             name="tokopedia_url"
             placeholder="Tokopedia URL"
@@ -305,6 +392,7 @@ export default function AddItemPage() {
             "
           />
 
+          {/* SHOPEE */}
           <input
             name="shopee_url"
             placeholder="Shopee URL"
@@ -319,6 +407,7 @@ export default function AddItemPage() {
             "
           />
 
+          {/* WHATSAPP */}
           <input
             name="whatsapp_url"
             placeholder="WhatsApp URL"
@@ -333,6 +422,7 @@ export default function AddItemPage() {
             "
           />
 
+          {/* OFFICIAL */}
           <input
             name="official_url"
             placeholder="Official URL"
@@ -347,6 +437,7 @@ export default function AddItemPage() {
             "
           />
 
+          {/* UPLOAD */}
           <div>
 
             <label
@@ -376,6 +467,7 @@ export default function AddItemPage() {
 
           </div>
 
+          {/* PREVIEW */}
           {form.image_urls
             .length > 0 && (
 
@@ -412,6 +504,7 @@ export default function AddItemPage() {
 
           )}
 
+          {/* BUTTON */}
           <button
             disabled={
               loading ||
