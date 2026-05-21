@@ -103,6 +103,7 @@ const [
 
   // GET FILTERS
 async function getFilters() {
+
   const { data, error } = await supabase
     .from("items")
     .select(`
@@ -117,25 +118,39 @@ async function getFilters() {
     return;
   }
 
-  // =========================
-  // HIERARCHY
-  // =========================
+  console.log("TOTAL DATA:", data?.length);
+
   const hierarchyMap = new Map<
     string,
     Set<string>
   >();
 
-  // =========================
-  // LEGACY CATEGORY
-  // =========================
   const legacySet = new Set<string>();
 
-  // =========================
-  // VENDOR
-  // =========================
   const vendorSet = new Set<string>();
 
-  data?.forEach((item: any) => {
+  data?.forEach((item: any, index) => {
+
+    const main = String(
+  item.main_category || ""
+)
+  .replace(/\s+/g, " ")
+  .trim();
+
+const sub = String(
+  item.sub_category || ""
+)
+  .replace(/\s+/g, " ")
+  .trim();
+
+    // DEBUG
+    console.log(
+      index,
+      "MAIN:",
+      main,
+      "SUB:",
+      sub
+    );
 
     // VENDOR
     if (item.vendor) {
@@ -144,35 +159,37 @@ async function getFilters() {
       );
     }
 
-    // MAIN CATEGORY
-    const main = String(
-      item.main_category || ""
-    ).trim();
-
-    // SUB CATEGORY
-    const sub = String(
-      item.sub_category || ""
-    ).trim();
-
-    // CREATE MAIN
+    // CATEGORY
     if (main !== "") {
 
       if (!hierarchyMap.has(main)) {
+
+        console.log(
+          "ADD MAIN:",
+          main
+        );
+
         hierarchyMap.set(
           main,
           new Set()
         );
       }
 
-      // ADD SUB
       if (sub !== "") {
+
+        console.log(
+          "ADD SUB:",
+          main,
+          sub
+        );
+
         hierarchyMap
           .get(main)
           ?.add(sub);
       }
     }
 
-    // LEGACY CATEGORY
+    // LEGACY
     if (item.category) {
       legacySet.add(
         item.category.trim()
@@ -181,47 +198,65 @@ async function getFilters() {
 
   });
 
-  // =========================
-  // CONVERT MAP -> OBJECT
-  // =========================
-  const hierarchyObject: Record<
-    string,
-    string[]
-  > = {};
+  // CONVERT
+const hierarchyObject: Record<
+  string,
+  string[]
+> = {};
 
-  hierarchyMap.forEach(
-    (subs, main) => {
+// MAIN + SUB
+hierarchyMap.forEach(
+  (subs, main) => {
 
-      hierarchyObject[main] =
-        Array.from(subs).sort();
+    hierarchyObject[main] =
+      Array.from(subs).sort();
 
-    }
-  );
-
-  console.log(
-    "HIERARCHY OBJECT",
-    hierarchyObject
-  );
-
-  // SAVE STATE
-  setHierarchicalCategories(
-    hierarchyObject
-  );
-
-   console.log(
-  "TOTAL MAIN CATEGORY:",
-  Object.keys(hierarchyObject).length
+  }
 );
 
-  setCategories([
-    "All",
-    ...Array.from(legacySet).sort(),
-  ]);
+// LEGACY CATEGORY
+Array.from(legacySet).forEach(
+  (cat) => {
 
-  setVendors([
-    "All",
-    ...Array.from(vendorSet).sort(),
-  ]);
+    // skip all
+    if (!cat) return;
+
+    // kalau category lama
+    // BELUM ADA di hierarchy
+    const alreadyExists =
+      Object.entries(
+        hierarchyObject
+      ).some(
+        ([main, subs]) =>
+          cat === main ||
+          subs.includes(cat) ||
+          cat.startsWith(main)
+      );
+
+    // masukkan sebagai
+    // MAIN CATEGORY BARU
+    if (!alreadyExists) {
+
+      hierarchyObject[cat] = [];
+
+    }
+
+  }
+);
+
+console.log(
+  "FINAL HIERARCHY",
+  hierarchyObject
+);
+
+setHierarchicalCategories(
+  hierarchyObject
+);
+
+setVendors([
+  "All",
+  ...Array.from(vendorSet).sort(),
+]);
 }
 
   // GET ITEMS
@@ -526,9 +561,40 @@ function toggleCategory(
       </div>
 
       {/* HIERARCHICAL CATEGORY */}
-      {Object.entries(
-        hierarchicalCategories
-      ).map(([main, subs]) => (
+{Object.entries(hierarchicalCategories)
+
+  .filter(([main, subs]) => {
+
+    // SEARCH MAIN
+    const mainMatch =
+      main
+        .toLowerCase()
+        .includes(
+          catSearch.toLowerCase()
+        );
+
+    // SEARCH SUB
+    const subMatch =
+      subs.some((sub) =>
+        sub
+          .toLowerCase()
+          .includes(
+            catSearch.toLowerCase()
+          )
+      );
+
+    return (
+      mainMatch ||
+      subMatch ||
+      catSearch === ""
+    );
+  })
+
+  .sort(([a], [b]) =>
+    a.localeCompare(b)
+  )
+
+  .map(([main, subs]) => (
         <div
           key={main}
           className="border-b"
@@ -584,7 +650,11 @@ function toggleCategory(
     )}
 
     {/* SUB CATEGORY */}
-    {subs.map((sub) => (
+    {subs
+  .sort((a, b) =>
+    a.localeCompare(b)
+  )
+  .map((sub) => (
                 <div
                   key={sub}
                   onClick={() => {
@@ -617,7 +687,7 @@ function toggleCategory(
             </div>
           )}
 
-        </div>
+                </div>
       ))}
 
     </div>
