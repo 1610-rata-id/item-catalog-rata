@@ -33,7 +33,17 @@ export default function EditItemPage() {
   const [form, setForm] = useState({
     item_name: "",
     vendor: "",
-    category: "",
+
+    // CATEGORY
+    main_category: "",
+    sub_category: "",
+
+    // MARKETPLACE URLS
+    tokopedia_url: "",
+    shopee_url: "",
+    whatsapp_url: "",
+    official_url: "",
+
     price: "",
     description: "",
     image_urls: [] as string[],
@@ -116,12 +126,31 @@ export default function EditItemPage() {
       item_name:
         data.item_name || "",
 
-      vendor: data.vendor || "",
+      vendor:
+        data.vendor || "",
 
-      category:
-        data.category || "",
+      // CATEGORY
+      main_category:
+        data.main_category || "",
 
-      price: data.price || "",
+      sub_category:
+        data.sub_category || "",
+
+      // MARKETPLACE URLS
+      tokopedia_url:
+        data.tokopedia_url || "",
+
+      shopee_url:
+        data.shopee_url || "",
+
+      whatsapp_url:
+        data.whatsapp_url || "",
+
+      official_url:
+        data.official_url || "",
+
+      price:
+        data.price || "",
 
       description:
         data.description || "",
@@ -132,14 +161,17 @@ export default function EditItemPage() {
       item_code:
         data.item_code || "",
 
-      UOM: data.UOM || "",
+      UOM:
+        data.UOM || "",
 
       Manufacture:
         data.Manufacture || "",
 
-      type: data.type || "",
+      type:
+        data.type || "",
 
-      Term: data.Term || "",
+      Term:
+        data.Term || "",
 
       Remarks:
         data.Remarks || "",
@@ -162,10 +194,28 @@ export default function EditItemPage() {
           item_name:
             form.item_name,
 
-          vendor: form.vendor,
+          vendor:
+            form.vendor,
 
-          category:
-            form.category,
+          // CATEGORY
+          main_category:
+            form.main_category,
+
+          sub_category:
+            form.sub_category,
+
+          // MARKETPLACE URLS
+          tokopedia_url:
+            form.tokopedia_url,
+
+          shopee_url:
+            form.shopee_url,
+
+          whatsapp_url:
+            form.whatsapp_url,
+
+          official_url:
+            form.official_url,
 
           price: Number(
             form.price
@@ -175,7 +225,7 @@ export default function EditItemPage() {
             form.description,
 
           image_url:
-            form.image_urls[0] || "",
+            form.image_urls[0] || null,
 
           image_urls:
             form.image_urls,
@@ -183,14 +233,17 @@ export default function EditItemPage() {
           item_code:
             form.item_code,
 
-          UOM: form.UOM,
+          UOM:
+            form.UOM,
 
           Manufacture:
             form.Manufacture,
 
-          type: form.type,
+          type:
+            form.type,
 
-          Term: form.Term,
+          Term:
+            form.Term,
 
           Remarks:
             form.Remarks,
@@ -274,6 +327,7 @@ export default function EditItemPage() {
           className="space-y-5"
         >
 
+          {/* ITEM NAME */}
           <input
             name="item_name"
             placeholder="Item Name"
@@ -287,6 +341,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* VENDOR */}
           <input
             name="vendor"
             placeholder="Vendor"
@@ -300,19 +355,107 @@ export default function EditItemPage() {
             "
           />
 
-          <input
-            name="category"
-            placeholder="Category"
-            value={form.category}
-            onChange={handleChange}
-            className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
-            "
-          />
+          {/* MAIN CATEGORY */}
+          <select
+            name="main_category"
+            value={form.main_category}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                main_category:
+                  e.target.value,
 
+                sub_category: "",
+              })
+            }
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+              outline-none
+              focus:border-black
+            "
+          >
+
+            <option value="">
+              Select Main Category
+            </option>
+
+            <option value="Main Material">
+              Main Material
+            </option>
+
+            <option value="Asset">
+              Asset
+            </option>
+
+          </select>
+
+          {/* SUB CATEGORY */}
+          <select
+            name="sub_category"
+            value={form.sub_category}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                sub_category:
+                  e.target.value,
+              })
+            }
+            className="
+              w-full
+              border border-gray-300
+              p-4 rounded-xl
+              bg-white
+              text-black
+              outline-none
+              focus:border-black
+            "
+          >
+
+            <option value="">
+              Select Sub Category
+            </option>
+
+            {form.main_category ===
+              "Main Material" && (
+              <>
+                <option value="Membrane">
+                  Membrane
+                </option>
+
+                <option value="Fixture">
+                  Fixture
+                </option>
+
+                <option value="Prosthetic">
+                  Prosthetic
+                </option>
+
+                <option value="Bone Graft">
+                  Bone Graft
+                </option>
+              </>
+            )}
+
+            {form.main_category ===
+              "Asset" && (
+              <>
+                <option value="Autoclave">
+                  Autoclave
+                </option>
+
+                <option value="Implant Motor">
+                  Implant Motor
+                </option>
+              </>
+            )}
+
+          </select>
+
+          {/* PRICE */}
           <input
             name="price"
             placeholder="Price"
@@ -327,6 +470,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* ITEM CODE */}
           <input
             name="item_code"
             placeholder="Item Code"
@@ -340,6 +484,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* UOM */}
           <input
             name="UOM"
             placeholder="UOM"
@@ -353,6 +498,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* MANUFACTURE */}
           <input
             name="Manufacture"
             placeholder="Manufacture"
@@ -368,6 +514,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* TYPE */}
           <input
             name="type"
             placeholder="Type"
@@ -381,6 +528,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* TERM */}
           <input
             name="Term"
             placeholder="Term"
@@ -394,6 +542,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* REMARKS */}
           <input
             name="Remarks"
             placeholder="Remarks"
@@ -406,6 +555,79 @@ export default function EditItemPage() {
               placeholder:text-gray-500
             "
           />
+
+          {/* MARKETPLACE URLS */}
+          <div className="pt-4">
+
+            <h2 className="text-xl font-bold text-black mb-4">
+              Marketplace Links
+            </h2>
+
+            <div className="space-y-4">
+
+              <input
+                name="tokopedia_url"
+                placeholder="Tokopedia URL"
+                value={
+                  form.tokopedia_url
+                }
+                onChange={handleChange}
+                className="
+                  w-full border p-4
+                  rounded-xl
+                  text-black
+                  placeholder:text-gray-500
+                "
+              />
+
+              <input
+                name="shopee_url"
+                placeholder="Shopee URL"
+                value={
+                  form.shopee_url
+                }
+                onChange={handleChange}
+                className="
+                  w-full border p-4
+                  rounded-xl
+                  text-black
+                  placeholder:text-gray-500
+                "
+              />
+
+              <input
+                name="whatsapp_url"
+                placeholder="WhatsApp URL"
+                value={
+                  form.whatsapp_url
+                }
+                onChange={handleChange}
+                className="
+                  w-full border p-4
+                  rounded-xl
+                  text-black
+                  placeholder:text-gray-500
+                "
+              />
+
+              <input
+                name="official_url"
+                placeholder="Official Website URL"
+                value={
+                  form.official_url
+                }
+                onChange={handleChange}
+                className="
+                  w-full border p-4
+                  rounded-xl
+                  text-black
+                  placeholder:text-gray-500
+                "
+              />
+
+            </div>
+
+          </div>
 
           {/* UPLOAD MULTIPLE IMAGES */}
           <div>
@@ -475,17 +697,17 @@ export default function EditItemPage() {
                   >
 
                     <Image
-  src={url}
-  alt="Item Image"
-  width={300}
-  height={300}
-  className="
-    w-full h-32
-    object-cover
-    rounded-2xl
-    border
-  "
-/>
+                      src={url}
+                      alt="Item Image"
+                      width={300}
+                      height={300}
+                      className="
+                        w-full h-32
+                        object-cover
+                        rounded-2xl
+                        border
+                      "
+                    />
 
                     <button
                       type="button"
@@ -523,6 +745,7 @@ export default function EditItemPage() {
             </div>
           )}
 
+          {/* DESCRIPTION */}
           <textarea
             name="description"
             placeholder="Description"
@@ -538,6 +761,7 @@ export default function EditItemPage() {
             "
           />
 
+          {/* SUBMIT */}
           <button
             disabled={saving}
             className="

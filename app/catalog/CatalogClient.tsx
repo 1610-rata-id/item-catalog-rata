@@ -21,8 +21,20 @@ export default function Catalog() {
 
   // NEW
   const [categories, setCategories] = useState<
-    string[]
-  >([]);
+  string[]
+>([]);
+
+const [
+  hierarchicalCategories,
+  setHierarchicalCategories,
+] = useState<
+  Record<string, string[]>
+>({});
+
+const [
+  expandedCategory,
+  setExpandedCategory,
+] = useState<string | null>(null);
 
   const [vendors, setVendors] = useState<
     string[]
@@ -90,38 +102,127 @@ export default function Catalog() {
   );
 
   // GET FILTERS
-  async function getFilters() {
-    const { data, error } = await supabase
-      .from("items")
-      .select("category, vendor");
+async function getFilters() {
+  const { data, error } = await supabase
+    .from("items")
+    .select(`
+      category,
+      vendor,
+      main_category,
+      sub_category
+    `);
 
-    if (error) {
-      console.error(error);
-      return;
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // =========================
+  // HIERARCHY
+  // =========================
+  const hierarchyMap = new Map<
+    string,
+    Set<string>
+  >();
+
+  // =========================
+  // LEGACY CATEGORY
+  // =========================
+  const legacySet = new Set<string>();
+
+  // =========================
+  // VENDOR
+  // =========================
+  const vendorSet = new Set<string>();
+
+  data?.forEach((item: any) => {
+
+    // VENDOR
+    if (item.vendor) {
+      vendorSet.add(
+        item.vendor.trim()
+      );
     }
 
-    const uniqueCategories = [
-      "All",
-      ...new Set(
-        data
-          ?.map((i) => i.category)
-          .filter(Boolean)
-      ),
-    ];
+    // MAIN CATEGORY
+    const main = String(
+      item.main_category || ""
+    ).trim();
 
-    const uniqueVendors = [
-      "All",
-      ...new Set(
-        data
-          ?.map((i) => i.vendor)
-          .filter(Boolean)
-      ),
-    ];
+    // SUB CATEGORY
+    const sub = String(
+      item.sub_category || ""
+    ).trim();
 
-    setCategories(uniqueCategories as string[]);
+    // CREATE MAIN
+    if (main !== "") {
 
-    setVendors(uniqueVendors as string[]);
-  }
+      if (!hierarchyMap.has(main)) {
+        hierarchyMap.set(
+          main,
+          new Set()
+        );
+      }
+
+      // ADD SUB
+      if (sub !== "") {
+        hierarchyMap
+          .get(main)
+          ?.add(sub);
+      }
+    }
+
+    // LEGACY CATEGORY
+    if (item.category) {
+      legacySet.add(
+        item.category.trim()
+      );
+    }
+
+  });
+
+  // =========================
+  // CONVERT MAP -> OBJECT
+  // =========================
+  const hierarchyObject: Record<
+    string,
+    string[]
+  > = {};
+
+  hierarchyMap.forEach(
+    (subs, main) => {
+
+      hierarchyObject[main] =
+        Array.from(subs).sort();
+
+    }
+  );
+
+  console.log(
+    "HIERARCHY OBJECT",
+    hierarchyObject
+  );
+
+  // SAVE STATE
+  setHierarchicalCategories(
+    hierarchyObject
+  );
+
+   console.log(
+  "TOTAL MAIN CATEGORY:",
+  Object.keys(hierarchyObject).length
+);
+
+  setCategories([
+    "All",
+    ...Array.from(legacySet).sort(),
+  ]);
+
+  setVendors([
+    "All",
+    ...Array.from(vendorSet).sort(),
+  ]);
+}
 
   // GET ITEMS
   async function getItems() {
@@ -148,12 +249,13 @@ export default function Catalog() {
 }
 
   // CATEGORY
-  if (selectedCategory !== "All") {
-    query = query.eq(
-      "category",
-      selectedCategory
-    );
-  }
+if (selectedCategory !== "All") {
+
+  query = query.or(
+    `category.eq.${selectedCategory},main_category.eq.${selectedCategory},sub_category.eq.${selectedCategory}`
+  );
+
+}
 
   // VENDOR
   if (selectedVendor !== "All") {
@@ -166,6 +268,10 @@ export default function Catalog() {
   // PAGINATION
   query = query.range(from, to);
 
+  console.log(
+  "SELECTED CATEGORY:",
+  selectedCategory
+);
   const {
     data,
     error,
@@ -237,6 +343,16 @@ export default function Catalog() {
     setSelectedCategory(value);
     setPage(1);
   }
+
+function toggleCategory(
+  main: string
+) {
+  setExpandedCategory(
+    expandedCategory === main
+      ? null
+      : main
+  );
+}
 
   function handleVendorChange(
     value: string
@@ -357,72 +473,157 @@ export default function Catalog() {
           </button>
 
           {/* CATEGORY */}
-          <div
-            ref={catRef}
-            className="relative"
+<div
+  ref={catRef}
+  className="relative"
+>
+
+  <button
+    onClick={() =>
+      setShowCategory(
+        !showCategory
+      )
+    }
+    className="hover:text-red-600 transition"
+  >
+    Category ▾
+  </button>
+
+  {showCategory && (
+    <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
+
+      <input
+        placeholder="Search..."
+        value={catSearch}
+        onChange={(e) =>
+          setCatSearch(
+            e.target.value
+          )
+        }
+        className="w-full p-3 border-b outline-none"
+      />
+
+      {/* ALL */}
+      <div
+        onClick={() => {
+          handleCategoryChange(
+            "All"
+          );
+
+          setShowCategory(false);
+        }}
+        className={`
+          px-4 py-3 cursor-pointer transition
+          hover:bg-gray-100 border-b
+          ${
+            selectedCategory === "All"
+              ? "bg-red-50 text-red-600 font-semibold"
+              : ""
+          }
+        `}
+      >
+        All
+      </div>
+
+      {/* HIERARCHICAL CATEGORY */}
+      {Object.entries(
+        hierarchicalCategories
+      ).map(([main, subs]) => (
+        <div
+          key={main}
+          className="border-b"
+        >
+
+          {/* MAIN */}
+          <button
+            onClick={() =>
+              toggleCategory(main)
+            }
+            className="
+              w-full
+              flex
+              justify-between
+              items-center
+              px-4 py-3
+              hover:bg-gray-50
+              transition
+              font-semibold
+            "
           >
+            <span>{main}</span>
 
-            <button
-              onClick={() =>
-                setShowCategory(
-                  !showCategory
-                )
-              }
-              className="hover:text-red-600 transition"
-            >
-              Category ▾
-            </button>
+            <span>
+              {expandedCategory === main
+                ? "−"
+                : "+"}
+            </span>
+          </button>
 
-            {showCategory && (
-              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
+          {/* SUB */}
+{expandedCategory === main && (
+  <div className="pb-2">
 
-                <input
-                  placeholder="Search..."
-                  value={catSearch}
-                  onChange={(e) =>
-                    setCatSearch(
-                      e.target.value
-                    )
-                  }
-                  className="w-full p-3 border-b outline-none"
-                />
+    {/* EMPTY SUB */}
+    {subs.length === 0 && (
+      <div
+        onClick={() => {
+          handleCategoryChange(main);
 
-                {categories
-                  .filter((c) =>
-                    c
-                      ?.toLowerCase()
-                      .includes(
-                        catSearch.toLowerCase()
-                      )
-                  )
-                  .map((cat) => (
-                    <div
-                      key={cat}
-                      onClick={() => {
-                        handleCategoryChange(
-                          cat
-                        );
+          setShowCategory(false);
+        }}
+        className="
+          px-8 py-2
+          text-sm
+          text-gray-500
+          cursor-pointer
+          hover:bg-gray-100
+        "
+      >
+        View All
+      </div>
+    )}
 
-                        setShowCategory(
-                          false
-                        );
-                      }}
-                      className={`
-                        px-4 py-3 cursor-pointer transition
-                        hover:bg-gray-100
-                        ${
-                          selectedCategory === cat
-                            ? "bg-red-50 text-red-600 font-semibold"
-                            : ""
-                        }
-                      `}
-                    >
-                      {cat}
-                    </div>
-                  ))}
-              </div>
-            )}
-          </div>
+    {/* SUB CATEGORY */}
+    {subs.map((sub) => (
+                <div
+                  key={sub}
+                  onClick={() => {
+
+                    handleCategoryChange(
+                      sub
+                    );
+
+                    setShowCategory(
+                      false
+                    );
+                  }}
+                  className={`
+                    px-8 py-2
+                    cursor-pointer
+                    text-sm
+                    hover:bg-gray-100
+                    transition
+                    ${
+                      selectedCategory === sub
+                        ? "bg-red-50 text-red-600 font-medium"
+                        : "text-gray-600"
+                    }
+                  `}
+                >
+                  └ {sub}
+                </div>
+              ))}
+
+            </div>
+          )}
+
+        </div>
+      ))}
+
+    </div>
+  )}
+
+</div>
 
           {/* VENDOR */}
           <div
@@ -1050,7 +1251,7 @@ export default function Catalog() {
 
                   <h2 className="font-bold text-2xl mb-5">
                     Description
-                  </h2>
+                  </h2> 
 
                   <div className="whitespace-pre-line text-gray-700 leading-8">
                     {selectedItem.description ||
