@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import PublicCatalogClient from "./PublicCatalogClient";
 
 export default function Page() {
-  return <PublicCatalogClient />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PublicCatalogClient />
+    </Suspense>
+  );
 }
