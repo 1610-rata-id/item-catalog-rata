@@ -993,43 +993,113 @@ function toggleCategory(
       )}
 
       {/* PAGINATION */}
-      <div className="flex justify-center items-center gap-4 pb-10 flex-wrap">
+<div className="flex justify-center items-center gap-2 pb-14 flex-wrap">
 
-        <button
-          disabled={page === 1}
-          onClick={() =>
-            setPage(page - 1)
-          }
-          className="
-            px-5 py-2 rounded-xl border
-            bg-white hover:bg-gray-100
-            disabled:opacity-50
-          "
+  {/* PREVIOUS */}
+  <button
+    disabled={page === 1}
+    onClick={() =>
+      setPage(page - 1)
+    }
+    className="
+      px-4 py-2 rounded-xl border
+      bg-white hover:bg-gray-100
+      disabled:opacity-40
+      transition
+    "
+  >
+    ←
+  </button>
+
+  {/* PAGE NUMBERS */}
+  {Array.from(
+    { length: totalPages },
+    (_, i) => i + 1
+  )
+
+    // LIMIT BUTTONS
+    .filter((p) => {
+
+      // ALWAYS SHOW
+      if (
+        p === 1 ||
+        p === totalPages
+      ) {
+        return true;
+      }
+
+      // SHOW AROUND CURRENT PAGE
+      return (
+        p >= page - 2 &&
+        p <= page + 2
+      );
+    })
+
+    .map((p, index, arr) => {
+
+      // ADD ...
+      const prev =
+        arr[index - 1];
+
+      const showDots =
+        prev &&
+        p - prev > 1;
+
+      return (
+        <div
+          key={p}
+          className="flex items-center"
         >
-          Previous
-        </button>
 
-        <div className="px-4 py-2 font-semibold">
-          Page {page} / {totalPages || 1}
+          {showDots && (
+            <span className="px-1">
+              ...
+            </span>
+          )}
+
+          <button
+            onClick={() =>
+              setPage(p)
+            }
+            className={`
+              min-w-[42px]
+              h-[42px]
+              rounded-xl
+              transition
+              border
+              ${
+                page === p
+                  ? "bg-red-500 text-white border-red-500 shadow-lg"
+                  : "bg-white hover:bg-gray-100"
+              }
+            `}
+          >
+            {p}
+          </button>
+
         </div>
+      );
+    })}
 
-        <button
-          disabled={
-            page >= totalPages
-          }
-          onClick={() =>
-            setPage(page + 1)
-          }
-          className="
-            px-5 py-2 rounded-xl border
-            bg-white hover:bg-gray-100
-            disabled:opacity-50
-          "
-        >
-          Next
-        </button>
+  {/* NEXT */}
+  <button
+    disabled={
+      page >= totalPages
+    }
+    onClick={() =>
+      setPage(page + 1)
+    }
+    className="
+      px-4 py-2 rounded-xl border
+      bg-white hover:bg-gray-100
+      disabled:opacity-40
+      transition
+    "
+  >
+    →
+  </button>
 
-      </div>
+</div>
 
       {/* MODAL DETAIL */}
       {selectedItem && (
