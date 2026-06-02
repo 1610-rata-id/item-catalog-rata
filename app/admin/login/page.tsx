@@ -37,43 +37,33 @@ export default function AdminLoginPage() {
     }
 
     router.push(
-      "/admin/dashboard"
+      "/catalog"
     );
   }
 
   return (
     <main
-      className="
-        relative
-        min-h-screen
-        overflow-hidden
-        bg-[#f7f7f8]
-        flex
-        items-center
-        justify-center
-        px-6
-        py-10
-      "
-    >
-      {/* BACKGROUND GLOW */}
-      <div
-        className="
-          absolute
-          inset-0
-          bg-[radial-gradient(circle_at_top_left,rgba(255,0,0,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(0,0,0,0.04),transparent_30%)]
-        "
-      />
-
-      {/* GRID */}
-      <div
-        className="
-          absolute
-          inset-0
-          opacity-[0.03]
-          bg-[linear-gradient(to_right,#000_1px,transparent_1px),linear-gradient(to_bottom,#000_1px,transparent_1px)]
-          bg-[size:42px_42px]
-        "
-      />
+  className="
+    relative
+    min-h-screen
+    overflow-hidden
+    flex
+    items-center
+    justify-center
+  "
+>
+      {/* BACKGROUND */}
+<img
+  src="/hero-v2.jpg"
+  alt="Background"
+  className="
+    absolute
+    inset-0
+    w-full
+    h-full
+    object-cover
+  "
+/>
 
       {/* CARD */}
       <div
@@ -85,31 +75,14 @@ export default function AdminLoginPage() {
           overflow-hidden
           rounded-[38px]
           border
-          border-white/60
-          bg-white/80
+          border-cyan-300/20
+          bg-black/35
           backdrop-blur-xl
-          shadow-[0_20px_80px_rgba(0,0,0,0.08)]
+border-cyan-300/20
+shadow-[0_0_60px_rgba(0,255,255,0.15)]
         "
       >
-        {/* TOP LOGO */}
-<div className="p-5 pb-0">
-  <div
-    className="
-      flex
-      items-center
-      justify-center
-      rounded-[28px]
-      bg-gradient-to-br
-      from-[#fafafa]
-      via-white
-      to-[#f3f6ff]
-      border
-      border-[#f0f0f0]
-      h-[180px]
-      overflow-hidden
-      relative
-    "
-  >
+
     {/* SOFT GLOW */}
     <div
       className="
@@ -122,19 +95,6 @@ export default function AdminLoginPage() {
       "
     />
 
-    <img
-      src="/logo-red.png"
-      alt="Logo"
-      className="
-        relative
-        z-10
-        w-[260px]
-        object-contain
-      "
-    />
-  </div>
-</div>
-
         {/* CONTENT */}
         <div className="px-8 pt-10 pb-8">
           {/* TITLE */}
@@ -145,7 +105,7 @@ export default function AdminLoginPage() {
                 font-semibold
                 uppercase
                 tracking-[0.28em]
-                text-red-500
+                text-cyan-300
               "
             >
               ITEM CATALOG SYSTEM
@@ -158,7 +118,7 @@ export default function AdminLoginPage() {
                 leading-none
                 font-bold
                 tracking-tight
-                text-[#111111]
+                text-white
               "
             >
               Admin Login
@@ -172,7 +132,7 @@ export default function AdminLoginPage() {
                 text-gray-500
               "
             >
-              Masuk untuk mengakses dashboard
+              Masuk untuk mengakses katalog internal
             </p>
           </div>
 
@@ -189,7 +149,7 @@ export default function AdminLoginPage() {
                   block
                   text-[15px]
                   font-medium
-                  text-gray-700
+                  text-gray-200
                 "
               >
                 Email Address
@@ -208,12 +168,12 @@ export default function AdminLoginPage() {
                   w-full
                   rounded-[22px]
                   border
-                  border-[#e7e9ee]
-                  bg-[#f5f7fd]
+                  border-cyan-300/30
+                  bg-black/20
                   px-5
                   py-5
                   text-[16px]
-                  text-black
+                  text-white
                   outline-none
                   transition-all
                   duration-300
@@ -234,7 +194,7 @@ export default function AdminLoginPage() {
                   block
                   text-[15px]
                   font-medium
-                  text-gray-700
+                  text-gray-200
                 "
               >
                 Password
@@ -253,12 +213,12 @@ export default function AdminLoginPage() {
                   w-full
                   rounded-[22px]
                   border
-                  border-[#e7e9ee]
-                  bg-[#f5f7fd]
+                  border-cyan-300/30
+                  bg-black/20
                   px-5
                   py-5
                   text-[16px]
-                  text-black
+                  text-white
                   outline-none
                   transition-all
                   duration-300
@@ -280,13 +240,13 @@ export default function AdminLoginPage() {
                 w-full
                 rounded-[22px]
                 bg-gradient-to-r
-                from-[#ff3131]
-                to-[#ff000f]
+                from-cyan-400
+                to-cyan-300
                 py-5
                 text-[17px]
                 font-semibold
                 text-white
-                shadow-[0_10px_30px_rgba(255,0,0,0.22)]
+                shadow-[0_10px_30px_rgba(0,255,255,0.25)]
                 transition-all
                 duration-300
                 hover:scale-[1.01]

@@ -2,12 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from "@/lib/supabase";
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -15,9 +10,12 @@ function formatRupiah(number: number) {
 
 export default function Catalog() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+const searchParams = useSearchParams();
 
-  const [items, setItems] = useState<any[]>([]);
+const [authLoading, setAuthLoading] =
+  useState(true);
+
+const [items, setItems] = useState<any[]>([]);
 
   // NEW
   const [categories, setCategories] = useState<
@@ -100,6 +98,24 @@ const [
   const totalPages = Math.ceil(
     totalItems / ITEMS_PER_PAGE
   );
+
+// AUTH CHECK
+useEffect(() => {
+  async function checkUser() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.replace("/admin/login");
+      return;
+    }
+
+    setAuthLoading(false);
+  }
+
+  checkUser();
+}, [router]);
 
   // GET FILTERS
 async function getFilters() {
@@ -481,8 +497,16 @@ function toggleCategory(
       );
   }, []);
 
+  if (authLoading) {
   return (
-    <main className="bg-[#f8f8f7] min-h-screen font-[Poppins] text-black">
+    <main className="min-h-screen flex items-center justify-center">
+      Checking authentication...
+    </main>
+  );
+}
+
+return (
+  <main className="bg-[#f8f8f7] min-h-screen font-[Poppins] text-black">
 
       {/* HEADER */}
       <div className="sticky top-0 bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center z-50">
