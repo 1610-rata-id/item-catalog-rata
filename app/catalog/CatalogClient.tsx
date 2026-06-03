@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -10,6 +11,9 @@ function formatRupiah(number: number) {
 
 export default function Catalog() {
   const router = useRouter();
+const { role } =
+  useRequireAuth();
+
 const searchParams = useSearchParams();
 
 const [authLoading, setAuthLoading] =
@@ -788,24 +792,75 @@ return (
           </div>
 
           {/* SEARCH */}
-          <input
-            value={search}
-            onChange={(e) =>
-              handleSearch(
-                e.target.value
-              )
-            }
-            placeholder="Cari item..."
-            className="
-              px-5 py-2 rounded-full
-              border bg-white
-              outline-none
-              focus:ring-2 focus:ring-red-500
-              transition
-            "
-          />
+<input
+  value={search}
+  onChange={(e) =>
+    handleSearch(
+      e.target.value
+    )
+  }
+  placeholder="Cari item..."
+  className="
+    px-5 py-2 rounded-full
+    border bg-white
+    outline-none
+    focus:ring-2 focus:ring-red-500
+    transition
+  "
+/>
 
-        </div>
+{/* ADMIN MENU */}
+{role === "admin" && (
+  <>
+    <button
+      onClick={() =>
+        router.push(
+          "/admin/dashboard"
+        )
+      }
+      className="
+        px-4 py-2
+        rounded-full
+        bg-black
+        text-white
+      "
+    >
+      Dashboard
+    </button>
+
+    <button
+      onClick={() =>
+        router.push(
+          "/admin/add-item"
+        )
+      }
+      className="
+        px-4 py-2
+        rounded-full
+        border
+      "
+    >
+      Add Item
+    </button>
+  </>
+)}
+
+<button
+  onClick={async () => {
+    await supabase.auth.signOut();
+
+    router.push("/");
+  }}
+  className="
+    px-4 py-2
+    rounded-full
+    border
+  "
+>
+  Logout
+</button>
+
+</div>
       </div>
 
       {/* HERO BANNER */}

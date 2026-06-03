@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { supabase } from "@/lib/supabase";
 
 import {
@@ -15,6 +16,15 @@ import {
 } from "next/navigation";
 
 export default function EditItemPage() {
+
+  const {
+  loading: authLoading,
+  role,
+} = useRequireAuth([
+  "admin",
+  "procurement",
+]);
+
   const router = useRouter();
 
   const params = useParams();
@@ -265,16 +275,26 @@ export default function EditItemPage() {
   }
 
   useEffect(() => {
+  if (!authLoading) {
     getItem();
-  }, []);
-
-  if (loading) {
-    return (
-      <main className="p-10">
-        Loading...
-      </main>
-    );
   }
+}, [authLoading]);
+
+  if (authLoading) {
+  return (
+    <main className="min-h-screen flex items-center justify-center">
+      Checking authentication...
+    </main>
+  );
+}
+
+if (loading) {
+  return (
+    <main className="p-10">
+      Loading...
+    </main>
+  );
+}
 
   return (
     <main className="min-h-screen bg-[#f8f8f7] p-10">

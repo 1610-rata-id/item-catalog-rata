@@ -31,14 +31,29 @@ export default function AdminLoginPage() {
 
     setLoading(false);
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+if (error) {
+  alert(error.message);
+  return;
+}
 
-    router.push(
-      "/catalog"
-    );
+const { data: profile } =
+  await supabase
+    .from("profiles")
+    .select("role")
+    .eq("email", email)
+    .single();
+
+if (
+  profile?.role === "admin"
+) {
+  router.push(
+    "/admin/dashboard"
+  );
+} else {
+  router.push(
+    "/catalog"
+  );
+}
   }
 
   return (

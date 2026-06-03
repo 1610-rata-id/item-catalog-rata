@@ -3,8 +3,17 @@
 import Image from "next/image";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function AddItemPage() {
+  const {
+    loading: authLoading,
+    role,
+  } = useRequireAuth([
+    "admin",
+    "procurement",
+  ]);
+
   const [loading, setLoading] =
     useState(false);
 
@@ -186,6 +195,14 @@ export default function AddItemPage() {
       image_urls: [],
     });
   }
+
+  if (authLoading) {
+  return (
+    <main className="min-h-screen flex items-center justify-center">
+      Checking permissions...
+    </main>
+  );
+}
 
   return (
     <main className="min-h-screen bg-[#f5f5f5] p-10">

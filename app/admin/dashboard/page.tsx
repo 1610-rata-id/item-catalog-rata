@@ -4,6 +4,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
+import AdminSidebar from "@/app/components/admin/AdminSidebar";
+
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat(
@@ -14,12 +17,26 @@ function formatRupiah(number: number) {
 export default function AdminDashboard() {
   const router = useRouter();
 
+  const {
+    loading: authLoading,
+    role,
+  } = useRequireAuth([
+    "admin",
+    "procurement",
+  ]);
+
   const [loading, setLoading] =
     useState(true);
 
   const [items, setItems] = useState<
     any[]
   >([]);
+  
+  const [stats, setStats] = useState({
+  totalItems: 0,
+  totalVendors: 0,
+  totalCategories: 0,
+});
 
   const [search, setSearch] =
     useState("");
@@ -34,8 +51,38 @@ const ITEMS_PER_PAGE = 100;
     router.push("/admin/login");
   }
 
-  async function getItems() {
+  async function getStats() {
+  const { data } =
+    await supabase
+      .from("items")
+      .select(
+        "vendor, main_category, category"
+      );
 
+  const rows = data || [];
+
+  setStats({
+    totalItems: rows.length,
+
+    totalVendors: new Set(
+      rows
+        .map((i) => i.vendor)
+        .filter(Boolean)
+    ).size,
+
+    totalCategories: new Set(
+      rows
+        .map(
+          (i) =>
+            i.main_category ||
+            i.category
+        )
+        .filter(Boolean)
+    ).size,
+  });
+}
+
+  async function getItems() {
   const from =
     (page - 1) *
     ITEMS_PER_PAGE;
@@ -71,7 +118,30 @@ if (search.trim()) {
   return;
 }
 
-  setItems(data || []);
+  const allItems = data || [];
+
+setItems(allItems);
+
+setStats({
+  totalItems: allItems.length,
+
+  totalVendors: new Set(
+    allItems
+      .map((i) => i.vendor)
+      .filter(Boolean)
+  ).size,
+
+  totalCategories: new Set(
+    allItems
+      .map(
+        (i) =>
+          i.main_category ||
+          i.category
+      )
+      .filter(Boolean)
+  ).size,
+});
+
 }
 
   async function deleteItem(
@@ -109,11 +179,13 @@ if (search.trim()) {
     }
 
     setLoading(false);
-
+	
     getItems();
   }
 
   checkUser();
+
+getStats();
 
   // REALTIME
   const channel = supabase
@@ -144,152 +216,231 @@ if (search.trim()) {
     getItems();
   }, [search, page]);
 
-  if (loading) {
+  if (
+  loading ||
+  authLoading
+) {
     return (
-      <main className="p-10 text-black">
+      <main className="p-10 text-cyan-200">
         Checking auth...
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f8f7] p-10 text-black">
+    <main className="relative min-h-screen text-white">
 
-      <div className="max-w-7xl mx-auto">
+  <img
+    src="/hero-v2.jpg"
+    alt="background"
+    className="
+      absolute inset-0
+      w-full h-full
+      object-cover
+    "
+  />
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-10">
+  <div className="relative z-10 p-10">
 
-          <div>
+      <div className="max-w-[1800px] mx-auto px-8 flex gap-8">
+   <AdminSidebar />
 
-            <h1
-              className="
-                text-5xl font-bold
-                text-black
-              "
-            >
-              Admin Dashboard
-            </h1>
+<div className="flex-1">
 
-            <p
-              className="
-                text-gray-700
-                mt-2 text-lg
-              "
-            >
-              Manage catalog items
-            </p>
+        {/* HERO */}
+<div
+  className="
+    relative
+    overflow-hidden
+    rounded-[32px]
+    border border-cyan-300/20
+    bg-white/5
+    backdrop-blur-xl
+    mb-8
+    min-h-[340px]
+  "
+>
 
-          </div>
+  {/* Banner Background */}
+  <img
+    src="/admin-hero.png"
+    alt="banner"
+    className="
+      absolute
+      inset-0
+      w-full
+      h-full
+      object-cover
+      opacity-90
+    "
+  />
 
-          <div className="flex gap-4">
+  {/* Overlay */}
+  <div
+    className="
+      absolute inset-0
+      bg-gradient-to-r
+      from-[#031427]
+      via-[#031427]/80
+      to-transparent
+    "
+  />
 
-            <button
-              onClick={() =>
-                router.push(
-                  "/admin/add-item"
-                )
-              }
-              className="
-                bg-black text-white
-                px-6 py-3 rounded-xl
-                hover:opacity-90
-                transition
-                font-medium
-              "
-            >
-              + Add Item
-            </button>
+  {/* Content */}
+  <div className="relative z-10 p-10">
 
-            <button
-              onClick={() =>
-                router.push("/")
-              }
-              className="
-                border border-gray-400
-                bg-white
-                text-black
-                px-6 py-3 rounded-xl
-                hover:bg-gray-100
-                transition
-                font-medium
-              "
-            >
-              Back
-            </button>
+    <p
+      className="
+        uppercase
+        tracking-[6px]
+        text-cyan-300
+        text-sm
+      "
+    >
+      ITEM CATALOG SYSTEM
+    </p>
 
-            <button
-              onClick={handleLogout}
-              className="
-                border border-red-500
-                text-red-600
-                bg-white
-                px-6 py-3 rounded-xl
-                hover:bg-red-500
-                hover:text-white
-                transition
-                font-medium
-              "
-            >
-              Logout
-            </button>
+    <h1
+      className="
+        mt-4
+        text-7xl
+        font-bold
+        text-white
+      "
+    >
+      Admin Dashboard
+    </h1>
 
-          </div>
+    <p
+      className="
+        mt-3
+        text-white/70
+        text-lg
+      "
+    >
+      Manage Internal Catalog
+    </p>
 
-        </div>
+  </div>
+
+</div>
+
+        {/* STATS */}
+
+<div className="grid grid-cols-3 gap-6 mb-8">
+  <div
+    className="
+      rounded-[28px]
+      border border-cyan-300/20
+      bg-white/5
+      backdrop-blur-xl
+      p-6
+    "
+  >
+    <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
+      Total Items
+    </p>
+
+    <h2 className="text-4xl font-bold mt-2">
+      {stats.totalItems}
+    </h2>
+  </div>
+
+  <div
+    className="
+      rounded-[28px]
+      border border-cyan-300/20
+      bg-white/5
+      backdrop-blur-xl
+      p-6
+    "
+  >
+    <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
+      Vendors
+    </p>
+
+    <h2 className="text-4xl font-bold mt-2">
+      {stats.totalVendors}
+    </h2>
+  </div>
+
+  <div
+    className="
+      rounded-[28px]
+      border border-cyan-300/20
+      bg-white/5
+      backdrop-blur-xl
+      p-6
+    "
+  >
+    <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
+      Categories
+    </p>
+
+    <h2 className="text-4xl font-bold mt-2">
+      {stats.totalCategories}
+    </h2>
+  </div>
+
+</div>
 
         {/* SEARCH */}
-        <div className="mb-8">
 
-          <input
-            placeholder="Search item..."
-            value={search}
-            onChange={(e) =>
-              setSearch(
-                e.target.value
-              )
-            }
-            className="
-              w-full bg-white border
-              border-gray-300
-              rounded-2xl p-4
-              outline-none
-              text-black
-              placeholder:text-gray-500
-              focus:ring-2
-              focus:ring-black
-            "
-          />
-
-        </div>
+<div
+  className="
+    mb-8
+    rounded-[28px]
+    border border-cyan-300/20
+    bg-white/5
+    backdrop-blur-xl
+    p-5
+  "
+>
+  <input
+    placeholder="Search item..."
+    value={search}
+    onChange={(e) =>
+      setSearch(e.target.value)
+    }
+    className="
+      w-full
+      bg-transparent
+      text-white
+      text-lg
+      outline-none
+      placeholder:text-white/40
+    "
+  />
+</div>
 
         {/* TABLE */}
         <div
-          className="
-            bg-white rounded-3xl
-            shadow-lg overflow-hidden
-            border border-gray-200
-          "
-        >
+  className="
+    rounded-[32px]
+    border border-cyan-300/20
+    bg-white/5
+    backdrop-blur-xl
+    overflow-hidden
+  "
+>
 
           <div className="overflow-x-auto">
 
             <table className="w-full">
 
-              <thead className="bg-gray-100">
+              <thead className="bg-transparent">
 
                 <tr
                   className="
                     text-left
-                    text-black
+                    text-cyan-200
                   "
                 >
 
                   <th
                     className="
                       p-5 font-bold
-                      text-black
-                    "
+                      text-cyan-200                    "
                   >
                     Image
                   </th>
@@ -297,7 +448,7 @@ if (search.trim()) {
                   <th
                     className="
                       p-5 font-bold
-                      text-black
+                      text-cyan-200
                     "
                   >
                     Item Name
@@ -306,7 +457,7 @@ if (search.trim()) {
                   <th
                     className="
                       p-5 font-bold
-                      text-black
+                      text-cyan-200
                     "
                   >
                     Vendor
@@ -315,7 +466,7 @@ if (search.trim()) {
                   <th
                     className="
                       p-5 font-bold
-                      text-black
+                      text-cyan-200
                     "
                   >
                     Category
@@ -324,7 +475,7 @@ if (search.trim()) {
                   <th
                     className="
                       p-5 font-bold
-                      text-black
+                      text-cyan-200
                     "
                   >
                     Price
@@ -333,7 +484,7 @@ if (search.trim()) {
                   <th
                     className="
                       p-5 font-bold
-                      text-black
+                      text-cyan-200
                     "
                   >
                     Action
@@ -394,7 +545,7 @@ if (search.trim()) {
                     <td
                       className="
                         p-5 font-semibold
-                        text-black
+                        text-cyan-200
                       "
                     >
                       {
@@ -451,7 +602,7 @@ if (search.trim()) {
                           className="
                             px-4 py-2 rounded-xl
                             bg-gray-200
-                            text-black
+                            text-cyan-200
                             hover:bg-gray-300
                             transition
                             font-medium
@@ -492,7 +643,6 @@ if (search.trim()) {
 
         </div>
 
-      </div>
 {/* PAGINATION */}
 <div className="flex justify-center gap-4 mt-10">
 
@@ -527,6 +677,13 @@ if (search.trim()) {
   </button>
 
 </div>
-    </main>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
   );
 }
