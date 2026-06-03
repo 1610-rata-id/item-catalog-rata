@@ -6,6 +6,11 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import AdminSidebar from "@/app/components/admin/AdminSidebar";
+import {
+  Package,
+  Building2,
+  Tags,
+} from "lucide-react";
 
 
 function formatRupiah(number: number) {
@@ -328,6 +333,9 @@ getStats();
         {/* STATS */}
 
 <div className="grid grid-cols-3 gap-6 mb-8">
+
+  {/* TOTAL ITEMS */}
+
   <div
     className="
       rounded-[28px]
@@ -335,17 +343,51 @@ getStats();
       bg-white/5
       backdrop-blur-xl
       p-6
+
+      flex
+      justify-between
+      items-center
     "
   >
-    <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
-      Total Items
-    </p>
+    <div>
+      <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
+        Total Items
+      </p>
 
-    <h2 className="text-4xl font-bold mt-2">
-      {stats.totalItems}
-    </h2>
+      <h2
+        className="
+          text-5xl
+          font-bold
+          mt-3
+
+          text-white
+          drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]
+        "
+      >
+        {stats.totalItems}
+      </h2>
+    </div>
+
+    <div
+      className="
+        w-16 h-16
+        rounded-full
+        border border-cyan-300/20
+
+        flex
+        items-center
+        justify-center
+      "
+    >
+      <Package
+        size={28}
+        className="text-cyan-300"
+      />
+    </div>
   </div>
 
+  {/* VENDORS */}
+
   <div
     className="
       rounded-[28px]
@@ -353,17 +395,51 @@ getStats();
       bg-white/5
       backdrop-blur-xl
       p-6
+
+      flex
+      justify-between
+      items-center
     "
   >
-    <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
-      Vendors
-    </p>
+    <div>
+      <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
+        Vendors
+      </p>
 
-    <h2 className="text-4xl font-bold mt-2">
-      {stats.totalVendors}
-    </h2>
+      <h2
+        className="
+          text-5xl
+          font-bold
+          mt-3
+
+          text-white
+          drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]
+        "
+      >
+        {stats.totalVendors}
+      </h2>
+    </div>
+
+    <div
+      className="
+        w-16 h-16
+        rounded-full
+        border border-cyan-300/20
+
+        flex
+        items-center
+        justify-center
+      "
+    >
+      <Building2
+        size={28}
+        className="text-cyan-300"
+      />
+    </div>
   </div>
 
+  {/* CATEGORIES */}
+
   <div
     className="
       rounded-[28px]
@@ -371,15 +447,47 @@ getStats();
       bg-white/5
       backdrop-blur-xl
       p-6
+
+      flex
+      justify-between
+      items-center
     "
   >
-    <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
-      Categories
-    </p>
+    <div>
+      <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
+        Categories
+      </p>
 
-    <h2 className="text-4xl font-bold mt-2">
-      {stats.totalCategories}
-    </h2>
+      <h2
+        className="
+          text-5xl
+          font-bold
+          mt-3
+
+          text-white
+          drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]
+        "
+      >
+        {stats.totalCategories}
+      </h2>
+    </div>
+
+    <div
+      className="
+        w-16 h-16
+        rounded-full
+        border border-cyan-300/20
+
+        flex
+        items-center
+        justify-center
+      "
+    >
+      <Tags
+        size={28}
+        className="text-cyan-300"
+      />
+    </div>
   </div>
 
 </div>
@@ -393,9 +501,28 @@ getStats();
     border border-cyan-300/20
     bg-white/5
     backdrop-blur-xl
-    p-5
+    px-6 py-5
+
+    flex items-center gap-4
   "
 >
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="22"
+    height="22"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    className="text-cyan-300"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"
+    />
+  </svg>
+
   <input
     placeholder="Search item..."
     value={search}
@@ -403,10 +530,9 @@ getStats();
       setSearch(e.target.value)
     }
     className="
-      w-full
+      flex-1
       bg-transparent
       text-white
-      text-lg
       outline-none
       placeholder:text-white/40
     "
@@ -500,9 +626,10 @@ getStats();
                   <tr
                     key={item.id}
                     className="
-                      border-t
-                      hover:bg-gray-50
-                      transition
+                      border-t border-cyan-300/10
+                      hover:bg-cyan-400/5
+                      transition-all
+                      duration-300
                     "
                   >
 
@@ -529,13 +656,13 @@ getStats();
                             w-16 h-16
                             rounded-xl border
                             border-gray-300
-                            bg-gray-100
+                            bg-cyan-500/5
                             flex items-center
                             justify-center
-                            text-xs text-gray-500
+                            text-xs text-cyan-100/80
                           "
                         >
-                          No Image
+                          IMG
                         </div>
                       )}
 
@@ -545,7 +672,7 @@ getStats();
                     <td
                       className="
                         p-5 font-semibold
-                        text-cyan-200
+                        text-white-200
                       "
                     >
                       {
@@ -557,7 +684,7 @@ getStats();
                     <td
                       className="
                         p-5
-                        text-gray-800
+                        text-white-800
                         font-medium
                       "
                     >
@@ -568,7 +695,7 @@ getStats();
                     <td
                       className="
                         p-5
-                        text-gray-800
+                        text-white-800
                         font-medium
                       "
                     >
@@ -579,7 +706,8 @@ getStats();
                     <td
                       className="
                         p-5 font-bold
-                        text-green-700
+                        text-cyan-300
+drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]
                       "
                     >
                       Rp{" "}
@@ -600,13 +728,21 @@ getStats();
                             )
                           }
                           className="
-                            px-4 py-2 rounded-xl
-                            bg-gray-200
-                            text-cyan-200
-                            hover:bg-gray-300
-                            transition
-                            font-medium
-                          "
+px-5 py-2
+
+rounded-xl
+
+border
+border-cyan-400/30
+
+bg-cyan-500/10
+
+text-cyan-300
+
+hover:bg-cyan-500/20
+
+transition
+"
                         >
                           Edit
                         </button>
@@ -618,12 +754,21 @@ getStats();
                             )
                           }
                           className="
-                            px-4 py-2 rounded-xl
-                            bg-red-500 text-white
-                            hover:opacity-90
-                            transition
-                            font-medium
-                          "
+px-5 py-2
+
+rounded-xl
+
+border
+border-red-400/30
+
+bg-red-500/10
+
+text-red-300
+
+hover:bg-red-500/20
+
+transition
+"
                         >
                           Delete
                         </button>
