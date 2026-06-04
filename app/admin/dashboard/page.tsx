@@ -27,7 +27,6 @@ export default function AdminDashboard() {
     role,
   } = useRequireAuth([
     "admin",
-    "procurement",
   ]);
 
   const [loading, setLoading] =

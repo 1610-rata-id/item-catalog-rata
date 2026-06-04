@@ -49,10 +49,15 @@ if (
   router.push(
     "/admin/dashboard"
   );
-} else {
+} else if (
+  profile?.role === "inventory"
+) {
   router.push(
     "/catalog"
   );
+} else {
+  alert("Role tidak memiliki akses");
+  await supabase.auth.signOut();
 }
   }
 
