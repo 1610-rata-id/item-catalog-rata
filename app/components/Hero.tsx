@@ -124,13 +124,14 @@ export default function Hero() {
                 py-5
                 rounded-2xl
                 border
-                border-white/30
-                bg-white/5
+                border-cyan-300/70
+                bg-cyan-400/10
                 text-white
                 text-xl
                 font-medium
                 backdrop-blur-md
-                hover:bg-white/10
+                shadow-[0_0_30px_rgba(0,255,255,0.25)]
+                hover:scale-105
                 transition
               "
             >

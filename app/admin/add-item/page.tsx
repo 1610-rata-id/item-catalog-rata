@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { ArrowLeft } from "lucide-react";
 
 export default function AddItemPage() {
   const {
@@ -205,28 +206,72 @@ export default function AddItemPage() {
 }
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5] p-10">
+    <main className="relative min-h-screen text-white">
 
       <div
-        className="
-          max-w-2xl mx-auto
-          bg-white
-          p-8 rounded-3xl
-          shadow-xl
-          border border-gray-200
-        "
-      >
+  className="
+    max-w-5xl
+    mx-auto
 
-        <h1
-          className="
-            text-4xl font-bold
-            mb-8 text-black
-          "
-        >
-          Add New Item
-        </h1>
+    rounded-[32px]
 
-        <form
+    border
+    border-cyan-300/20
+
+    bg-[#051a2e]/80
+
+    backdrop-blur-xl
+
+    p-10
+
+    shadow-[0_0_40px_rgba(0,255,255,0.08)]
+  "
+>
+
+     <div className="flex items-start justify-between mb-8">
+
+  <div>
+    <h1 className="text-5xl font-bold text-white">
+      Add New Item
+    </h1>
+
+    <p className="text-cyan-300 mt-2">
+      Create New Catalog Item
+    </p>
+  </div>
+
+  <button
+    type="button"
+    onClick={() => window.history.back()}
+    className="
+      flex
+      items-center
+      gap-2
+
+      px-5
+      py-3
+
+      rounded-2xl
+
+      border
+      border-cyan-300/20
+
+      bg-white/5
+
+      text-cyan-300
+
+      hover:bg-cyan-500/10
+
+      transition
+    "
+  >
+    <ArrowLeft size={18} />
+    Back
+  </button>
+
+</div>
+
+                <form
           onSubmit={handleSubmit}
           className="space-y-4"
         >
@@ -238,15 +283,26 @@ export default function AddItemPage() {
             value={form.name}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              placeholder:text-gray-400
-              outline-none
-              focus:border-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* VENDOR */}
@@ -256,15 +312,26 @@ export default function AddItemPage() {
             value={form.vendor}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              placeholder:text-gray-400
-              outline-none
-              focus:border-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* MAIN CATEGORY */}
@@ -280,14 +347,26 @@ export default function AddItemPage() {
               })
             }
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              outline-none
-              focus:border-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           >
 
             <option value="">
@@ -310,14 +389,26 @@ export default function AddItemPage() {
             value={form.sub_category}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              outline-none
-              focus:border-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           >
 
             <option value="">
@@ -364,15 +455,26 @@ export default function AddItemPage() {
             value={form.price}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              placeholder:text-gray-400
-              outline-none
-              focus:border-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* DESCRIPTION */}
@@ -382,16 +484,26 @@ export default function AddItemPage() {
             value={form.description}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              h-40
-              bg-white
-              text-black
-              placeholder:text-gray-400
-              outline-none
-              focus:border-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* TOKOPEDIA */}
@@ -401,12 +513,26 @@ export default function AddItemPage() {
             value={form.tokopedia_url}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* SHOPEE */}
@@ -416,12 +542,26 @@ export default function AddItemPage() {
             value={form.shopee_url}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* WHATSAPP */}
@@ -431,12 +571,26 @@ export default function AddItemPage() {
             value={form.whatsapp_url}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* OFFICIAL */}
@@ -446,25 +600,52 @@ export default function AddItemPage() {
             value={form.official_url}
             onChange={handleChange}
             className="
-              w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-            "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
 
           {/* UPLOAD */}
-          <div>
+          <div
+  className="
+    rounded-2xl
+
+    border
+    border-dashed
+    border-cyan-300/30
+
+    bg-white/5
+
+    p-6
+  "
+>
 
             <label
               className="
                 block mb-2
                 font-medium
-                text-black
+                text-white
               "
             >
               Upload Images
+
             </label>
 
             <input
@@ -475,11 +656,26 @@ export default function AddItemPage() {
                 handleImageUpload
               }
               className="
-                w-full border p-4
-                rounded-xl
-                bg-white
-                text-black
-              "
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
             />
 
           </div>
@@ -508,11 +704,15 @@ export default function AddItemPage() {
                     width={160}
                     height={160}
                     className="
-                      w-40 h-40
-                      object-cover
-                      rounded-2xl
-                      border
-                    "
+  w-32 h-32
+
+  rounded-2xl
+
+  border
+  border-cyan-300/20
+
+  object-cover
+"
                   />
                 )
               )}
@@ -528,12 +728,27 @@ export default function AddItemPage() {
               uploading
             }
             className="
-              bg-black text-white
-              px-6 py-4 rounded-xl
-              w-full
-              hover:opacity-90
-              transition
-            "
+  w-full
+
+  py-4
+
+  rounded-2xl
+
+  border
+  border-cyan-400/30
+
+  bg-cyan-500/10
+
+  text-cyan-300
+
+  font-semibold
+
+  hover:bg-cyan-500/20
+
+  transition
+
+  hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]
+"
           >
 
             {uploading

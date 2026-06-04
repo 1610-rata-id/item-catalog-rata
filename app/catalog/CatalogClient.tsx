@@ -510,10 +510,49 @@ function toggleCategory(
 }
 
 return (
-  <main className="bg-[#f8f8f7] min-h-screen font-[Poppins] text-black">
+  <main
+    className="
+      min-h-screen
+      font-[Poppins]
+      text-white
+      bg-[#02111f]
+      relative
+    "
+  >
+
+    <img
+      src="/hero-v2.jpg"
+      alt="background"
+      className="
+        absolute
+        inset-0
+        w-full
+        h-full
+        object-cover
+        opacity-60
+      "
+    />
+
+    <div className="relative z-10">
 
       {/* HEADER */}
-      <div className="sticky top-0 bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center z-50">
+      <div
+  className="
+    sticky top-0 z-50
+
+    bg-[#04192c]/80
+    backdrop-blur-xl
+
+    border-b
+    border-cyan-400/10
+
+    px-8 py-5
+
+    flex
+    justify-between
+    items-center
+  "
+>
 
         {/* LOGO */}
         <img
@@ -801,12 +840,25 @@ return (
   }
   placeholder="Cari item..."
   className="
-    px-5 py-2 rounded-full
-    border bg-white
-    outline-none
-    focus:ring-2 focus:ring-red-500
-    transition
-  "
+  w-[280px]
+
+  px-5 py-3
+
+  rounded-2xl
+
+  bg-white/5
+
+  border
+  border-cyan-400/30
+
+  text-white
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
 />
 
 {/* ADMIN MENU */}
@@ -864,7 +916,7 @@ return (
       </div>
 
       {/* HERO BANNER */}
-<div className="max-w-7xl mx-auto px-6 pt-6">
+<div className="px-8 pt-8">
 
   <div
     className="
@@ -879,7 +931,7 @@ return (
       alt="Catalog Banner"
       className="
         w-full
-        h-[220px] md:h-[300px]
+        h-[420px]
         object-cover
       "
     />
@@ -891,17 +943,19 @@ return (
       {/* TOTAL RESULT */}
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
-        <p className="text-sm text-gray-500">
-          Menampilkan{" "}
-          <span className="font-semibold">
-            {items.length}
-          </span>{" "}
-          dari{" "}
-          <span className="font-semibold">
-            {totalItems}
-          </span>{" "}
-          item
-        </p>
+        <div className="mt-10 mb-8">
+  <p className="text-white/70 text-lg">
+  Menampilkan{" "}
+  <span className="text-cyan-300 font-semibold">
+    {items.length}
+  </span>{" "}
+  dari{" "}
+  <span className="text-cyan-300 font-semibold">
+    {totalItems}
+  </span>{" "}
+  item
+</p>
+</div>
 
         {/* ACTIVE FILTER */}
         <div className="flex gap-2 flex-wrap">
@@ -913,7 +967,8 @@ return (
               }
               className="
                 px-3 py-1 rounded-full
-                bg-red-100 text-red-600
+                bg-cyan-500/20
+text-cyan-300
                 text-xs font-medium
               "
             >
@@ -928,7 +983,8 @@ return (
               }
               className="
                 px-3 py-1 rounded-full
-                bg-blue-100 text-blue-600
+                bg-cyan-500/20
+text-cyan-300
                 text-xs font-medium
               "
             >
@@ -958,7 +1014,7 @@ return (
 
       {/* GRID */}
       {!loading && (
-        <div className="max-w-7xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div className="max-w-[1700px] mx-auto p-6 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
 
           {items.map((item) => (
             <div
@@ -980,16 +1036,44 @@ return (
                 }
               }}
               className="
-                bg-white rounded-2xl overflow-hidden
-                shadow-sm cursor-pointer
-                transition-all duration-300
-                hover:-translate-y-2
-                hover:shadow-2xl
-              "
+  rounded-[28px]
+
+  border
+  border-cyan-400/20
+
+  bg-[#051a2e]/80
+
+  backdrop-blur-xl
+
+  overflow-hidden
+
+  cursor-pointer
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-2
+
+  hover:border-cyan-400/50
+
+  hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
+"
             >
 
               {/* IMAGE */}
-<div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
+<div
+  className="
+    h-64
+
+    bg-[#071f35]
+
+    flex
+    items-center
+    justify-center
+
+    overflow-hidden
+  "
+>
 
   {item.image_url ? (
 
@@ -1029,7 +1113,16 @@ return (
               {/* CONTENT */}
               <div className="p-4">
 
-                <h2 className="text-sm font-semibold line-clamp-2 min-h-[40px]">
+                <h2
+  className="
+    text-white
+    font-semibold
+    text-lg
+
+    line-clamp-2
+    min-h-[56px]
+  "
+>
                   {item.item_name}
                 </h2>
 
@@ -1041,7 +1134,7 @@ return (
                   {item.vendor}
                 </p>
 
-                <p className="text-green-600 font-bold mt-3 text-lg">
+                <p className="text-cyan-300 font-bold mt-3 text-lg">
                   Rp{" "}
                   {formatRupiah(
                     item.price
@@ -1197,11 +1290,27 @@ return (
               e.stopPropagation()
             }
             className="
-              bg-white w-full max-w-6xl rounded-3xl
-              overflow-hidden relative
-              max-h-[90vh] overflow-y-auto
-              shadow-2xl
-            "
+  w-full
+  max-w-6xl
+
+  rounded-[32px]
+
+  border
+  border-cyan-400/20
+
+  bg-[#051a2e]
+
+  backdrop-blur-xl
+
+  overflow-hidden
+
+  relative
+
+  max-h-[90vh]
+  overflow-y-auto
+
+  shadow-[0_0_50px_rgba(0,255,255,0.15)]
+"
           >
 
             {/* CLOSE */}
@@ -1212,7 +1321,8 @@ return (
               className="
                 absolute top-4 right-5 z-50
                 text-4xl font-light
-                hover:text-red-500 transition
+                text-cyan-300
+hover:text-cyan-100 transition
               "
             >
               ×
@@ -1224,7 +1334,7 @@ return (
               <div>
 
                 {/* MAIN IMAGE */}
-                <div className="flex items-center justify-center bg-gray-100 rounded-2xl p-10">
+                <div className="flex items-center justify-center bg-[#071f35] rounded-2xl p-10">
 
                   <img
                     src={activeImage}
@@ -1269,8 +1379,8 @@ return (
                           ${
                             activeImage ===
                             img
-                              ? "border-red-500"
-                              : "border-gray-200"
+                              ? "border-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.3)]"
+: "border-cyan-400/20"
                           }
                         `}
                       />
@@ -1284,7 +1394,15 @@ return (
               {/* DETAIL */}
               <div>
 
-                <h1 className="text-4xl font-bold leading-tight">
+                <h1
+  className="
+    text-4xl
+    font-bold
+    leading-tight
+
+    text-white
+  "
+>
                   {
                     selectedItem.item_name
                   }
@@ -1296,7 +1414,7 @@ return (
                   }
                 </p>
 
-                <p className="text-green-600 text-5xl font-bold mt-6">
+                <p className="text-cyan-300 text-5xl font-bold mt-6">
                   Rp{" "}
                   {formatRupiah(
                     selectedItem.price
@@ -1304,7 +1422,21 @@ return (
                 </p>
 
                 {/* INFO */}
-                <div className="mt-10 space-y-4 text-sm">
+                <div
+  className="
+    mt-10
+    space-y-4
+
+    text-white/80
+
+    text-sm
+
+    border-t
+    border-cyan-400/10
+
+    pt-6
+  "
+>
 
                   <p>
                     <span className="font-bold">
@@ -1386,7 +1518,8 @@ return (
         target="_blank"
         className="
           px-6 py-4 rounded-2xl
-          bg-green-500
+          bg-green-600
+hover:bg-green-500
           text-white
           font-semibold
           hover:scale-105
@@ -1406,7 +1539,8 @@ return (
         target="_blank"
         className="
           px-6 py-4 rounded-2xl
-          bg-orange-500
+          bg-orange-600
+hover:bg-orange-500
           text-white
           font-semibold
           hover:scale-105
@@ -1447,9 +1581,9 @@ return (
         className="
           px-6 py-4 rounded-2xl
           border
-          border-gray-300
-          bg-white
-          text-black
+          border-cyan-400/30
+bg-cyan-500/10
+text-cyan-300
           font-semibold
           hover:scale-105
           hover:shadow-xl
@@ -1472,7 +1606,13 @@ return (
                     Description
                   </h2> 
 
-                  <div className="whitespace-pre-line text-gray-700 leading-8">
+                  <div
+  className="
+    whitespace-pre-line
+    text-white/70
+    leading-8
+  "
+>
                     {selectedItem.description ||
                       "-"}
                   </div>
@@ -1487,7 +1627,7 @@ return (
 
         </div>
       )}
-
+      </div>
     </main>
   );
 }

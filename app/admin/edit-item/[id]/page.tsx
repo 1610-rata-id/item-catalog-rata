@@ -297,50 +297,85 @@ if (loading) {
 }
 
   return (
-    <main className="min-h-screen bg-[#f8f8f7] p-10">
+    <main className="relative min-h-screen text-white">
+
+  <img
+    src="/hero-v2.jpg"
+    alt="background"
+    className="
+      absolute inset-0
+      w-full h-full
+      object-cover
+    "
+  />
+
+  <div className="relative z-10 p-10">
 
       <div
-        className="
-          max-w-3xl mx-auto
-          bg-white rounded-3xl
-          shadow-xl p-10
-        "
-      >
+  className="
+    max-w-5xl
+    mx-auto
 
-        <div className="flex justify-between items-center mb-10">
+    rounded-[32px]
 
-          <div>
+    border
+    border-cyan-300/20
 
-            <h1 className="text-4xl font-bold text-black">
-              Edit Item
-            </h1>
+    bg-[#051a2e]/80
 
-            <p className="text-gray-700 mt-2">
-              Update catalog item
-            </p>
+    backdrop-blur-xl
 
-          </div>
+    p-10
 
-          <button
-            onClick={() =>
-              router.push(
-                "/admin/dashboard"
-              )
-            }
-            className="
-              border border-gray-300
-              px-5 py-3
-              rounded-xl
-              bg-white
-              text-black
-              hover:bg-gray-100
-              transition
-            "
-          >
-            Back
-          </button>
+    shadow-[0_0_40px_rgba(0,255,255,0.08)]
+  "
+>
 
-        </div>
+        <div className="flex items-start justify-between mb-8">
+
+  <div>
+
+    <h1 className="text-5xl font-bold text-white">
+      Edit Item
+    </h1>
+
+    <p className="text-cyan-300 mt-2">
+      Update Catalog Item
+    </p>
+
+  </div>
+
+  <button
+    type="button"
+    onClick={() =>
+      window.history.back()
+    }
+    className="
+      flex
+      items-center
+      gap-2
+
+      px-5
+      py-3
+
+      rounded-2xl
+
+      border
+      border-cyan-300/20
+
+      bg-white/5
+
+      text-cyan-300
+
+      hover:bg-cyan-500/10
+
+      transition
+    "
+  >
+    Back
+  </button>
+
+</div>
 
         <form
           onSubmit={handleSubmit}
@@ -354,10 +389,25 @@ if (loading) {
             value={form.item_name}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -368,10 +418,25 @@ if (loading) {
             value={form.vendor}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -390,12 +455,24 @@ if (loading) {
             }
             className="
               w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              outline-none
-              focus:border-black
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           >
 
@@ -426,12 +503,24 @@ if (loading) {
             }
             className="
               w-full
-              border border-gray-300
-              p-4 rounded-xl
-              bg-white
-              text-black
-              outline-none
-              focus:border-black
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           >
 
@@ -483,10 +572,25 @@ if (loading) {
             value={form.price}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -497,10 +601,25 @@ if (loading) {
             value={form.item_code}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -511,10 +630,25 @@ if (loading) {
             value={form.UOM}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -527,10 +661,25 @@ if (loading) {
             }
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -541,10 +690,25 @@ if (loading) {
             value={form.type}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -555,10 +719,25 @@ if (loading) {
             value={form.Term}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
@@ -569,17 +748,32 @@ if (loading) {
             value={form.Remarks}
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
             "
           />
 
           {/* MARKETPLACE URLS */}
           <div className="pt-4">
 
-            <h2 className="text-xl font-bold text-black mb-4">
+            <h2 className="text-xl font-bold text-cyan-300 mb-4">
               Marketplace Links
             </h2>
 
@@ -593,10 +787,26 @@ if (loading) {
                 }
                 onChange={handleChange}
                 className="
-                  w-full border p-4
-                  rounded-xl
-                  text-black
-                  placeholder:text-gray-500
+                  w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
+
                 "
               />
 
@@ -608,10 +818,26 @@ if (loading) {
                 }
                 onChange={handleChange}
                 className="
-                  w-full border p-4
-                  rounded-xl
-                  text-black
-                  placeholder:text-gray-500
+                  w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
+
                 "
               />
 
@@ -623,10 +849,26 @@ if (loading) {
                 }
                 onChange={handleChange}
                 className="
-                  w-full border p-4
-                  rounded-xl
-                  text-black
-                  placeholder:text-gray-500
+                  w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
+
                 "
               />
 
@@ -638,10 +880,26 @@ if (loading) {
                 }
                 onChange={handleChange}
                 className="
-                  w-full border p-4
-                  rounded-xl
-                  text-black
-                  placeholder:text-gray-500
+                  w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
+
                 "
               />
 
@@ -650,9 +908,21 @@ if (loading) {
           </div>
 
           {/* UPLOAD MULTIPLE IMAGES */}
-          <div>
+          <div
+  className="
+    rounded-2xl
 
-            <label className="block mb-2 font-medium text-black">
+    border
+    border-dashed
+    border-cyan-300/30
+
+    bg-white/5
+
+    p-6
+  "
+>
+
+  <label className="block mb-2 font-medium text-cyan-300">
               Upload Images
             </label>
 
@@ -774,10 +1044,26 @@ if (loading) {
             }
             onChange={handleChange}
             className="
-              w-full border p-4
-              rounded-xl h-40
-              text-black
-              placeholder:text-gray-500
+              w-full
+
+border border-cyan-300/20
+
+p-4
+
+rounded-2xl
+
+bg-white/5
+
+text-white
+
+placeholder:text-white/40
+
+outline-none
+
+focus:border-cyan-400
+
+transition
+
             "
           />
 
@@ -785,10 +1071,26 @@ if (loading) {
           <button
             disabled={saving}
             className="
-              w-full bg-black
-              text-white
-              rounded-xl p-4
-              hover:opacity-90
+              w-full
+
+py-4
+
+rounded-2xl
+
+border
+border-cyan-400/30
+
+bg-cyan-500/10
+
+text-cyan-300
+
+font-semibold
+
+hover:bg-cyan-500/20
+
+hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]
+
+transition
             "
           >
             {uploading
@@ -799,6 +1101,8 @@ if (loading) {
           </button>
 
         </form>
+
+      </div>
 
       </div>
 
