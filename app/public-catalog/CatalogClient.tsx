@@ -847,7 +847,6 @@ function toggleCategory(
                 handleCategoryChange("All")
               }
               
-              "
             >
               {selectedCategory} ✕
             </button>
