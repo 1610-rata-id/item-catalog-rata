@@ -368,10 +368,35 @@ export default function PublicCatalogClient() {
   }, []);
 
   return (
-    <main className="bg-[#f8f8f7] min-h-screen font-[Poppins] text-black">
+    <main
+  className="
+    min-h-screen
+    font-[Poppins]
+    text-white
+    bg-[#031427]
+    relative
+  "
+>
 
       {/* HEADER */}
-      <div className="sticky top-0 bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center z-50">
+      <div
+  className="
+    sticky top-0 z-50
+
+    bg-[#031427]/90
+
+    backdrop-blur-xl
+
+    border-b
+    border-cyan-300/10
+
+    px-8 py-6
+
+    flex
+    justify-between
+    items-center
+  "
+>
 
         <img
           src="/logo.png"
@@ -409,7 +434,31 @@ export default function PublicCatalogClient() {
             </button>
 
             {showCategory && (
-              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
+              <div
+  className="
+    absolute
+    mt-3
+
+    w-72
+
+    rounded-3xl
+
+    border
+    border-cyan-300/20
+
+    bg-[#071d33]
+
+    backdrop-blur-xl
+
+    shadow-[0_0_30px_rgba(0,255,255,0.1)]
+
+    overflow-y-auto custom-scrollbar
+
+    max-h-[420px]
+
+    z-50
+  "
+>
 
                 <input
                   placeholder="Search..."
@@ -419,30 +468,50 @@ export default function PublicCatalogClient() {
                       e.target.value
                     )
                   }
-                  className="w-full p-3 border-b outline-none"
+                  className="
+  w-full
+
+  px-4
+  py-4
+
+  bg-transparent
+
+  border-b
+  border-cyan-300/10
+
+  text-white
+
+  outline-none
+"
                 />
 
                 <div
-                  onClick={() => {
-                    handleCategoryChange(
-                      "All"
-                    );
+  onClick={() => {
+    handleCategoryChange("All");
+    setShowCategory(false);
+  }}
+  className={`
+    px-4
+    py-3
 
-                    setShowCategory(false);
-                  }}
-                  className={`
-                    px-4 py-3 cursor-pointer transition
-                    hover:bg-gray-100 border-b
-                    ${
-                      selectedCategory ===
-                      "All"
-                        ? "bg-red-50 text-red-600 font-semibold"
-                        : ""
-                    }
-                  `}
-                >
-                  All
-                </div>
+    cursor-pointer
+
+    transition
+
+    border-b
+    border-cyan-300/10
+
+    hover:bg-cyan-500/10
+
+    ${
+      selectedCategory === "All"
+        ? "bg-cyan-500/10 text-cyan-300 font-semibold"
+        : "text-white"
+    }
+  `}
+>
+  All
+</div>
 
                 {Object.entries(
                   hierarchicalCategories
@@ -482,7 +551,7 @@ export default function PublicCatalogClient() {
                     ([main, subs]) => (
                       <div
                         key={main}
-                        className="border-b"
+                        className="border-b border-cyan-300/10"
                       >
                         <button
                           onClick={() =>
@@ -491,15 +560,23 @@ export default function PublicCatalogClient() {
                             )
                           }
                           className="
-                            w-full
-                            flex
-                            justify-between
-                            items-center
-                            px-4 py-3
-                            hover:bg-gray-50
-                            transition
-                            font-semibold
-                          "
+  w-full
+
+  flex
+  justify-between
+  items-center
+
+  px-4
+  py-3
+
+  text-white
+
+  hover:bg-cyan-500/10
+
+  transition
+
+  font-semibold
+"
                         >
                           <span>
                             {main}
@@ -530,11 +607,16 @@ export default function PublicCatalogClient() {
                                   );
                                 }}
                                 className="
-                                  px-8 py-2
-                                  text-sm
-                                  text-gray-500
-                                  cursor-pointer
-                                  hover:bg-gray-100
+                                  px-8
+  py-2
+
+  cursor-pointer
+
+  text-sm
+
+  hover:bg-cyan-500/10
+
+  transition
                                 "
                               >
                                 View All
@@ -555,16 +637,21 @@ export default function PublicCatalogClient() {
                                     );
                                   }}
                                   className={`
-                                    px-8 py-2
-                                    cursor-pointer
-                                    text-sm
-                                    hover:bg-gray-100
-                                    transition
+                                    px-8
+  py-2
+
+  cursor-pointer
+
+  text-sm
+
+  hover:bg-cyan-500/10
+
+  transition
                                     ${
                                       selectedCategory ===
                                       sub
-                                        ? "bg-red-50 text-red-600 font-medium"
-                                        : "text-gray-600"
+                                        ? "bg-cyan-500/10 text-cyan-300 font-medium"
+                                        : "text-white/70"
                                     }
                                   `}
                                 >
@@ -591,12 +678,26 @@ export default function PublicCatalogClient() {
             }
             placeholder="Cari item..."
             className="
-              px-5 py-2 rounded-full
-              border bg-white
-              outline-none
-              focus:ring-2 focus:ring-red-500
-              transition
-            "
+  px-6
+  py-3
+
+  rounded-2xl
+
+  border
+  border-cyan-300/20
+
+  bg-white/5
+
+  text-white
+
+  placeholder:text-white/40
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
           />
         </div>
       </div>
@@ -625,17 +726,55 @@ export default function PublicCatalogClient() {
       {/* RESULT */}
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
-        <p className="text-sm text-gray-500">
+        <p className="text-cyan-300">
           Menampilkan{" "}
-          <span className="font-semibold">
+          <span className="
+  font-semibold
+  text-cyan-400
+">
             {items.length}
           </span>{" "}
           dari{" "}
-          <span className="font-semibold">
+          <span className="
+  font-semibold
+  text-cyan-400
+">
             {totalItems}
           </span>{" "}
           item
         </p>
+<div className="flex gap-2 flex-wrap">
+
+  {selectedCategory !== "All" && (
+    <button
+      onClick={() =>
+        setSelectedCategory("All")
+      }
+      className="
+        px-4
+        py-2
+
+        rounded-full
+
+        bg-cyan-400/20
+
+        border
+        border-cyan-400/30
+
+        text-cyan-300
+
+        text-sm
+
+        hover:bg-cyan-400/30
+
+        transition
+      "
+    >
+      {selectedCategory} ✕
+    </button>
+  )}
+
+</div>
       </div>
 
       {/* LOADING */}
@@ -683,16 +822,40 @@ export default function PublicCatalogClient() {
 
               }}
               className="
-                bg-white rounded-2xl overflow-hidden
-                shadow-sm cursor-pointer
-                transition-all duration-300
-                hover:-translate-y-2
-                hover:shadow-2xl
-              "
+  rounded-[28px]
+
+  border
+  border-cyan-300/20
+
+  bg-[#071d33]
+
+  overflow-hidden
+
+  cursor-pointer
+
+  transition-all
+  duration-300
+
+  hover:-translate-y-2
+
+  hover:border-cyan-400/50
+
+  hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
+"
             >
 
               {/* IMAGE */}
-              <div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
+              <div className="
+  h-60
+
+  bg-[#0b2745]
+
+  flex
+  items-center
+  justify-center
+
+  overflow-hidden
+">
 
                 {item.image_url ? (
 
@@ -730,13 +893,35 @@ export default function PublicCatalogClient() {
               </div>
 
               {/* CONTENT */}
-              <div className="p-4">
+              <div className="p-5">
 
-                <h2 className="text-sm font-semibold line-clamp-2 min-h-[40px]">
+                <h2
+  className="
+    text-white
+    font-semibold
+    text-base
+
+    line-clamp-2
+
+    min-h-[52px]
+  "
+>
                   {item.item_name}
                 </h2>
 
-                <p className="text-xs text-gray-500 mt-2">
+                <p
+  className="
+    text-cyan-300
+
+    uppercase
+
+    tracking-[2px]
+
+    text-xs
+
+    mt-3
+  "
+>
                   {item.category}
                 </p>
 
@@ -775,7 +960,7 @@ export default function PublicCatalogClient() {
     }
     className="
       px-4 py-2 rounded-xl border
-      bg-white hover:bg-gray-100
+      
       disabled:opacity-40
       transition
     "
@@ -841,7 +1026,7 @@ export default function PublicCatalogClient() {
               border
               ${
                 page === p
-                  ? "bg-red-500 text-white border-red-500 shadow-lg"
+                  ? "bg-cyan-400 text-[#031427] border-red-500 shadow-lg"
                   : "bg-white hover:bg-gray-100"
               }
             `}
@@ -863,7 +1048,10 @@ export default function PublicCatalogClient() {
     }
     className="
       px-4 py-2 rounded-xl border
-      bg-white hover:bg-gray-100
+      bg-[#071d33]
+border-cyan-300/20
+text-white
+hover:border-cyan-400
       disabled:opacity-40
       transition
     "
@@ -881,7 +1069,7 @@ export default function PublicCatalogClient() {
             fixed inset-0 z-[999]
             bg-black/70
             backdrop-blur-sm
-            overflow-y-auto
+            overflow-y-auto custom-scrollbar
             p-4
           "
         >
@@ -897,7 +1085,8 @@ export default function PublicCatalogClient() {
 
             <div
               className="
-                bg-white
+                bg-[#071d33]
+text-white
                 w-full
                 max-w-7xl
                 rounded-[32px]
@@ -933,7 +1122,7 @@ export default function PublicCatalogClient() {
 
                   <div
                     className="
-                      bg-gray-100
+                      text-cyan-300
                       rounded-3xl
                       p-8
                       flex
@@ -1069,7 +1258,7 @@ export default function PublicCatalogClient() {
                     <div
                       className="
                         whitespace-pre-line
-                        text-gray-700
+                        text-white-700
                         leading-8
                       "
                     >

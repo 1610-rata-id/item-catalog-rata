@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useSearchParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -11,15 +15,9 @@ function formatRupiah(number: number) {
 
 export default function Catalog() {
   const router = useRouter();
-const { role } =
-  useRequireAuth();
+  const searchParams = useSearchParams();
 
-const searchParams = useSearchParams();
-
-const [authLoading, setAuthLoading] =
-  useState(true);
-
-const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
 
   // NEW
   const [categories, setCategories] = useState<
@@ -102,24 +100,6 @@ const [
   const totalPages = Math.ceil(
     totalItems / ITEMS_PER_PAGE
   );
-
-// AUTH CHECK
-useEffect(() => {
-  async function checkUser() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      router.replace("/admin/login");
-      return;
-    }
-
-    setAuthLoading(false);
-  }
-
-  checkUser();
-}, [router]);
 
   // GET FILTERS
 async function getFilters() {
@@ -291,7 +271,21 @@ setVendors([
 
   let query = supabase
     .from("items")
-    .select("*", { count: "exact" })
+    .select(
+  `
+    id,
+    item_name,
+    category,
+    main_category,
+    sub_category,
+    description,
+    image_url,
+    image_urls,
+    item_code,
+    UOM
+  `,
+  { count: "exact" }
+)
     .order("item_name", {
       ascending: true,
     });
@@ -501,58 +495,11 @@ function toggleCategory(
       );
   }, []);
 
-  if (authLoading) {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      Checking authentication...
-    </main>
-  );
-}
-
-return (
-  <main
-    className="
-      min-h-screen
-      font-[Poppins]
-      text-white
-      bg-[#02111f]
-      relative
-    "
-  >
-
-    <img
-      src="/hero-v2.jpg"
-      alt="background"
-      className="
-        absolute
-        inset-0
-        w-full
-        h-full
-        object-cover
-        opacity-60
-      "
-    />
-
-    <div className="relative z-10">
+    <main className="bg-[#f8f8f7] min-h-screen font-[Poppins] text-black">
 
       {/* HEADER */}
-      <div
-  className="
-    sticky top-0 z-50
-
-    bg-[#04192c]/80
-    backdrop-blur-xl
-
-    border-b
-    border-cyan-400/10
-
-    px-8 py-5
-
-    flex
-    justify-between
-    items-center
-  "
->
+      <div className="sticky top-0 bg-white/90 backdrop-blur-md shadow-sm px-6 py-4 flex justify-between items-center z-50">
 
         {/* LOGO */}
         <img
@@ -569,13 +516,7 @@ return (
             onClick={() =>
               router.push("/")
             }
-            className="
-  text-white
-
-  hover:text-cyan-300
-
-  transition
-"
+            className="hover:text-red-600 transition"
           >
             Beranda
           </button>
@@ -592,43 +533,13 @@ return (
         !showCategory
       )
     }
-    className="
-  text-white
-
-  hover:text-cyan-300
-
-  transition
-"
+    className="hover:text-red-600 transition"
   >
     Category ▾
   </button>
 
   {showCategory && (
-    <div
-  className="
-    absolute
-    mt-3
-
-    w-72
-
-    rounded-3xl
-
-    border
-    border-cyan-300/20
-
-    bg-[#071d33]
-
-    backdrop-blur-xl
-
-    shadow-[0_0_30px_rgba(0,255,255,0.1)]
-
-    overflow-y-auto
-
-    max-h-[420px]
-
-    z-50
-  "
->
+    <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
 
       <input
         placeholder="Search..."
@@ -638,21 +549,7 @@ return (
             e.target.value
           )
         }
-        className="
-  w-full
-
-  px-4
-  py-4
-
-  bg-transparent
-
-  border-b
-  border-cyan-300/10
-
-  text-white
-
-  outline-none
-"
+        className="w-full p-3 border-b outline-none"
       />
 
       {/* ALL */}
@@ -666,13 +563,11 @@ return (
         }}
         className={`
           px-4 py-3 cursor-pointer transition
-          hover:bg-cyan-500/10
-border-b
-border-cyan-300/10
+          hover:bg-gray-100 border-b
           ${
             selectedCategory === "All"
-              ? "bg-cyan-500/10 text-cyan-300 font-semibold"
-: "text-white"
+              ? "bg-red-50 text-red-600 font-semibold"
+              : ""
           }
         `}
       >
@@ -725,23 +620,15 @@ border-cyan-300/10
               toggleCategory(main)
             }
             className="
-  w-full
-
-  flex
-  justify-between
-  items-center
-
-  px-4
-  py-3
-
-  text-white
-
-  hover:bg-cyan-500/10
-
-  transition
-
-  font-semibold
-"
+              w-full
+              flex
+              justify-between
+              items-center
+              px-4 py-3
+              hover:bg-gray-50
+              transition
+              font-semibold
+            "
           >
             <span>{main}</span>
 
@@ -798,7 +685,7 @@ border-cyan-300/10
                     px-8 py-2
                     cursor-pointer
                     text-sm
-                    hover:bg-cyan-500/10
+                    hover:bg-gray-100
                     transition
                     ${
                       selectedCategory === sub
@@ -834,43 +721,13 @@ border-cyan-300/10
                   !showVendor
                 )
               }
-              className="
-  text-white
-
-  hover:text-cyan-300
-
-  transition
-"
+              className="hover:text-red-600 transition"
             >
               Vendor ▾
             </button>
 
             {showVendor && (
-              <div
-  className="
-    absolute
-    mt-3
-
-    w-72
-
-    rounded-3xl
-
-    border
-    border-cyan-300/20
-
-    bg-[#071d33]
-
-    backdrop-blur-xl
-
-    shadow-[0_0_30px_rgba(0,255,255,0.1)]
-
-    overflow-y-auto
-
-    max-h-[420px]
-
-    z-50
-  "
->
+              <div className="absolute mt-2 bg-white shadow-2xl rounded-xl w-56 max-h-64 overflow-y-auto border z-50">
 
                 <input
                   placeholder="Search..."
@@ -880,21 +737,7 @@ border-cyan-300/10
                       e.target.value
                     )
                   }
-                  className="
-  w-full
-
-  px-4
-  py-4
-
-  bg-transparent
-
-  border-b
-  border-cyan-300/10
-
-  text-white
-
-  outline-none
-"
+                  className="w-full p-3 border-b outline-none"
                 />
 
                 {vendors
@@ -919,11 +762,11 @@ border-cyan-300/10
                       }}
                       className={`
                         px-4 py-3 cursor-pointer transition
-                        hover:bg-cyan-500/10
+                        hover:bg-gray-100
                         ${
                           selectedVendor === v
-                            ? "bg-cyan-500/10 text-cyan-300 font-semibold"
-: "text-white"
+                            ? "bg-red-50 text-red-600 font-semibold"
+                            : ""
                         }
                       `}
                     >
@@ -935,137 +778,28 @@ border-cyan-300/10
           </div>
 
           {/* SEARCH */}
-<input
-  value={search}
-  onChange={(e) =>
-    handleSearch(
-      e.target.value
-    )
-  }
-  placeholder="Cari item..."
-  className="
-  w-[280px]
+          <input
+            value={search}
+            onChange={(e) =>
+              handleSearch(
+                e.target.value
+              )
+            }
+            placeholder="Cari item..."
+            className="
+              px-5 py-2 rounded-full
+              border bg-white
+              outline-none
+              focus:ring-2 focus:ring-red-500
+              transition
+            "
+          />
 
-  px-5 py-3
-
-  rounded-2xl
-
-  bg-white/5
-
-  border
-  border-cyan-400/30
-
-  text-white
-
-  outline-none
-
-  focus:border-cyan-400
-
-  transition
-"
-/>
-
-{/* ADMIN MENU */}
-{role === "admin" && (
-  <>
-    <button
-      onClick={() =>
-        router.push(
-          "/admin/dashboard"
-        )
-      }
-      className="
-h-12
-px-8
-
-rounded-2xl
-
-border
-border-cyan-400/30
-
-bg-cyan-500/15
-
-text-cyan-300
-
-font-medium
-
-shadow-[0_0_25px_rgba(0,255,255,0.25)]
-
-hover:bg-cyan-500/20
-
-transition
-"
-    >
-      Dashboard
-    </button>
-
-    <button
-      onClick={() =>
-        router.push(
-          "/admin/add-item"
-        )
-      }
-      className="
-h-12
-px-8
-
-rounded-2xl
-
-border
-border-cyan-400/30
-
-bg-cyan-500/15
-
-text-cyan-300
-
-font-medium
-
-shadow-[0_0_25px_rgba(0,255,255,0.25)]
-
-hover:bg-cyan-500/20
-
-transition
-"
-    >
-      Add Item
-    </button>
-  </>
-)}
-
-<button
-  onClick={async () => {
-    await supabase.auth.signOut();
-
-    router.push("/");
-  }}
-  className="
-h-12
-px-8
-
-rounded-2xl
-
-border
-border-red-400/30
-
-bg-red-500/5
-
-text-red-300
-
-font-medium
-
-hover:bg-red-500/10
-
-transition
-"
->
-  Logout
-</button>
-
-</div>
+        </div>
       </div>
 
       {/* HERO BANNER */}
-<div className="px-8 pt-8">
+<div className="max-w-7xl mx-auto px-6 pt-6">
 
   <div
     className="
@@ -1080,7 +814,7 @@ transition
       alt="Catalog Banner"
       className="
         w-full
-        h-[420px]
+        h-[220px] md:h-[300px]
         object-cover
       "
     />
@@ -1092,19 +826,17 @@ transition
       {/* TOTAL RESULT */}
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
-        <div className="mt-10 mb-8">
-  <p className="text-white/70 text-lg">
-  Menampilkan{" "}
-  <span className="text-cyan-300 font-semibold">
-    {items.length}
-  </span>{" "}
-  dari{" "}
-  <span className="text-cyan-300 font-semibold">
-    {totalItems}
-  </span>{" "}
-  item
-</p>
-</div>
+        <p className="text-sm text-gray-500">
+          Menampilkan{" "}
+          <span className="font-semibold">
+            {items.length}
+          </span>{" "}
+          dari{" "}
+          <span className="font-semibold">
+            {totalItems}
+          </span>{" "}
+          item
+        </p>
 
         {/* ACTIVE FILTER */}
         <div className="flex gap-2 flex-wrap">
@@ -1114,11 +846,7 @@ transition
               onClick={() =>
                 handleCategoryChange("All")
               }
-              className="
-                px-3 py-1 rounded-full
-                bg-cyan-500/20
-text-cyan-300
-                text-xs font-medium
+              
               "
             >
               {selectedCategory} ✕
@@ -1132,8 +860,7 @@ text-cyan-300
               }
               className="
                 px-3 py-1 rounded-full
-                bg-cyan-500/20
-text-cyan-300
+                bg-blue-100 text-blue-600
                 text-xs font-medium
               "
             >
@@ -1163,7 +890,7 @@ text-cyan-300
 
       {/* GRID */}
       {!loading && (
-        <div className="max-w-[1700px] mx-auto p-6 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+        <div className="max-w-7xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
 
           {items.map((item) => (
             <div
@@ -1185,44 +912,16 @@ text-cyan-300
                 }
               }}
               className="
-  rounded-[28px]
-
-  border
-  border-cyan-400/20
-
-  bg-[#051a2e]/80
-
-  backdrop-blur-xl
-
-  overflow-hidden
-
-  cursor-pointer
-
-  transition-all
-  duration-300
-
-  hover:-translate-y-2
-
-  hover:border-cyan-400/50
-
-  hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
-"
+                bg-white rounded-2xl overflow-hidden
+                shadow-sm cursor-pointer
+                transition-all duration-300
+                hover:-translate-y-2
+                hover:shadow-2xl
+              "
             >
 
               {/* IMAGE */}
-<div
-  className="
-    h-64
-
-    bg-[#071f35]
-
-    flex
-    items-center
-    justify-center
-
-    overflow-hidden
-  "
->
+<div className="h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
 
   {item.image_url ? (
 
@@ -1262,32 +961,12 @@ text-cyan-300
               {/* CONTENT */}
               <div className="p-4">
 
-                <h2
-  className="
-    text-white
-    font-semibold
-    text-lg
-
-    line-clamp-2
-    min-h-[56px]
-  "
->
+                <h2 className="text-sm font-semibold line-clamp-2 min-h-[40px]">
                   {item.item_name}
                 </h2>
 
                 <p className="text-xs text-gray-500 mt-2">
                   {item.category}
-                </p>
-
-                <p className="text-xs text-gray-400">
-                  {item.vendor}
-                </p>
-
-                <p className="text-cyan-300 font-bold mt-3 text-lg">
-                  Rp{" "}
-                  {formatRupiah(
-                    item.price
-                  )}
                 </p>
 
               </div>
@@ -1314,113 +993,43 @@ text-cyan-300
       )}
 
       {/* PAGINATION */}
-<div className="flex justify-center items-center gap-2 pb-14 flex-wrap">
+      <div className="flex justify-center items-center gap-4 pb-10 flex-wrap">
 
-  {/* PREVIOUS */}
-  <button
-    disabled={page === 1}
-    onClick={() =>
-      setPage(page - 1)
-    }
-    className="
-      px-4 py-2 rounded-xl border
-      bg-white hover:bg-cyan-500/10
-      disabled:opacity-40
-      transition
-    "
-  >
-    ←
-  </button>
-
-  {/* PAGE NUMBERS */}
-  {Array.from(
-    { length: totalPages },
-    (_, i) => i + 1
-  )
-
-    // LIMIT BUTTONS
-    .filter((p) => {
-
-      // ALWAYS SHOW
-      if (
-        p === 1 ||
-        p === totalPages
-      ) {
-        return true;
-      }
-
-      // SHOW AROUND CURRENT PAGE
-      return (
-        p >= page - 2 &&
-        p <= page + 2
-      );
-    })
-
-    .map((p, index, arr) => {
-
-      // ADD ...
-      const prev =
-        arr[index - 1];
-
-      const showDots =
-        prev &&
-        p - prev > 1;
-
-      return (
-        <div
-          key={p}
-          className="flex items-center"
+        <button
+          disabled={page === 1}
+          onClick={() =>
+            setPage(page - 1)
+          }
+          className="
+            px-5 py-2 rounded-xl border
+            bg-white hover:bg-gray-100
+            disabled:opacity-50
+          "
         >
+          Previous
+        </button>
 
-          {showDots && (
-            <span className="px-1">
-              ...
-            </span>
-          )}
-
-          <button
-            onClick={() =>
-              setPage(p)
-            }
-            className={`
-              min-w-[42px]
-              h-[42px]
-              rounded-xl
-              transition
-              border
-              ${
-                page === p
-                  ? "bg-red-500 text-white border-red-500 shadow-lg"
-                  : "bg-white hover:bg-gray-100"
-              }
-            `}
-          >
-            {p}
-          </button>
-
+        <div className="px-4 py-2 font-semibold">
+          Page {page} / {totalPages || 1}
         </div>
-      );
-    })}
 
-  {/* NEXT */}
-  <button
-    disabled={
-      page >= totalPages
-    }
-    onClick={() =>
-      setPage(page + 1)
-    }
-    className="
-      px-4 py-2 rounded-xl border
-      bg-white hover:bg-gray-100
-      disabled:opacity-40
-      transition
-    "
-  >
-    →
-  </button>
+        <button
+          disabled={
+            page >= totalPages
+          }
+          onClick={() =>
+            setPage(page + 1)
+          }
+          className="
+            px-5 py-2 rounded-xl border
+            bg-white hover:bg-gray-100
+            disabled:opacity-50
+          "
+        >
+          Next
+        </button>
 
-</div>
+      </div>
 
       {/* MODAL DETAIL */}
       {selectedItem && (
@@ -1439,27 +1048,11 @@ text-cyan-300
               e.stopPropagation()
             }
             className="
-  w-full
-  max-w-6xl
-
-  rounded-[32px]
-
-  border
-  border-cyan-400/20
-
-  bg-[#051a2e]
-
-  backdrop-blur-xl
-
-  overflow-hidden
-
-  relative
-
-  max-h-[90vh]
-  overflow-y-auto
-
-  shadow-[0_0_50px_rgba(0,255,255,0.15)]
-"
+              bg-white w-full max-w-6xl rounded-3xl
+              overflow-hidden relative
+              max-h-[90vh] overflow-y-auto
+              shadow-2xl
+            "
           >
 
             {/* CLOSE */}
@@ -1470,8 +1063,7 @@ text-cyan-300
               className="
                 absolute top-4 right-5 z-50
                 text-4xl font-light
-                text-cyan-300
-hover:text-cyan-100 transition
+                hover:text-red-500 transition
               "
             >
               ×
@@ -1483,7 +1075,7 @@ hover:text-cyan-100 transition
               <div>
 
                 {/* MAIN IMAGE */}
-                <div className="flex items-center justify-center bg-[#071f35] rounded-2xl p-10">
+                <div className="flex items-center justify-center bg-gray-100 rounded-2xl p-10">
 
                   <img
                     src={activeImage}
@@ -1528,8 +1120,8 @@ hover:text-cyan-100 transition
                           ${
                             activeImage ===
                             img
-                              ? "border-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.3)]"
-: "border-cyan-400/20"
+                              ? "border-red-500"
+                              : "border-gray-200"
                           }
                         `}
                       />
@@ -1543,15 +1135,7 @@ hover:text-cyan-100 transition
               {/* DETAIL */}
               <div>
 
-                <h1
-  className="
-    text-4xl
-    font-bold
-    leading-tight
-
-    text-white
-  "
->
+                <h1 className="text-4xl font-bold leading-tight">
                   {
                     selectedItem.item_name
                   }
@@ -1563,7 +1147,7 @@ hover:text-cyan-100 transition
                   }
                 </p>
 
-                <p className="text-cyan-300 text-5xl font-bold mt-6">
+                <p className="text-green-600 text-5xl font-bold mt-6">
                   Rp{" "}
                   {formatRupiah(
                     selectedItem.price
@@ -1571,21 +1155,7 @@ hover:text-cyan-100 transition
                 </p>
 
                 {/* INFO */}
-                <div
-  className="
-    mt-10
-    space-y-4
-
-    text-white/80
-
-    text-sm
-
-    border-t
-    border-cyan-400/10
-
-    pt-6
-  "
->
+                <div className="mt-10 space-y-4 text-sm">
 
                   <p>
                     <span className="font-bold">
@@ -1645,123 +1215,14 @@ hover:text-cyan-100 transition
 
                 </div>
 
-                {/* BUY BUTTONS */}
-<div className="mt-10">
-
-  <h2
-    className="
-      font-bold
-      text-2xl
-      mb-5
-    "
-  >
-    Purchase Links
-  </h2>
-
-  <div className="flex flex-wrap gap-4">
-
-    {/* TOKOPEDIA */}
-    {selectedItem.tokopedia_url && (
-      <a
-        href={selectedItem.tokopedia_url}
-        target="_blank"
-        className="
-          px-6 py-4 rounded-2xl
-          bg-green-600
-hover:bg-green-500
-          text-white
-          font-semibold
-          hover:scale-105
-          hover:shadow-xl
-          transition-all
-          duration-300
-        "
-      >
-        Tokopedia
-      </a>
-    )}
-
-    {/* SHOPEE */}
-    {selectedItem.shopee_url && (
-      <a
-        href={selectedItem.shopee_url}
-        target="_blank"
-        className="
-          px-6 py-4 rounded-2xl
-          bg-orange-600
-hover:bg-orange-500
-          text-white
-          font-semibold
-          hover:scale-105
-          hover:shadow-xl
-          transition-all
-          duration-300
-        "
-      >
-        Shopee
-      </a>
-    )}
-
-    {/* WHATSAPP */}
-    {selectedItem.whatsapp_url && (
-      <a
-        href={selectedItem.whatsapp_url}
-        target="_blank"
-        className="
-          px-6 py-4 rounded-2xl
-          bg-black
-          text-white
-          font-semibold
-          hover:scale-105
-          hover:shadow-xl
-          transition-all
-          duration-300
-        "
-      >
-        WhatsApp
-      </a>
-    )}
-
-    {/* OFFICIAL */}
-    {selectedItem.official_url && (
-      <a
-        href={selectedItem.official_url}
-        target="_blank"
-        className="
-          px-6 py-4 rounded-2xl
-          border
-          border-cyan-400/30
-bg-cyan-500/10
-text-cyan-300
-          font-semibold
-          hover:scale-105
-          hover:shadow-xl
-          transition-all
-          duration-300
-        "
-      >
-        Official Site
-      </a>
-    )}
-
-  </div>
-
-</div>
-
-                {/* DESCRIPTION */}
+                                {/* DESCRIPTION */}
                 <div className="mt-12">
 
                   <h2 className="font-bold text-2xl mb-5">
                     Description
                   </h2> 
 
-                  <div
-  className="
-    whitespace-pre-line
-    text-white/70
-    leading-8
-  "
->
+                  <div className="whitespace-pre-line text-gray-700 leading-8">
                     {selectedItem.description ||
                       "-"}
                   </div>
@@ -1776,7 +1237,7 @@ text-cyan-300
 
         </div>
       )}
-      </div>
+
     </main>
   );
 }
