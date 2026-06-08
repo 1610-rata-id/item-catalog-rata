@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -15,6 +16,9 @@ export default function AdminLoginPage() {
 
   const [loading, setLoading] =
     useState(false);
+
+  const [showPassword, setShowPassword] =
+  useState(false);
 
   async function handleLogin(
     e: React.FormEvent
@@ -176,80 +180,117 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
               </label>
 
               <input
-                type="email"
-                placeholder="admin@company.com"
-                value={email}
-                onChange={(e) =>
-                  setEmail(
-                    e.target.value
-                  )
-                }
-                className="
-                  w-full
-                  rounded-[22px]
-                  border
-                  border-cyan-300/30
-                  bg-black/20
-                  px-5
-                  py-5
-                  text-[16px]
-                  text-white
-                  outline-none
-                  transition-all
-                  duration-300
-                  placeholder:text-gray-400
-                  focus:border-red-400
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-red-100
-                "
-              />
+  type="email"
+  autoComplete="email"
+  placeholder="admin@company.com"
+  value={email}
+  onChange={(e) =>
+    setEmail(
+      e.target.value
+    )
+  }
+  className="
+    w-full
+    rounded-[22px]
+    border
+    border-cyan-300/30
+    bg-black/20
+    px-5
+    py-5
+    text-[16px]
+    text-white
+    outline-none
+    transition-all
+    duration-300
+    placeholder:text-gray-400
+    focus:border-red-400
+    focus:bg-white
+    focus:text-black
+    focus:ring-4
+    focus:ring-red-100
+  "
+/>
             </div>
 
             {/* PASSWORD */}
             <div>
-              <label
-                className="
-                  mb-3
-                  block
-                  text-[15px]
-                  font-medium
-                  text-gray-200
-                "
-              >
-                Password
-              </label>
+  <label
+    className="
+      mb-3
+      block
+      text-[15px]
+      font-medium
+      text-gray-200
+    "
+  >
+    Password
+  </label>
 
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) =>
-                  setPassword(
-                    e.target.value
-                  )
-                }
-                className="
-                  w-full
-                  rounded-[22px]
-                  border
-                  border-cyan-300/30
-                  bg-black/20
-                  px-5
-                  py-5
-                  text-[16px]
-                  text-white
-                  outline-none
-                  transition-all
-                  duration-300
-                  placeholder:text-gray-400
-                  focus:border-red-400
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-red-100
-                "
-              />
-            </div>
+  <div className="relative">
+
+    <input
+      type={
+        showPassword
+          ? "text"
+          : "password"
+      }
+      autoComplete="current-password"
+      placeholder="••••••••"
+      value={password}
+      onChange={(e) =>
+        setPassword(
+          e.target.value
+        )
+      }
+      className="
+        w-full
+        rounded-[22px]
+        border
+        border-cyan-300/30
+        bg-black/20
+        px-5
+        pr-14
+        py-5
+        text-[16px]
+        text-white
+        outline-none
+        transition-all
+        duration-300
+        placeholder:text-gray-400
+        focus:border-red-400
+        focus:bg-white
+        focus:text-black
+        focus:ring-4
+        focus:ring-red-100
+      "
+    />
+
+    <button
+      type="button"
+      onClick={() =>
+        setShowPassword(
+          !showPassword
+        )
+      }
+      className="
+        absolute
+        right-5
+        top-1/2
+        -translate-y-1/2
+        text-gray-400
+        hover:text-cyan-300
+        transition
+      "
+    >
+      {showPassword ? (
+        <EyeOff size={20} />
+      ) : (
+        <Eye size={20} />
+      )}
+    </button>
+
+  </div>
+</div>
 
             {/* LOGIN BUTTON */}
             <button
