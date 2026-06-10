@@ -11,6 +11,7 @@ import {
   Building2,
   Tags,
 } from "lucide-react";
+import { useTheme } from "@/app/providers/ThemeProvider";
 
 
 function formatRupiah(number: number) {
@@ -21,6 +22,7 @@ function formatRupiah(number: number) {
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const { theme } = useTheme();
 
   const {
     loading: authLoading,
@@ -232,10 +234,25 @@ getStats();
   }
 
   return (
-    <main className="relative min-h-screen text-white">
+    <main
+  className={`
+    relative
+    min-h-screen
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
 
   <img
-    src="/hero-v2.jpg"
+  src={
+    theme === "dark"
+      ? "/dark/home-hero.jpg"
+      : "/light/home-hero.jpg"
+  }
     alt="background"
     className="
       absolute inset-0
@@ -253,42 +270,72 @@ getStats();
 
         {/* HERO */}
 <div
-  className="
+  className={`
     relative
     overflow-hidden
     rounded-[32px]
-    border border-cyan-300/20
-    bg-white/5
-    backdrop-blur-xl
+
+    border
+
     mb-8
     min-h-[340px]
-  "
+
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/20
+          bg-white/5
+          backdrop-blur-xl
+        `
+        : `
+          border-slate-200
+          bg-white/70
+          backdrop-blur-md
+          shadow-xl
+        `
+    }
+  `}
 >
 
   {/* Banner Background */}
   <img
-    src="/admin-hero.png"
-    alt="banner"
-    className="
-      absolute
-      inset-0
-      w-full
-      h-full
-      object-cover
-      opacity-90
-    "
-  />
+  src={
+    theme === "dark"
+      ? "/dark/dashboard-hero.jpg"
+      : "/light/dashboard-hero.jpg"
+  }
+  alt="banner"
+  className="
+    absolute
+    inset-0
+    w-full
+    h-full
+    object-cover
+  "
+/>
 
   {/* Overlay */}
   <div
-    className="
-      absolute inset-0
-      bg-gradient-to-r
-      from-[#031427]
-      via-[#031427]/80
-      to-transparent
-    "
-  />
+  className={`
+    absolute inset-0
+
+    ${
+      theme === "dark"
+        ? `
+          bg-gradient-to-r
+          from-[#031427]
+          via-[#031427]/80
+          to-transparent
+        `
+        : `
+          bg-gradient-to-r
+          from-white/70
+          via-white/30
+          to-transparent
+        `
+    }
+  `}
+/>
 
   {/* Content */}
   <div className="relative z-10 p-10">
@@ -305,23 +352,33 @@ getStats();
     </p>
 
     <h1
-      className="
-        mt-4
-        text-7xl
-        font-bold
-        text-white
-      "
-    >
+  className={`
+    mt-4
+    text-7xl
+    font-bold
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
       Admin Dashboard
     </h1>
 
     <p
-      className="
-        mt-3
-        text-white/70
-        text-lg
-      "
-    >
+  className={`
+    mt-3
+    text-lg
+
+    ${
+      theme === "dark"
+        ? "text-white/70"
+        : "text-slate-600"
+    }
+  `}
+>
       Manage Internal Catalog
     </p>
 
@@ -336,33 +393,63 @@ getStats();
   {/* TOTAL ITEMS */}
 
   <div
-    className="
-      rounded-[28px]
-      border border-cyan-300/20
-      bg-white/5
-      backdrop-blur-xl
-      p-6
+  className={`
+    rounded-[28px]
 
-      flex
-      justify-between
-      items-center
-    "
-  >
+    border
+
+    p-6
+
+    flex
+    justify-between
+    items-center
+
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/20
+          bg-white/5
+          backdrop-blur-xl
+        `
+        : `
+          border-slate-200
+          bg-white/80
+          backdrop-blur-md
+          shadow-lg
+        `
+    }
+  `}
+>
     <div>
-      <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
-        Total Items
-      </p>
+      <p
+  className={`
+    text-sm
+    uppercase
+    tracking-[3px]
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
+>
+  Total Items
+</p>
 
       <h2
-        className="
-          text-5xl
-          font-bold
-          mt-3
+  className={`
+    text-5xl
+    font-bold
+    mt-3
 
-          text-white
-          drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]
-        "
-      >
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
         {stats.totalItems}
       </h2>
     </div>
@@ -379,42 +466,75 @@ getStats();
       "
     >
       <Package
-        size={28}
-        className="text-cyan-300"
-      />
+  className={
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-blue-600"
+  }
+/>
     </div>
   </div>
 
   {/* VENDORS */}
 
   <div
-    className="
-      rounded-[28px]
-      border border-cyan-300/20
-      bg-white/5
-      backdrop-blur-xl
-      p-6
+  className={`
+    rounded-[28px]
 
-      flex
-      justify-between
-      items-center
-    "
-  >
+    border
+
+    p-6
+
+    flex
+    justify-between
+    items-center
+
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/20
+          bg-white/5
+          backdrop-blur-xl
+        `
+        : `
+          border-slate-200
+          bg-white/80
+          backdrop-blur-md
+          shadow-lg
+        `
+    }
+  `}
+>
     <div>
-      <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
-        Vendors
-      </p>
+      <p
+  className={`
+    text-sm
+    uppercase
+    tracking-[3px]
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
+>
+  Vendors
+</p>
 
       <h2
-        className="
-          text-5xl
-          font-bold
-          mt-3
+  className={`
+    text-5xl
+    font-bold
+    mt-3
 
-          text-white
-          drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]
-        "
-      >
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
         {stats.totalVendors}
       </h2>
     </div>
@@ -431,42 +551,75 @@ getStats();
       "
     >
       <Building2
-        size={28}
-        className="text-cyan-300"
-      />
+        className={
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-blue-600"
+  }
+/>
     </div>
   </div>
 
   {/* CATEGORIES */}
 
   <div
-    className="
-      rounded-[28px]
-      border border-cyan-300/20
-      bg-white/5
-      backdrop-blur-xl
-      p-6
+  className={`
+    rounded-[28px]
 
-      flex
-      justify-between
-      items-center
-    "
-  >
+    border
+
+    p-6
+
+    flex
+    justify-between
+    items-center
+
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/20
+          bg-white/5
+          backdrop-blur-xl
+        `
+        : `
+          border-slate-200
+          bg-white/80
+          backdrop-blur-md
+          shadow-lg
+        `
+    }
+  `}
+>
     <div>
-      <p className="text-cyan-300 text-sm uppercase tracking-[3px]">
-        Categories
-      </p>
+      <p
+  className={`
+    text-sm
+    uppercase
+    tracking-[3px]
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
+>
+  Categories
+</p>
 
       <h2
-        className="
-          text-5xl
-          font-bold
-          mt-3
+  className={`
+    text-5xl
+    font-bold
+    mt-3
 
-          text-white
-          drop-shadow-[0_0_10px_rgba(0,255,255,0.4)]
-        "
-      >
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
         {stats.totalCategories}
       </h2>
     </div>
@@ -483,9 +636,12 @@ getStats();
       "
     >
       <Tags
-        size={28}
-        className="text-cyan-300"
-      />
+        className={
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-blue-600"
+  }
+/>
     </div>
   </div>
 
@@ -494,16 +650,35 @@ getStats();
         {/* SEARCH */}
 
 <div
-  className="
-    mb-8
-    rounded-[28px]
-    border border-cyan-300/20
-    bg-white/5
-    backdrop-blur-xl
-    px-6 py-5
+  className={`
+  mb-8
 
-    flex items-center gap-4
-  "
+  rounded-[28px]
+
+  border
+
+  px-6
+  py-5
+
+  flex
+  items-center
+  gap-4
+
+  ${
+    theme === "dark"
+      ? `
+        border-cyan-300/20
+        bg-white/5
+        backdrop-blur-xl
+      `
+      : `
+        border-slate-200
+        bg-white/80
+        backdrop-blur-md
+        shadow-lg
+      `
+  }
+`}
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -512,8 +687,12 @@ getStats();
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    className="text-cyan-300"
-  >
+    className={
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-blue-500"
+  }
+>
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -528,25 +707,50 @@ getStats();
     onChange={(e) =>
       setSearch(e.target.value)
     }
-    className="
-      flex-1
-      bg-transparent
-      text-white
-      outline-none
-      placeholder:text-white/40
-    "
+    className={`
+  flex-1
+  bg-transparent
+  outline-none
+
+  ${
+    theme === "dark"
+      ? `
+        text-white
+        placeholder:text-white/40
+      `
+      : `
+        text-slate-900
+        placeholder:text-slate-400
+      `
+  }
+`}
   />
 </div>
 
         {/* TABLE */}
         <div
-  className="
+  className={`
     rounded-[32px]
-    border border-cyan-300/20
-    bg-white/5
-    backdrop-blur-xl
+
+    border
+
     overflow-hidden
-  "
+
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/20
+          bg-white/5
+          backdrop-blur-xl
+        `
+        : `
+          border-slate-200
+          bg-white/80
+          backdrop-blur-md
+          shadow-xl
+        `
+    }
+  `}
 >
 
           <div className="overflow-x-auto">
@@ -556,61 +760,103 @@ getStats();
               <thead className="bg-transparent">
 
                 <tr
-                  className="
-                    text-left
-                    text-cyan-200
-                  "
-                >
+  className={`
+    text-left
+
+    ${
+      theme === "dark"
+        ? "text-cyan-200"
+        : "text-slate-500"
+    }
+  `}
+>
 
                   <th
-                    className="
-                      p-5 font-bold
-                      text-cyan-200                    "
+                    className={`
+  p-5
+  font-bold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-200"
+      : "text-slate-500"
+  }
+`}
                   >
                     Image
                   </th>
 
                   <th
-                    className="
-                      p-5 font-bold
-                      text-cyan-200
-                    "
+                    className={`
+  p-5
+  font-bold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-200"
+      : "text-slate-500"
+  }
+`}
                   >
                     Item Name
                   </th>
 
                   <th
-                    className="
-                      p-5 font-bold
-                      text-cyan-200
-                    "
+                    className={`
+  p-5
+  font-bold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-200"
+      : "text-slate-500"
+  }
+`}
                   >
                     Vendor
                   </th>
 
                   <th
-                    className="
-                      p-5 font-bold
-                      text-cyan-200
-                    "
+                    className={`
+  p-5
+  font-bold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-200"
+      : "text-slate-500"
+  }
+`}
                   >
                     Category
                   </th>
 
                   <th
-                    className="
-                      p-5 font-bold
-                      text-cyan-200
-                    "
+                    className={`
+  p-5
+  font-bold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-200"
+      : "text-slate-500"
+  }
+`}
                   >
                     Price
                   </th>
 
                   <th
-                    className="
-                      p-5 font-bold
-                      text-cyan-200
-                    "
+                    className={`
+  p-5
+  font-bold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-200"
+      : "text-slate-500"
+  }
+`}
                   >
                     Action
                   </th>

@@ -6,10 +6,13 @@ import {
   PlusSquare,
   LogOut,
 } from "lucide-react";
+import { useTheme } from "@/app/providers/ThemeProvider";
 import { useRouter } from "next/navigation";
 
 export default function AdminSidebar() {
   const router = useRouter();
+
+  const { theme } = useTheme();
 
   const menus = [
   {
@@ -31,26 +34,37 @@ export default function AdminSidebar() {
 
   return (
     <div
-      className="
-        sticky
-        top-6
+      className={`
+  sticky
+  top-6
 
-        w-[260px]
-        h-fit
+  w-[260px]
+  h-fit
 
-        rounded-[32px]
+  rounded-[32px]
+
+  p-6
+
+  flex
+  flex-col
+  gap-4
+
+  ${
+    theme === "dark"
+      ? `
         border border-cyan-300/20
-
         bg-[#071828]/80
         backdrop-blur-xl
-
-        p-6
-
-        flex flex-col
-        gap-4
-
         shadow-[0_0_40px_rgba(0,255,255,0.08)]
-      "
+      `
+      : `
+        border border-slate-200
+        bg-white/80
+        backdrop-blur-md
+        shadow-xl
+      `
+  }
+`}
     >
 
       {/* LOGO */}
@@ -89,18 +103,21 @@ export default function AdminSidebar() {
         shadow-[0_0_30px_rgba(0,255,255,0.18)]
       `
       : `
-        border-cyan-300/10
-        bg-white/5
+        border-blue-200
+        shadow-lg
       `
   }
 
-  text-white
-  text-lg
+${
+  theme === "dark"
+    ? "text-white"
+    : "text-slate-700"
+}
 
-  hover:border-cyan-300/40
-  hover:bg-cyan-500/10
+hover:border-cyan-300/40
+hover:bg-cyan-500/10
 
-  transition
+transition
 `}
         >
           <div className="flex items-center gap-3 justify-center">
@@ -116,19 +133,33 @@ export default function AdminSidebar() {
   onClick={() =>
     router.push("/admin/login")
   }
-  className="
-    h-20
-    rounded-2xl
-    border
-    border-red-400/20
-    text-red-300
-    hover:bg-red-500/10
-    transition
-    flex
-    items-center
-    justify-center
-    gap-3
-  "
+  className={`
+  h-20
+  rounded-2xl
+
+  border
+
+  ${
+    theme === "dark"
+      ? `
+        border-red-400/20
+        text-red-300
+      `
+      : `
+        border-red-200
+        text-red-500
+      `
+  }
+
+  hover:bg-red-500/10
+
+  transition
+
+  flex
+  items-center
+  justify-center
+  gap-3
+`}
 >
   <LogOut size={20} />
   <span>Logout</span>
@@ -152,44 +183,64 @@ export default function AdminSidebar() {
   "
 >
   <p
-    className="
-      text-cyan-300
-      text-xs
-    "
-  >
+  className={`
+    text-xs
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
+>
     Welcome Back,
   </p>
 
   <h3
-    className="
-      text-white
-      text-xl
-      font-bold
-      mt-2
-    "
-  >
+  className={`
+    text-xl
+    font-bold
+    mt-2
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
     Admin
   </h3>
 
   <div
-    className="
-      mt-3
+  className={`
+    mt-3
 
-      inline-flex
-      items-center
-      justify-center
+    inline-flex
+    items-center
+    justify-center
 
-      px-3 py-1.5
+    px-4 py-2
 
-      rounded-full
+    rounded-full
 
-      bg-cyan-500/10
-      border border-cyan-300/20
+    text-xs
 
-      text-cyan-300
-      text-xs
-    "
-  >
+    ${
+      theme === "dark"
+        ? `
+          bg-cyan-500/10
+          border border-cyan-300/20
+          text-cyan-300
+        `
+        : `
+          bg-blue-50
+          border border-blue-200
+          text-blue-600
+        `
+    }
+  `}
+>
     Administrator
   </div>
 </div>

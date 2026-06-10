@@ -4,9 +4,13 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useTheme } from "@/app/providers/ThemeProvider";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+
+  const { theme } = useTheme();
 
   const [email, setEmail] =
     useState("");
@@ -67,18 +71,33 @@ if (
 
   return (
     <main
-  className="
+  className={`
     relative
     min-h-screen
     overflow-hidden
+
     flex
     items-center
     justify-center
-  "
+
+    ${
+      theme === "dark"
+        ? "bg-black"
+        : "bg-[#f6f8fc]"
+    }
+  `}
 >
+<div className="absolute top-8 right-8 z-50">
+      <ThemeToggle />
+    </div>
+
       {/* BACKGROUND */}
 <img
-  src="/hero-v2.jpg"
+  src={
+    theme === "dark"
+      ? "/dark/home-hero.jpg"
+      : "/light/home-hero.jpg"
+  }
   alt="Background"
   className="
     absolute
@@ -91,71 +110,104 @@ if (
 
       {/* CARD */}
       <div
-        className="
-          relative
-          z-10
-          w-full
-          max-w-md
-          overflow-hidden
-          rounded-[38px]
-          border
-          border-cyan-300/20
+  className={`
+    relative
+    z-10
+
+    w-full
+    max-w-md
+
+    overflow-hidden
+    rounded-[38px]
+
+    ${
+      theme === "dark"
+        ? `
+          border border-cyan-300/20
           bg-black/35
           backdrop-blur-xl
-border-cyan-300/20
-shadow-[0_0_60px_rgba(0,255,255,0.15)]
-        "
-      >
+          shadow-[0_0_60px_rgba(0,255,255,0.15)]
+        `
+        : `
+          border border-slate-200
+          bg-white/80
+          backdrop-blur-md
+          shadow-2xl
+        `
+    }
+  `}
+>
 
     {/* SOFT GLOW */}
     <div
-      className="
-        absolute
-        w-[280px]
-        h-[280px]
-        bg-red-100/40
-        rounded-full
-        blur-3xl
-      "
-    />
+  className={`
+    absolute
+    w-[280px]
+    h-[280px]
+
+    rounded-full
+    blur-3xl
+
+    ${
+      theme === "dark"
+        ? "bg-cyan-400/20"
+        : "bg-blue-200/40"
+    }
+  `}
+/>
 
         {/* CONTENT */}
         <div className="px-8 pt-10 pb-8">
           {/* TITLE */}
           <div className="text-center">
             <p
-              className="
-                text-[13px]
-                font-semibold
-                uppercase
-                tracking-[0.28em]
-                text-cyan-300
-              "
-            >
+  className={`
+    text-[13px]
+    font-semibold
+    uppercase
+    tracking-[0.28em]
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
+>
               ITEM CATALOG SYSTEM
             </p>
 
             <h1
-              className="
-                mt-4
-                text-[52px]
-                leading-none
-                font-bold
-                tracking-tight
-                text-white
-              "
-            >
+  className={`
+    mt-4
+    text-[52px]
+    leading-none
+    font-bold
+    tracking-tight
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
               Admin Login
             </h1>
 
             <p
-              className="
-                mt-5
-                text-[16px]
-                leading-relaxed
-                text-gray-500
-              "
-            >
+  className={`
+    mt-5
+    text-[16px]
+    leading-relaxed
+
+    ${
+      theme === "dark"
+        ? "text-gray-500"
+        : "text-slate-500"
+    }
+  `}
+>
               Masuk untuk mengakses katalog internal
             </p>
           </div>
@@ -168,13 +220,17 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
             {/* EMAIL */}
             <div>
               <label
-                className="
+                className={`
                   mb-3
                   block
                   text-[15px]
                   font-medium
-                  text-gray-200
-                "
+                  ${
+  theme === "dark"
+    ? "text-gray-200"
+    : "text-slate-600"
+}
+                `}
               >
                 Email Address
               </label>
@@ -189,40 +245,48 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
       e.target.value
     )
   }
-  className="
-    w-full
-    rounded-[22px]
-    border
-    border-cyan-300/30
-    bg-black/20
-    px-5
-    py-5
-    text-[16px]
-    text-white
-    outline-none
-    transition-all
-    duration-300
-    placeholder:text-gray-400
-    focus:border-red-400
-    focus:bg-white
-    focus:text-black
-    focus:ring-4
-    focus:ring-red-100
-  "
+  className={`
+  w-full
+  rounded-[22px]
+  border
+  px-5
+  py-5
+  text-[16px]
+  outline-none
+  transition-all
+
+  ${
+    theme === "dark"
+      ? `
+        border-cyan-300/30
+        bg-black/20
+        text-white
+      `
+      : `
+        border-cyan-200
+        bg-blue-50/70
+        text-slate-800
+      `
+  }
+`}
 />
             </div>
 
             {/* PASSWORD */}
             <div>
   <label
-    className="
-      mb-3
-      block
-      text-[15px]
-      font-medium
-      text-gray-200
-    "
-  >
+    className={`
+                  mb-3
+                  block
+                  text-[15px]
+                  font-medium
+                  ${
+  theme === "dark"
+    ? "text-gray-200"
+    : "text-slate-600"
+}
+                `}
+              >
     Password
   </label>
 
@@ -242,27 +306,30 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
           e.target.value
         )
       }
-      className="
-        w-full
-        rounded-[22px]
-        border
+      className={`
+  w-full
+  rounded-[22px]
+  border
+  px-5
+  py-5
+  text-[16px]
+  outline-none
+  transition-all
+
+  ${
+    theme === "dark"
+      ? `
         border-cyan-300/30
         bg-black/20
-        px-5
-        pr-14
-        py-5
-        text-[16px]
         text-white
-        outline-none
-        transition-all
-        duration-300
-        placeholder:text-gray-400
-        focus:border-red-400
-        focus:bg-white
-        focus:text-black
-        focus:ring-4
-        focus:ring-red-100
-      "
+      `
+      : `
+        border-cyan-200
+        bg-blue-50/70
+        text-slate-800
+      `
+  }
+`}
     />
 
     <button
@@ -272,15 +339,18 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
           !showPassword
         )
       }
-      className="
-        absolute
-        right-5
-        top-1/2
-        -translate-y-1/2
-        text-gray-400
-        hover:text-cyan-300
-        transition
-      "
+      className={`
+  absolute
+  right-5
+  top-1/2
+  -translate-y-1/2
+
+  ${
+    theme === "dark"
+      ? "text-gray-400"
+      : "text-slate-500"
+  }
+`}
     >
       {showPassword ? (
         <EyeOff size={20} />
@@ -296,24 +366,37 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
             <button
               type="submit"
               disabled={loading}
-              className="
-                mt-2
-                w-full
-                rounded-[22px]
-                bg-gradient-to-r
-                from-cyan-400
-                to-cyan-300
-                py-5
-                text-[17px]
-                font-semibold
-                text-white
-                shadow-[0_10px_30px_rgba(0,255,255,0.25)]
-                transition-all
-                duration-300
-                hover:scale-[1.01]
-                hover:shadow-[0_15px_40px_rgba(255,0,0,0.28)]
-                disabled:opacity-50
-              "
+              className={`
+  mt-2
+  w-full
+  rounded-[22px]
+  py-5
+  text-[17px]
+  font-semibold
+  text-white
+  transition-all
+  duration-300
+  hover:scale-[1.01]
+  disabled:opacity-50
+
+  ${
+    theme === "dark"
+      ? `
+        bg-gradient-to-r
+        from-cyan-400
+        to-cyan-300
+        shadow-[0_10px_30px_rgba(0,255,255,0.25)]
+        hover:shadow-[0_15px_40px_rgba(0,255,255,0.35)]
+      `
+      : `
+        bg-gradient-to-r
+        from-[#18c7ea]
+        to-[#5fdcf7]
+        shadow-lg
+        hover:shadow-xl
+      `
+  }
+`}
             >
               {loading
                 ? "Loading..."
@@ -326,21 +409,37 @@ shadow-[0_0_60px_rgba(0,255,255,0.15)]
             onClick={() =>
               router.push("/")
             }
-            className="
-              mt-6
-              w-full
-              rounded-[22px]
-              border
-              border-gray-200
-              bg-white
-              py-5
-              text-[16px]
-              font-medium
-              text-gray-600
-              transition-all
-              duration-300
-              hover:bg-gray-50
-            "
+            className={`
+  mt-6
+  w-full
+  rounded-[22px]
+  py-5
+  text-[16px]
+  font-medium
+  transition-all
+  duration-300
+  hover:scale-[1.01]
+  disabled:opacity-50
+
+  ${
+    theme === "dark"
+      ? `
+        border
+        border-cyan-300/20
+        bg-white/10
+        text-white
+        hover:bg-white/15
+      `
+      : `
+        border
+        border-slate-200
+        bg-white
+        text-slate-600
+        shadow-sm
+        hover:bg-slate-50
+      `
+  }
+`}
           >
             ← Kembali ke Beranda
           </button>
