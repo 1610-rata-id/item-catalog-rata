@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+import { useTheme } from "@/app/providers/ThemeProvider";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,6 +13,8 @@ const supabase = createClient(
 export default function PublicCatalogClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+const { theme } = useTheme();
 
   const [items, setItems] = useState<any[]>([]);
 
@@ -36,7 +39,7 @@ export default function PublicCatalogClient() {
     useState<any | null>(null);
 
   const [activeImage, setActiveImage] =
-    useState("");
+  useState<string | null>(null);
 
   const [page, setPage] = useState(
     Number(searchParams.get("page")) || 1
@@ -369,33 +372,50 @@ export default function PublicCatalogClient() {
 
   return (
     <main
-  className="
+  className={`
     min-h-screen
     font-[Poppins]
-    text-white
-    bg-[#031427]
     relative
-  "
+
+    ${
+      theme === "dark"
+        ? "text-white bg-[#031427]"
+        : "text-slate-800 bg-[#f5f7fb]"
+    }
+  `}
 >
 
       {/* HEADER */}
       <div
-  className="
-    sticky top-0 z-50
-
-    bg-[#031427]/90
+  className={`
+    sticky
+    top-0
+    z-50
 
     backdrop-blur-xl
 
     border-b
-    border-cyan-300/10
 
-    px-8 py-6
+    px-8
+    py-6
 
     flex
     justify-between
     items-center
-  "
+
+    ${
+      theme === "dark"
+        ? `
+          bg-[#031427]/90
+          border-cyan-300/10
+        `
+        : `
+          bg-white/90
+          border-slate-200
+          shadow-sm
+        `
+    }
+  `}
 >
 
         <img
@@ -434,30 +454,32 @@ export default function PublicCatalogClient() {
             </button>
 
             {showCategory && (
-              <div
-  className="
-    absolute
-    mt-3
+  <div
+    className={`
+      absolute
+      mt-3
+      w-72
+      rounded-3xl
+      backdrop-blur-xl
+      overflow-y-auto custom-scrollbar
+      max-h-[420px]
+      z-50
 
-    w-72
-
-    rounded-3xl
-
-    border
-    border-cyan-300/20
-
-    bg-[#071d33]
-
-    backdrop-blur-xl
-
-    shadow-[0_0_30px_rgba(0,255,255,0.1)]
-
-    overflow-y-auto custom-scrollbar
-
-    max-h-[420px]
-
-    z-50
-  "
+      ${
+        theme === "dark"
+          ? `
+            border border-cyan-300/20
+            bg-[#071d33]
+            text-white
+          `
+          : `
+            border border-slate-200
+            bg-white
+            text-slate-800
+            shadow-xl
+          `
+      }
+    `}
 >
 
                 <input
@@ -677,27 +699,34 @@ export default function PublicCatalogClient() {
               )
             }
             placeholder="Cari item..."
-            className="
+            className={`
   px-6
   py-3
 
   rounded-2xl
 
   border
-  border-cyan-300/20
-
-  bg-white/5
-
-  text-white
-
-  placeholder:text-white/40
 
   outline-none
 
-  focus:border-cyan-400
-
   transition
-"
+
+  ${
+    theme === "dark"
+      ? `
+        border-cyan-300/20
+        bg-white/5
+        text-white
+        placeholder:text-white/40
+      `
+      : `
+        border-slate-200
+        bg-white
+        text-slate-800
+        placeholder:text-slate-400
+      `
+  }
+`}
           />
         </div>
       </div>
@@ -705,15 +734,30 @@ export default function PublicCatalogClient() {
       {/* BANNER */}
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <div
-          className="
-            relative overflow-hidden rounded-[32px]
-            shadow-sm border border-gray-100
-            bg-white
-          "
+          className={`
+  relative
+  overflow-hidden
+  rounded-[32px]
+
+  ${
+    theme === "dark"
+      ? `
+        border border-cyan-300/10
+        shadow-[0_0_30px_rgba(0,255,255,0.08)]
+      `
+      : `
+        border border-slate-200
+        shadow-xl
+      `
+  }
+`}
         >
           <img
-            src="/banner-catalog.png"
-            alt="Catalog Banner"
+  src={
+    theme === "dark"
+      ? "/dark/catalog-banner.jpg"
+      : "/light/catalog-banner.jpg"
+  }
             className="
               w-full
               h-[220px] md:h-[300px]
@@ -726,20 +770,38 @@ export default function PublicCatalogClient() {
       {/* RESULT */}
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
-        <p className="text-cyan-300">
+        <p
+  className={
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-slate-500"
+  }
+>
           Menampilkan{" "}
-          <span className="
-  font-semibold
-  text-cyan-400
-">
-            {items.length}
+          <span
+  className={`
+    font-semibold
+    ${
+      theme === "dark"
+        ? "text-cyan-400"
+        : "text-blue-600"
+    }
+  `}
+>
+  {items.length}
           </span>{" "}
           dari{" "}
-          <span className="
-  font-semibold
-  text-cyan-400
-">
-            {totalItems}
+          <span
+  className={`
+    font-semibold
+    ${
+      theme === "dark"
+        ? "text-cyan-400"
+        : "text-blue-600"
+    }
+  `}
+>
+  {totalItems}
           </span>{" "}
           item
         </p>
@@ -815,48 +877,55 @@ export default function PublicCatalogClient() {
                 } else {
 
                   setActiveImage(
-                    item.image_url || ""
-                  );
+  item.image_url || null
+);
 
                 }
 
               }}
-              className="
-  rounded-[28px]
+              className={`
+    rounded-[28px]
+    border
+    overflow-hidden
+    cursor-pointer
+    transition-all
+    duration-300
+    hover:-translate-y-2
 
-  border
-  border-cyan-300/20
-
-  bg-[#071d33]
-
-  overflow-hidden
-
-  cursor-pointer
-
-  transition-all
-  duration-300
-
-  hover:-translate-y-2
-
-  hover:border-cyan-400/50
-
-  hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
-"
-            >
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/20
+          bg-[#071d33]
+          hover:border-cyan-400/50
+          hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
+        `
+        : `
+          border-slate-200
+          bg-white
+          shadow-lg
+          hover:shadow-2xl
+        `
+    }
+  `}
+>
 
               {/* IMAGE */}
-              <div className="
-  h-60
+              <div
+  className={`
+    h-60
+    flex
+    items-center
+    justify-center
+    overflow-hidden
 
-  bg-[#0b2745]
-
-  flex
-  items-center
-  justify-center
-
-  overflow-hidden
-">
-
+    ${
+      theme === "dark"
+        ? "bg-[#0b2745]"
+        : "bg-slate-50"
+    }
+  `}
+>
                 {item.image_url ? (
 
                   <img
@@ -896,31 +965,35 @@ export default function PublicCatalogClient() {
               <div className="p-5">
 
                 <h2
-  className="
-    text-white
+  className={`
     font-semibold
     text-base
-
     line-clamp-2
-
     min-h-[52px]
-  "
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-800"
+    }
+  `}
 >
                   {item.item_name}
                 </h2>
 
                 <p
-  className="
-    text-cyan-300
-
+  className={`
     uppercase
-
     tracking-[2px]
-
     text-xs
-
     mt-3
-  "
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
 >
                   {item.category}
                 </p>
@@ -958,12 +1031,30 @@ export default function PublicCatalogClient() {
     onClick={() =>
       setPage(page - 1)
     }
-    className="
-      px-4 py-2 rounded-xl border
-      
-      disabled:opacity-40
-      transition
-    "
+    className={`
+  px-4
+  py-2
+  rounded-xl
+  border
+  transition
+
+  ${
+    theme === "dark"
+      ? `
+        bg-[#071d33]
+        text-white
+        border-cyan-300/20
+      `
+      : `
+        bg-white
+        text-slate-700
+        border-slate-300
+        shadow-md
+      `
+  }
+
+  disabled:opacity-40
+`}
   >
     ←
   </button>
@@ -1046,15 +1137,30 @@ export default function PublicCatalogClient() {
     onClick={() =>
       setPage(page + 1)
     }
-    className="
-      px-4 py-2 rounded-xl border
-      bg-[#071d33]
-border-cyan-300/20
-text-white
-hover:border-cyan-400
-      disabled:opacity-40
-      transition
-    "
+    className={`
+  px-4
+  py-2
+  rounded-xl
+  border
+  transition
+
+  ${
+    theme === "dark"
+      ? `
+        bg-[#071d33]
+        text-white
+        border-cyan-300/20
+      `
+      : `
+        bg-white
+        text-slate-700
+        border-slate-300
+        shadow-md
+      `
+  }
+
+  disabled:opacity-40
+`}
   >
     →
   </button>
@@ -1084,17 +1190,27 @@ hover:border-cyan-400
           >
 
             <div
-              className="
-                bg-[#071d33]
-text-white
-                w-full
-                max-w-7xl
-                rounded-[32px]
-                overflow-hidden
-                relative
-                shadow-2xl
-              "
-            >
+  className={`
+    w-full
+    max-w-7xl
+    rounded-[32px]
+    overflow-hidden
+    relative
+    shadow-2xl
+
+    ${
+      theme === "dark"
+        ? `
+          bg-[#071d33]
+          text-white
+        `
+        : `
+          bg-white
+          text-slate-900
+        `
+    }
+  `}
+>
 
               {/* CLOSE */}
               <button
@@ -1132,17 +1248,32 @@ text-white
                     "
                   >
 
-                    <img
-                      src={activeImage}
-                      alt={selectedItem.item_name}
-                      className="
-                        max-h-full
-                        object-contain
-                        transition-all
-                        duration-300
-                        hover:scale-105
-                      "
-                    />
+                    {activeImage ? (
+  <img
+    src={activeImage}
+    alt={selectedItem.item_name}
+    className="
+      max-h-full
+      object-contain
+      transition-all
+      duration-300
+      hover:scale-105
+    "
+  />
+) : (
+  <div
+    className="
+      flex
+      items-center
+      justify-center
+      w-full
+      h-full
+      text-slate-400
+    "
+  >
+    No Image Available
+  </div>
+)}
 
                   </div>
 
@@ -1150,13 +1281,14 @@ text-white
                   <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
 
                     {(
-                      selectedItem.image_urls &&
-                      selectedItem.image_urls.length > 0
-                        ? selectedItem.image_urls
-                        : [
-                            selectedItem.image_url,
-                          ]
-                    ).map(
+  selectedItem.image_urls &&
+  selectedItem.image_urls.length > 0
+    ? selectedItem.image_urls
+    : selectedItem.image_url
+      ? [selectedItem.image_url]
+      : []
+)
+.map(
                       (
                         img: string,
                         index: number
