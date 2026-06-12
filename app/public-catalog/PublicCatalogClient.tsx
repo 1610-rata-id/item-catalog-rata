@@ -490,7 +490,7 @@ const { theme } = useTheme();
                       e.target.value
                     )
                   }
-                  className="
+className={`
   w-full
 
   px-4
@@ -499,12 +499,21 @@ const { theme } = useTheme();
   bg-transparent
 
   border-b
-  border-cyan-300/10
-
-  text-white
 
   outline-none
-"
+
+  ${
+    theme === "dark"
+      ? `
+        border-cyan-300/10
+        text-white
+      `
+      : `
+        border-slate-200
+        text-slate-800
+      `
+  }
+`}
                 />
 
                 <div
@@ -527,8 +536,10 @@ const { theme } = useTheme();
 
     ${
       selectedCategory === "All"
-        ? "bg-cyan-500/10 text-cyan-300 font-semibold"
-        : "text-white"
+  ? "bg-cyan-500/10 text-cyan-300 font-semibold"
+  : theme === "dark"
+    ? "text-white"
+    : "text-slate-700"
     }
   `}
 >
@@ -581,7 +592,7 @@ const { theme } = useTheme();
                               main
                             )
                           }
-                          className="
+ className={`
   w-full
 
   flex
@@ -591,15 +602,22 @@ const { theme } = useTheme();
   px-4
   py-3
 
-  text-white
-
-  hover:bg-cyan-500/10
-
   transition
 
   font-semibold
-"
-                        >
+
+  ${
+    theme === "dark"
+      ? `
+        text-white
+        hover:bg-cyan-500/10
+      `
+      : `
+        text-slate-800
+        hover:bg-slate-100
+      `
+  }
+`}                        >
                           <span>
                             {main}
                           </span>
@@ -670,10 +688,11 @@ const { theme } = useTheme();
 
   transition
                                     ${
-                                      selectedCategory ===
-                                      sub
-                                        ? "bg-cyan-500/10 text-cyan-300 font-medium"
-                                        : "text-white/70"
+                                      selectedCategory === sub
+  ? "bg-cyan-500/10 text-cyan-300 font-medium"
+  : theme === "dark"
+    ? "text-white/70"
+    : "text-slate-600"
                                     }
                                   `}
                                 >
@@ -1110,17 +1129,33 @@ const { theme } = useTheme();
               setPage(p)
             }
             className={`
-              min-w-[42px]
-              h-[42px]
-              rounded-xl
-              transition
-              border
-              ${
-                page === p
-                  ? "bg-cyan-400 text-[#031427] border-red-500 shadow-lg"
-                  : "bg-white hover:bg-gray-100"
-              }
-            `}
+  min-w-[42px]
+  h-[42px]
+  rounded-xl
+  transition
+  border
+
+  ${
+    page === p
+      ? `
+          bg-cyan-400
+          text-[#031427]
+          border-cyan-400
+          shadow-lg
+        `
+      : theme === "dark"
+        ? `
+            bg-[#071d33]
+            text-white
+            border-cyan-300/20
+          `
+        : `
+            bg-white
+            text-slate-700
+            border-slate-300
+          `
+  }
+`}
           >
             {p}
           </button>
@@ -1237,16 +1272,21 @@ const { theme } = useTheme();
                 <div>
 
                   <div
-                    className="
-                      text-cyan-300
-                      rounded-3xl
-                      p-8
-                      flex
-                      items-center
-                      justify-center
-                      h-[500px]
-                    "
-                  >
+  className={`
+    rounded-3xl
+    p-8
+    flex
+    items-center
+    justify-center
+    h-[500px]
+
+    ${
+      theme === "dark"
+        ? "bg-[#0b2745]"
+        : "bg-slate-50"
+    }
+  `}
+>
 
                     {activeImage ? (
   <img
@@ -1311,8 +1351,10 @@ const { theme } = useTheme();
                             hover:scale-105
                             ${
                               activeImage === img
-                                ? "border-red-500"
-                                : "border-gray-200"
+  ? "border-cyan-400"
+  : theme === "dark"
+    ? "border-cyan-300/20"
+    : "border-slate-200"
                             }
                           `}
                         />
@@ -1337,7 +1379,18 @@ const { theme } = useTheme();
                     {selectedItem.item_name}
                   </h1>
 
-                  <p className="text-gray-500 mt-3 text-lg">
+                  <p
+  className={`
+    mt-3
+    text-lg
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-blue-600"
+    }
+  `}
+>
                     {selectedItem.category}
                   </p>
 
@@ -1388,12 +1441,17 @@ const { theme } = useTheme();
                     </h2>
 
                     <div
-                      className="
-                        whitespace-pre-line
-                        text-white-700
-                        leading-8
-                      "
-                    >
+  className={`
+    whitespace-pre-line
+    leading-8
+
+    ${
+      theme === "dark"
+        ? "text-white/80"
+        : "text-slate-600"
+    }
+  `}
+>
                       {selectedItem.description ||
                         "-"}
                     </div>

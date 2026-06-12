@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useTheme } from "@/app/providers/ThemeProvider";
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -11,6 +12,7 @@ function formatRupiah(number: number) {
 
 export default function Catalog() {
   const router = useRouter();
+const { theme } = useTheme();
 const { role } =
   useRequireAuth();
 
@@ -22,10 +24,6 @@ const [authLoading, setAuthLoading] =
 const [items, setItems] = useState<any[]>([]);
 
   // NEW
-  const [categories, setCategories] = useState<
-  string[]
->([]);
-
 const [
   hierarchicalCategories,
   setHierarchicalCategories,
@@ -511,47 +509,79 @@ function toggleCategory(
 
 return (
   <main
-    className="
-      min-h-screen
-      font-[Poppins]
-      text-white
-      bg-[#02111f]
-      relative
-    "
-  >
+  className={`
+    min-h-screen
+    font-[Poppins]
+    relative
+
+    ${
+      theme === "dark"
+        ? `
+          text-white
+          bg-[#02111f]
+        `
+        : `
+          text-slate-900
+          bg-[#f5f7fb]
+        `
+    }
+  `}
+>
 
     <img
-      src="/hero-v2.jpg"
+      src={
+  theme === "dark"
+    ? "/dark/dashboard-hero.jpg"
+    : "/light/dashboard-hero.jpg"
+}
       alt="background"
-      className="
+      className={`
         absolute
         inset-0
         w-full
         h-full
         object-cover
-        opacity-60
-      "
+        ${
+  theme === "dark"
+    ? "opacity-60"
+    : "opacity-100"
+}
+      `}
     />
 
     <div className="relative z-10">
 
       {/* HEADER */}
       <div
-  className="
-    sticky top-0 z-50
+  className={`
+  sticky
+  top-0
+  z-50
 
-    bg-[#04192c]/80
-    backdrop-blur-xl
+  backdrop-blur-xl
 
-    border-b
-    border-cyan-400/10
+  border-b
 
-    px-8 py-5
+  px-8
+  py-5
 
-    flex
-    justify-between
-    items-center
-  "
+  flex
+  justify-between
+  items-center
+
+  ${
+    theme === "dark"
+      ? `
+          bg-[#04192c]/80
+          border-cyan-400/10
+        `
+      : `
+          bg-white/90
+          border-slate-200
+          shadow-sm
+        `
+  }
+`}
 >
 
         {/* LOGO */}
@@ -569,13 +599,21 @@ return (
             onClick={() =>
               router.push("/")
             }
-            className="
-  text-white
-
-  hover:text-cyan-300
-
+            className={`
   transition
-"
+
+  ${
+    theme === "dark"
+      ? `
+          text-white
+          hover:text-cyan-300
+        `
+      : `
+          text-slate-700
+          hover:text-blue-600
+        `
+  }
+`}
           >
             Beranda
           </button>
@@ -592,42 +630,58 @@ return (
         !showCategory
       )
     }
-    className="
-  text-white
-
-  hover:text-cyan-300
-
+    className={`
   transition
-"
+
+  ${
+    theme === "dark"
+      ? `
+          text-white
+          hover:text-cyan-300
+        `
+      : `
+          text-slate-700
+          hover:text-blue-600
+        `
+  }
+`}
   >
     Category ▾
   </button>
 
   {showCategory && (
     <div
-  className="
-    absolute
-    mt-3
+  className={`
+  absolute
+  mt-3
 
-    w-72
+  w-72
 
-    rounded-3xl
+  rounded-3xl
 
-    border
-    border-cyan-300/20
+  backdrop-blur-xl
 
-    bg-[#071d33]
+  overflow-y-auto
 
-    backdrop-blur-xl
+  max-h-[420px]
 
-    shadow-[0_0_30px_rgba(0,255,255,0.1)]
+  z-50
 
-    overflow-y-auto
-
-    max-h-[420px]
-
-    z-50
-  "
+  ${
+    theme === "dark"
+      ? `
+          border border-cyan-300/20
+          bg-[#071d33]
+          text-white
+        `
+      : `
+          border border-slate-200
+          bg-white
+          text-slate-800
+          shadow-xl
+        `
+  }
+`}
 >
 
       <input
@@ -638,7 +692,7 @@ return (
             e.target.value
           )
         }
-        className="
+        className={`
   w-full
 
   px-4
@@ -647,12 +701,21 @@ return (
   bg-transparent
 
   border-b
-  border-cyan-300/10
-
-  text-white
 
   outline-none
-"
+
+  ${
+    theme === "dark"
+      ? `
+          border-cyan-300/10
+          text-white
+        `
+      : `
+          border-slate-200
+          text-slate-800
+        `
+  }
+`}
       />
 
       {/* ALL */}
@@ -670,10 +733,14 @@ return (
 border-b
 border-cyan-300/10
           ${
-            selectedCategory === "All"
-              ? "bg-cyan-500/10 text-cyan-300 font-semibold"
-: "text-white"
-          }
+  selectedCategory === "All"
+    ? theme === "dark"
+      ? "bg-cyan-500/10 text-cyan-300 font-semibold"
+      : "bg-blue-50 text-blue-600 font-semibold"
+    : theme === "dark"
+      ? "text-white"
+      : "text-slate-700"
+}
         `}
       >
         All
@@ -724,7 +791,7 @@ border-cyan-300/10
             onClick={() =>
               toggleCategory(main)
             }
-            className="
+            className={`
   w-full
 
   flex
@@ -734,14 +801,22 @@ border-cyan-300/10
   px-4
   py-3
 
-  text-white
-
-  hover:bg-cyan-500/10
-
   transition
 
   font-semibold
-"
+
+  ${
+    theme === "dark"
+      ? `
+          text-white
+          hover:bg-cyan-500/10
+        `
+      : `
+          text-slate-800
+          hover:bg-slate-50
+        `
+  }
+`}
           >
             <span>{main}</span>
 
@@ -764,13 +839,26 @@ border-cyan-300/10
 
           setShowCategory(false);
         }}
-        className="
-          px-8 py-2
-          text-sm
-          text-gray-500
-          cursor-pointer
-          hover:bg-gray-100
-        "
+        className={`
+  px-8
+  py-2
+
+  text-sm
+
+  cursor-pointer
+
+  ${
+    theme === "dark"
+      ? `
+          text-white/70
+          hover:bg-cyan-500/10
+        `
+      : `
+          text-slate-600
+          hover:bg-slate-50
+        `
+  }
+`}
       >
         View All
       </div>
@@ -802,8 +890,12 @@ border-cyan-300/10
                     transition
                     ${
                       selectedCategory === sub
-                        ? "bg-red-50 text-red-600 font-medium"
-                        : "text-gray-600"
+  ? theme === "dark"
+    ? "bg-cyan-500/10 text-cyan-300 font-medium"
+    : "bg-blue-50 text-blue-600 font-medium"
+  : theme === "dark"
+    ? "text-white/70"
+    : "text-slate-600"
                     }
                   `}
                 >
@@ -834,42 +926,57 @@ border-cyan-300/10
                   !showVendor
                 )
               }
-              className="
-  text-white
-
-  hover:text-cyan-300
-
+              className={`
   transition
-"
+
+  ${
+    theme === "dark"
+      ? `
+          text-white
+          hover:text-cyan-300
+        `
+      : `
+          text-slate-700
+          hover:text-blue-600
+        `
+  }
+`}
             >
               Vendor ▾
             </button>
 
             {showVendor && (
               <div
-  className="
-    absolute
-    mt-3
+  className={`
+  absolute
+  mt-3
 
-    w-72
+  w-72
 
-    rounded-3xl
+  rounded-3xl
 
-    border
-    border-cyan-300/20
+  backdrop-blur-xl
 
-    bg-[#071d33]
+  overflow-y-auto
 
-    backdrop-blur-xl
+  max-h-[420px]
 
-    shadow-[0_0_30px_rgba(0,255,255,0.1)]
+  z-50
 
-    overflow-y-auto
-
-    max-h-[420px]
-
-    z-50
-  "
+  ${
+    theme === "dark"
+      ? `
+          border border-cyan-300/20
+          bg-[#071d33]
+          shadow-[0_0_30px_rgba(0,255,255,0.1)]
+        `
+      : `
+          border border-slate-200
+          bg-white
+          shadow-xl
+        `
+  }
+`}
 >
 
                 <input
@@ -880,21 +987,29 @@ border-cyan-300/10
                       e.target.value
                     )
                   }
-                  className="
+                  className={`
   w-full
-
   px-4
   py-4
 
   bg-transparent
 
   border-b
-  border-cyan-300/10
-
-  text-white
 
   outline-none
-"
+
+  ${
+    theme === "dark"
+      ? `
+          border-cyan-300/10
+          text-white
+        `
+      : `
+          border-slate-200
+          text-slate-800
+        `
+  }
+`}
                 />
 
                 {vendors
@@ -922,8 +1037,12 @@ border-cyan-300/10
                         hover:bg-cyan-500/10
                         ${
                           selectedVendor === v
-                            ? "bg-cyan-500/10 text-cyan-300 font-semibold"
-: "text-white"
+  ? theme === "dark"
+    ? "bg-cyan-500/10 text-cyan-300 font-semibold"
+    : "bg-blue-50 text-blue-600 font-semibold"
+  : theme === "dark"
+    ? "text-white"
+    : "text-slate-700"
                         }
                       `}
                     >
@@ -943,26 +1062,35 @@ border-cyan-300/10
     )
   }
   placeholder="Cari item..."
-  className="
+  className={`
   w-[280px]
 
-  px-5 py-3
+  px-5
+  py-3
 
   rounded-2xl
 
-  bg-white/5
-
   border
-  border-cyan-400/30
-
-  text-white
 
   outline-none
 
-  focus:border-cyan-400
-
   transition
-"
+
+  ${
+    theme === "dark"
+      ? `
+          bg-white/5
+          border-cyan-400/30
+          text-white
+        `
+      : `
+          bg-white
+          border-slate-300
+          text-slate-800
+          shadow-sm
+        `
+  }
+`}
 />
 
 {/* ADMIN MENU */}
@@ -974,27 +1102,36 @@ border-cyan-300/10
           "/admin/dashboard"
         )
       }
-      className="
-h-12
-px-8
+      className={`
+  h-12
+  px-8
 
-rounded-2xl
+  rounded-2xl
 
-border
-border-cyan-400/30
+  border
 
-bg-cyan-500/15
+  font-medium
 
-text-cyan-300
+  transition
 
-font-medium
-
-shadow-[0_0_25px_rgba(0,255,255,0.25)]
-
-hover:bg-cyan-500/20
-
-transition
-"
+  ${
+    theme === "dark"
+      ? `
+          border-cyan-400/30
+          bg-cyan-500/15
+          text-cyan-300
+    hover:bg-blue-500/10
+          shadow-[0_0_25px_rgba(0,255,255,0.25)]
+        `
+      : `
+          border-slate-300
+          bg-white
+          text-slate-700
+    hover:bg-blue-500/10
+          shadow-sm
+        `
+  }
+`}
     >
       Dashboard
     </button>
@@ -1005,27 +1142,36 @@ transition
           "/admin/add-item"
         )
       }
-      className="
-h-12
-px-8
+   className={`
+  h-12
+  px-8
 
-rounded-2xl
+  rounded-2xl
 
-border
-border-cyan-400/30
+  border
 
-bg-cyan-500/15
+  font-medium
 
-text-cyan-300
+  transition
 
-font-medium
-
-shadow-[0_0_25px_rgba(0,255,255,0.25)]
-
-hover:bg-cyan-500/20
-
-transition
-"
+  ${
+    theme === "dark"
+      ? `
+          border-cyan-400/30
+          bg-cyan-500/15
+          text-cyan-300
+    hover:bg-blue-500/10
+          shadow-[0_0_25px_rgba(0,255,255,0.25)]
+        `
+      : `
+          border-slate-300
+          bg-white
+          text-slate-700
+    hover:bg-blue-500/10
+          shadow-sm
+        `
+  }
+`}
     >
       Add Item
     </button>
@@ -1038,25 +1184,36 @@ transition
 
     router.push("/");
   }}
-  className="
-h-12
-px-8
+  className={`
+  h-12
+  px-8
 
-rounded-2xl
+  rounded-2xl
 
-border
-border-red-400/30
+  border
 
-bg-red-500/5
+  font-medium
 
-text-red-300
+  transition
 
-font-medium
-
-hover:bg-red-500/10
-
-transition
-"
+  ${
+    theme === "dark"
+      ? `
+          border-red-400/30
+          bg-red-500/15
+          text-red-300
+    hover:bg-red-500/10
+          shadow-[0_0_25px_rgba(0,255,255,0.25)]
+        `
+      : `
+          border-red-200
+          bg-white
+          text-red-500
+    hover:bg-red-500/10
+          shadow-sm
+        `
+  }
+`}
 >
   Logout
 </button>
@@ -1068,15 +1225,38 @@ transition
 <div className="px-8 pt-8">
 
   <div
-    className="
-      relative overflow-hidden rounded-[32px]
-      shadow-sm border border-gray-100
-      bg-white
-    "
+    className={`
+  relative
+  overflow-hidden
+  rounded-[32px]
+
+  border
+
+  mb-8
+
+  ${
+    theme === "dark"
+      ? `
+          border-cyan-300/20
+          bg-white/5
+          backdrop-blur-xl
+        `
+      : `
+          border-slate-200
+          bg-white/70
+          backdrop-blur-md
+          shadow-xl
+        `
+  }
+`}
   >
 
     <img
-      src="/banner-catalog.png"
+      src={
+  theme === "dark"
+    ? "/dark/catalog-banner.jpg"
+    : "/light/catalog-banner.jpg"
+}
       alt="Catalog Banner"
       className="
         w-full
@@ -1093,13 +1273,41 @@ transition
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
 
         <div className="mt-10 mb-8">
-  <p className="text-white/70 text-lg">
+  <p
+  className={`
+    text-lg
+
+    ${
+      theme === "dark"
+        ? "text-white/70"
+        : "text-slate-600"
+    }
+  `}
+>
   Menampilkan{" "}
-  <span className="text-cyan-300 font-semibold">
+  <span className={`
+  font-semibold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-blue-600"
+  }
+`}
+>
     {items.length}
   </span>{" "}
   dari{" "}
-  <span className="text-cyan-300 font-semibold">
+  <span className={`
+  font-semibold
+
+  ${
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-blue-600"
+  }
+`}
+>
     {totalItems}
   </span>{" "}
   item
@@ -1114,12 +1322,28 @@ transition
               onClick={() =>
                 handleCategoryChange("All")
               }
-              className="
-                px-3 py-1 rounded-full
-                bg-cyan-500/20
-text-cyan-300
-                text-xs font-medium
-              "
+              className={`
+  px-3
+  py-1
+
+  rounded-full
+
+  text-xs
+  font-medium
+
+  ${
+    theme === "dark"
+      ? `
+          bg-cyan-500/20
+          text-cyan-300
+        `
+      : `
+          bg-blue-50
+          text-blue-600
+          border border-blue-200
+        `
+  }
+`}
             >
               {selectedCategory} ✕
             </button>
@@ -1130,12 +1354,28 @@ text-cyan-300
               onClick={() =>
                 handleVendorChange("All")
               }
-              className="
-                px-3 py-1 rounded-full
-                bg-cyan-500/20
-text-cyan-300
-                text-xs font-medium
-              "
+              className={`
+  px-3
+  py-1
+
+  rounded-full
+
+  text-xs
+  font-medium
+
+  ${
+    theme === "dark"
+      ? `
+          bg-cyan-500/20
+          text-cyan-300
+        `
+      : `
+          bg-blue-50
+          text-blue-600
+          border border-blue-200
+        `
+  }
+`}
             >
               {selectedVendor} ✕
             </button>
@@ -1184,15 +1424,10 @@ text-cyan-300
                   );
                 }
               }}
-              className="
+ className={`
   rounded-[28px]
 
   border
-  border-cyan-400/20
-
-  bg-[#051a2e]/80
-
-  backdrop-blur-xl
 
   overflow-hidden
 
@@ -1203,25 +1438,45 @@ text-cyan-300
 
   hover:-translate-y-2
 
-  hover:border-cyan-400/50
+  ${
+    theme === "dark"
+      ? `
+          border-cyan-400/20
+          bg-[#051a2e]/80
+          backdrop-blur-xl
 
-  hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
-"
+          hover:border-cyan-400/50
+          hover:shadow-[0_0_30px_rgba(0,255,255,0.15)]
+        `
+      : `
+          border-slate-200
+          bg-white
+
+          shadow-md
+
+          hover:shadow-xl
+        `
+  }
+`}
             >
 
               {/* IMAGE */}
 <div
-  className="
-    h-64
+  className={`
+  h-64
 
-    bg-[#071f35]
+  flex
+  items-center
+  justify-center
 
-    flex
-    items-center
-    justify-center
+  overflow-hidden
 
-    overflow-hidden
-  "
+  ${
+    theme === "dark"
+      ? "bg-[#071f35]"
+      : "bg-slate-50"
+  }
+`}
 >
 
   {item.image_url ? (
@@ -1262,28 +1517,66 @@ text-cyan-300
               {/* CONTENT */}
               <div className="p-4">
 
-                <h2
-  className="
-    text-white
+               <h2
+  className={`
     font-semibold
     text-lg
 
     line-clamp-2
     min-h-[56px]
-  "
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
 >
                   {item.item_name}
                 </h2>
 
-                <p className="text-xs text-gray-500 mt-2">
+                <p
+  className={`
+    text-xs
+    mt-2
+
+    ${
+      theme === "dark"
+        ? "text-gray-500"
+        : "text-slate-500"
+    }
+  `}
+>
                   {item.category}
                 </p>
 
-                <p className="text-xs text-gray-400">
+                <p
+  className={`
+    text-xs
+
+    ${
+      theme === "dark"
+        ? "text-gray-400"
+        : "text-slate-400"
+    }
+  `}
+>
                   {item.vendor}
                 </p>
 
-                <p className="text-cyan-300 font-bold mt-3 text-lg">
+                <p
+  className={`
+    font-bold
+    mt-3
+    text-lg
+
+    ${
+      theme === "dark"
+        ? "text-cyan-300"
+        : "text-green-600"
+    }
+  `}
+>
                   Rp{" "}
                   {formatRupiah(
                     item.price
@@ -1302,11 +1595,32 @@ text-cyan-300
       {!loading && items.length === 0 && (
         <div className="text-center py-20">
 
-          <h2 className="text-2xl font-bold">
+          <h2
+  className={`
+    text-2xl
+    font-bold
+
+    ${
+      theme === "dark"
+        ? "text-white"
+        : "text-slate-900"
+    }
+  `}
+>
             Item tidak ditemukan
           </h2>
 
-          <p className="text-gray-500 mt-2">
+          <p
+  className={`
+    mt-2
+
+    ${
+      theme === "dark"
+        ? "text-gray-500"
+        : "text-slate-500"
+    }
+  `}
+>
             Coba keyword atau filter lain
           </p>
 
@@ -1322,12 +1636,34 @@ text-cyan-300
     onClick={() =>
       setPage(page - 1)
     }
-    className="
-      px-4 py-2 rounded-xl border
-      bg-white hover:bg-cyan-500/10
-      disabled:opacity-40
-      transition
-    "
+    className={`
+  px-4
+  py-2
+
+  rounded-xl
+
+  border
+
+  disabled:opacity-40
+
+  transition
+
+  ${
+    theme === "dark"
+      ? `
+          bg-[#071d33]
+          border-cyan-300/20
+          text-white
+          hover:border-cyan-400
+        `
+      : `
+          bg-white
+          border-slate-300
+          text-slate-700
+          hover:bg-slate-50
+        `
+  }
+`}
   >
     ←
   </button>
@@ -1390,8 +1726,12 @@ text-cyan-300
               border
               ${
                 page === p
-                  ? "bg-red-500 text-white border-red-500 shadow-lg"
-                  : "bg-white hover:bg-gray-100"
+  ? theme === "dark"
+    ? "bg-cyan-400 text-[#031427] border-cyan-400 shadow-lg"
+    : "bg-blue-600 text-white border-blue-600 shadow-lg"
+  : theme === "dark"
+    ? "bg-[#071d33] text-white border-cyan-300/20 hover:border-cyan-400"
+    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
               }
             `}
           >
@@ -1410,12 +1750,34 @@ text-cyan-300
     onClick={() =>
       setPage(page + 1)
     }
-    className="
-      px-4 py-2 rounded-xl border
-      bg-white hover:bg-gray-100
-      disabled:opacity-40
-      transition
-    "
+    className={`
+  px-4
+  py-2
+
+  rounded-xl
+
+  border
+
+  disabled:opacity-40
+
+  transition
+
+  ${
+    theme === "dark"
+      ? `
+          bg-[#071d33]
+          border-cyan-300/20
+          text-white
+          hover:border-cyan-400
+        `
+      : `
+          bg-white
+          border-slate-300
+          text-slate-700
+          hover:bg-slate-50
+        `
+  }
+`}
   >
     →
   </button>
@@ -1438,18 +1800,11 @@ text-cyan-300
             onClick={(e) =>
               e.stopPropagation()
             }
-            className="
+   className={`
   w-full
   max-w-6xl
 
   rounded-[32px]
-
-  border
-  border-cyan-400/20
-
-  bg-[#051a2e]
-
-  backdrop-blur-xl
 
   overflow-hidden
 
@@ -1458,8 +1813,21 @@ text-cyan-300
   max-h-[90vh]
   overflow-y-auto
 
-  shadow-[0_0_50px_rgba(0,255,255,0.15)]
-"
+  ${
+    theme === "dark"
+      ? `
+          border border-cyan-400/20
+          bg-[#051a2e]
+          backdrop-blur-xl
+          shadow-[0_0_50px_rgba(0,255,255,0.15)]
+        `
+      : `
+          border border-slate-200
+          bg-white
+          shadow-2xl
+        `
+  }
+`}
           >
 
             {/* CLOSE */}
@@ -1467,12 +1835,29 @@ text-cyan-300
               onClick={() =>
                 setSelectedItem(null)
               }
-              className="
-                absolute top-4 right-5 z-50
-                text-4xl font-light
-                text-cyan-300
-hover:text-cyan-100 transition
-              "
+              className={`
+  absolute
+  top-4
+  right-5
+  z-50
+
+  text-4xl
+  font-light
+
+  transition
+
+  ${
+    theme === "dark"
+      ? `
+          text-cyan-300
+          hover:text-cyan-100
+        `
+      : `
+          text-slate-500
+          hover:text-slate-900
+        `
+  }
+`}
             >
               ×
             </button>
@@ -1483,7 +1868,21 @@ hover:text-cyan-100 transition
               <div>
 
                 {/* MAIN IMAGE */}
-                <div className="flex items-center justify-center bg-[#071f35] rounded-2xl p-10">
+                <div className={`
+  flex
+  items-center
+  justify-center
+
+  rounded-2xl
+  p-10
+
+  ${
+    theme === "dark"
+      ? "bg-[#071f35]"
+      : "bg-slate-50"
+  }
+`}
+>
 
                   <img
                     src={activeImage}
@@ -1526,10 +1925,13 @@ hover:text-cyan-100 transition
                           border-2 cursor-pointer transition-all duration-300
                           hover:scale-105 flex-shrink-0
                           ${
-                            activeImage ===
-                            img
-                              ? "border-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.3)]"
-: "border-cyan-400/20"
+                           activeImage === img
+  ? theme === "dark"
+    ? "border-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.3)]"
+    : "border-blue-500"
+  : theme === "dark"
+    ? "border-cyan-400/20"
+    : "border-slate-200"
                           }
                         `}
                       />
@@ -1544,26 +1946,49 @@ hover:text-cyan-100 transition
               <div>
 
                 <h1
-  className="
-    text-4xl
-    font-bold
-    leading-tight
+  className={`
+  text-4xl
+  font-bold
+  leading-tight
 
-    text-white
-  "
+  ${
+    theme === "dark"
+      ? "text-white"
+      : "text-slate-900"
+  }
+`}
 >
                   {
                     selectedItem.item_name
                   }
                 </h1>
 
-                <p className="text-gray-500 mt-3 text-lg">
+                <p className={`
+  mt-3
+  text-lg
+
+  ${
+    theme === "dark"
+      ? "text-gray-500"
+      : "text-slate-500"
+  }
+`}>
                   {
                     selectedItem.category
                   }
                 </p>
 
-                <p className="text-cyan-300 text-5xl font-bold mt-6">
+                <p className={`
+  text-5xl
+  font-bold
+  mt-6
+
+  ${
+    theme === "dark"
+      ? "text-cyan-300"
+      : "text-green-600"
+  }
+`}>
                   Rp{" "}
                   {formatRupiah(
                     selectedItem.price
@@ -1572,19 +1997,28 @@ hover:text-cyan-100 transition
 
                 {/* INFO */}
                 <div
-  className="
-    mt-10
-    space-y-4
+  className={`
+  mt-10
+  space-y-4
 
-    text-white/80
+  text-sm
 
-    text-sm
+  border-t
 
-    border-t
-    border-cyan-400/10
+  pt-6
 
-    pt-6
-  "
+  ${
+    theme === "dark"
+      ? `
+          text-white/80
+          border-cyan-400/10
+        `
+      : `
+          text-slate-700
+          border-slate-200
+        `
+  }
+`}
 >
 
                   <p>
@@ -1727,18 +2161,36 @@ hover:bg-orange-500
       <a
         href={selectedItem.official_url}
         target="_blank"
-        className="
-          px-6 py-4 rounded-2xl
-          border
+        className={`
+  px-6
+  py-4
+
+  rounded-2xl
+
+  border
+
+  font-semibold
+
+  transition-all
+  duration-300
+
+  hover:scale-105
+  hover:shadow-xl
+
+  ${
+    theme === "dark"
+      ? `
           border-cyan-400/30
-bg-cyan-500/10
-text-cyan-300
-          font-semibold
-          hover:scale-105
-          hover:shadow-xl
-          transition-all
-          duration-300
-        "
+          bg-cyan-500/10
+          text-cyan-300
+        `
+      : `
+          border-blue-200
+          bg-blue-50
+          text-blue-600
+        `
+  }
+`}
       >
         Official Site
       </a>
@@ -1756,11 +2208,16 @@ text-cyan-300
                   </h2> 
 
                   <div
-  className="
-    whitespace-pre-line
-    text-white/70
-    leading-8
-  "
+  className={`
+  whitespace-pre-line
+  leading-8
+
+  ${
+    theme === "dark"
+      ? "text-white/70"
+      : "text-slate-600"
+  }
+`}
 >
                     {selectedItem.description ||
                       "-"}
