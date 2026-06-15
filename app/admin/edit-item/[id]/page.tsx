@@ -9,6 +9,7 @@ import {
 
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { supabase } from "@/lib/supabase";
+import { createAuditLog } from "@/lib/audit";
 
 import {
   useParams,
@@ -197,10 +198,24 @@ export default function EditItemPage() {
 
     setSaving(true);
 
-    const { error } =
-      await supabase
-        .from("items")
-        .update({
+   const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+   const { data: oldItem } =
+  await supabase
+    .from("items")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+    const {
+  data: updatedItem,
+  error,
+} =
+  await supabase
+    .from("items")
+    .update({
           item_name:
             form.item_name,
 
@@ -258,7 +273,9 @@ export default function EditItemPage() {
           Remarks:
             form.Remarks,
         })
-        .eq("id", id);
+        .eq("id", id)
+.select()
+.single();
 
     setSaving(false);
 
@@ -266,6 +283,26 @@ export default function EditItemPage() {
       alert(error.message);
       return;
     }
+    if (
+  user?.email &&
+  oldItem &&
+  updatedItem
+) {
+  await createAuditLog({
+    userEmail: user.email,
+
+    action: "UPDATE_ITEM",
+
+    itemId: updatedItem.id,
+
+    itemName:
+      updatedItem.item_name,
+
+    oldData: oldItem,
+
+    newData: updatedItem,
+  });
+}
 
     alert("Item updated!");
 

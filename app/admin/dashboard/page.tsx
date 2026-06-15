@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { createAuditLog } from "@/lib/audit";
 import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import AdminSidebar from "@/app/components/admin/AdminSidebar";
@@ -159,6 +160,17 @@ setStats({
 
     if (!confirmDelete) return;
 
+    const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+   const { data: itemToDelete } =
+  await supabase
+    .from("items")
+    .select("*")
+    .eq("id", id)
+    .single();
+
     const { error } =
       await supabase
         .from("items")
@@ -169,6 +181,24 @@ setStats({
       alert(error.message);
       return;
     }
+    if (
+  user?.email &&
+  itemToDelete
+) {
+  await createAuditLog({
+    userEmail: user.email,
+
+    action: "DELETE_ITEM",
+
+    itemId: itemToDelete.id,
+
+    itemName:
+      itemToDelete.item_name,
+
+    oldData:
+      itemToDelete,
+  });
+}
 
     getItems();
   }

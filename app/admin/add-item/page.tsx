@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { createAuditLog } from "@/lib/audit";
 import { supabase } from "@/lib/supabase";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { ArrowLeft } from "lucide-react";
@@ -121,53 +122,56 @@ export default function AddItemPage() {
     e.preventDefault();
 
     setLoading(true);
+    const {
+  data: { user },
+} = await supabase.auth.getUser();
 
-    const { error } =
-      await supabase
-        .from("items")
-        .insert([
-          {
-            item_name:
-              form.name,
+    const {
+  data,
+  error,
+} = await supabase
+  .from("items")
+  .insert([
+    {
+      item_name: form.name,
 
-            vendor:
-              form.vendor,
+      vendor: form.vendor,
 
-            // NEW
-            main_category:
-              form.main_category,
+      main_category:
+        form.main_category,
 
-            sub_category:
-              form.sub_category,
+      sub_category:
+        form.sub_category,
 
-            price: Number(
-              form.price
-            ),
+      price: Number(
+        form.price
+      ),
 
-            description:
-              form.description,
+      description:
+        form.description,
 
-            // MARKETPLACE URLS
-            tokopedia_url:
-              form.tokopedia_url,
+      tokopedia_url:
+        form.tokopedia_url,
 
-            shopee_url:
-              form.shopee_url,
+      shopee_url:
+        form.shopee_url,
 
-            whatsapp_url:
-              form.whatsapp_url,
+      whatsapp_url:
+        form.whatsapp_url,
 
-            official_url:
-              form.official_url,
+      official_url:
+        form.official_url,
 
-            image_url:
-              form.image_urls[0] ||
-              null,
+      image_url:
+        form.image_urls[0] ||
+        null,
 
-            image_urls:
-              form.image_urls,
-          },
-        ]);
+      image_urls:
+        form.image_urls,
+    },
+  ])
+  .select()
+  .single();
 
     setLoading(false);
 
@@ -175,6 +179,20 @@ export default function AddItemPage() {
       alert(error.message);
       return;
     }
+   if (
+  user?.email &&
+  data
+) {
+  await createAuditLog({
+  userEmail: user.email,
+  action: "CREATE_ITEM",
+
+  itemId: data.id,
+
+  itemName: data.item_name,
+  newData: data,
+});
+}
 
     alert("Item added!");
 

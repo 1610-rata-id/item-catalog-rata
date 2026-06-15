@@ -6,13 +6,37 @@ import {
   PlusSquare,
   LogOut,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { createAuditLog } from "@/lib/audit";
 import { useTheme } from "@/app/providers/ThemeProvider";
 import { useRouter } from "next/navigation";
 
 export default function AdminSidebar() {
+
   const router = useRouter();
 
   const { theme } = useTheme();
+
+async function handleLogout() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  try {
+  if (user?.email) {
+    await createAuditLog({
+      userEmail: user.email,
+      action: "LOGOUT",
+    });
+  }
+} catch (err) {
+  console.error(err);
+}
+
+await supabase.auth.signOut();
+
+router.push("/admin/login");
+}
 
   const menus = [
   {
@@ -130,9 +154,7 @@ transition
       {/* LOGOUT */}
 
 <button
-  onClick={() =>
-    router.push("/admin/login")
-  }
+  onClick={handleLogout}
   className={`
   h-20
   rounded-2xl

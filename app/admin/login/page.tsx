@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { createAuditLog } from "@/lib/audit";
 import { useTheme } from "@/app/providers/ThemeProvider";
 import ThemeToggle from "@/app/components/ThemeToggle";
 
@@ -54,16 +55,30 @@ const { data: profile } =
 if (
   profile?.role === "admin"
 ) {
+
+  await createAuditLog({
+    userEmail: email,
+    action: "LOGIN",
+  });
+
   router.push(
     "/admin/dashboard"
   );
-} else if (
+}
+else if (
   profile?.role === "inventory"
 ) {
+
+  await createAuditLog({
+    userEmail: email,
+    action: "LOGIN",
+  });
+
   router.push(
     "/catalog"
   );
-} else {
+}
+else {
   alert("Role tidak memiliki akses");
   await supabase.auth.signOut();
 }
@@ -393,7 +408,7 @@ if (
         from-[#18c7ea]
         to-[#5fdcf7]
         shadow-lg
-        hover:shadow-xl
+        hover:shadow-2xl
       `
   }
 `}
