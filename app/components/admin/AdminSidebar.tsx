@@ -54,6 +54,11 @@ router.push("/admin/login");
     href: "/admin/add-item",
     icon: PlusSquare,
   },
+  {
+  label: "History",
+  href: "/admin/history",
+  icon: Package,
+},
 ];
 
   return (

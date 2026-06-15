@@ -11,6 +11,10 @@ import {
   Package,
   Building2,
   Tags,
+  User,
+  PlusSquare,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { useTheme } from "@/app/providers/ThemeProvider";
 
@@ -19,6 +23,30 @@ function formatRupiah(number: number) {
   return new Intl.NumberFormat(
     "id-ID"
   ).format(number || 0);
+}
+
+function getActionBadge(
+  action: string
+) {
+  switch (action) {
+    case "LOGIN":
+      return "🟢 Login";
+
+    case "LOGOUT":
+      return "⚪ Logout";
+
+    case "CREATE_ITEM":
+      return "🔵 Add Item";
+
+    case "UPDATE_ITEM":
+      return "🟡 Edit Item";
+
+    case "DELETE_ITEM":
+      return "🔴 Delete Item";
+
+    default:
+      return action;
+  }
 }
 
 export default function AdminDashboard() {
@@ -38,6 +66,17 @@ export default function AdminDashboard() {
   const [items, setItems] = useState<
     any[]
   >([]);
+
+  const [activityStats, setActivityStats] =
+  useState({
+    login: 0,
+    create: 0,
+    update: 0,
+    delete: 0,
+  });
+
+  const [recentLogs, setRecentLogs] =
+  useState<any[]>([]);
   
   const [stats, setStats] = useState({
   totalItems: 0,
@@ -87,6 +126,71 @@ const ITEMS_PER_PAGE = 100;
         .filter(Boolean)
     ).size,
   });
+}
+
+   async function getActivityStats() {
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  const { data } =
+    await supabase
+      .from("audit_logs")
+      .select(
+        "action, created_at"
+      );
+
+  const rows =
+    (data || []).filter(
+      (log) =>
+        log.created_at?.startsWith(
+          today
+        )
+    );
+
+  setActivityStats({
+    login: rows.filter(
+      (x) =>
+        x.action === "LOGIN"
+    ).length,
+
+    create: rows.filter(
+      (x) =>
+        x.action ===
+        "CREATE_ITEM"
+    ).length,
+
+    update: rows.filter(
+      (x) =>
+        x.action ===
+        "UPDATE_ITEM"
+    ).length,
+
+    delete: rows.filter(
+      (x) =>
+        x.action ===
+        "DELETE_ITEM"
+    ).length,
+  });
+}
+
+  async function getRecentLogs() {
+  const { data, error } =
+    await supabase
+      .from("audit_logs")
+      .select("*")
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(5);
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  setRecentLogs(data || []);
 }
 
   async function getItems() {
@@ -222,22 +326,26 @@ setStats({
   checkUser();
 
 getStats();
+getActivityStats();
+getRecentLogs();
 
   // REALTIME
   const channel = supabase
-    .channel("items-realtime")
-
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "items",
-      },
-      () => {
-        getItems();
-      }
-    )
+  .channel("items-realtime")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "items",
+    },
+    () => {
+      getItems();
+      getStats();
+      getActivityStats();
+      getRecentLogs();
+    }
+  )
 
     .subscribe();
 
@@ -677,6 +785,503 @@ getStats();
 
 </div>
 
+        {/* ACTIVITY STATS */}
+
+<div className="grid grid-cols-4 gap-6 mb-8">
+
+  {/* LOGIN */}
+
+  <div
+    className={`
+      rounded-[28px]
+      border
+      p-6
+
+      ${
+        theme === "dark"
+          ? `
+            border-green-400/20
+            bg-white/5
+          `
+          : `
+            border-slate-200
+            bg-white
+            shadow-lg
+          `
+      }
+    `}
+  >
+
+    <div className="flex items-center justify-between">
+
+      <div>
+
+        <p className="text-sm opacity-70">
+          LOGIN TODAY
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-green-400">
+          {activityStats.login}
+        </h2>
+
+      </div>
+
+      <div
+        className="
+          w-16 h-16
+          rounded-full
+
+          flex
+          items-center
+          justify-center
+
+          bg-green-500/10
+          border
+          border-green-400/20
+        "
+      >
+        <User
+          size={30}
+          className="text-green-400"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* ADD */}
+
+  <div
+    className={`
+      rounded-[28px]
+      border
+      p-6
+
+      ${
+        theme === "dark"
+          ? `
+            border-cyan-400/20
+            bg-white/5
+          `
+          : `
+            border-slate-200
+            bg-white
+            shadow-lg
+          `
+      }
+    `}
+  >
+
+    <div className="flex items-center justify-between">
+
+      <div>
+
+        <p className="text-sm opacity-70">
+          ADD ITEM
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-cyan-400">
+          {activityStats.create}
+        </h2>
+
+      </div>
+
+      <div
+        className="
+          w-16 h-16
+          rounded-full
+
+          flex
+          items-center
+          justify-center
+
+          bg-cyan-500/10
+          border
+          border-cyan-400/20
+        "
+      >
+        <PlusSquare
+          size={30}
+          className="text-cyan-400"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* EDIT */}
+
+  <div
+    className={`
+      rounded-[28px]
+      border
+      p-6
+
+      ${
+        theme === "dark"
+          ? `
+            border-yellow-400/20
+            bg-white/5
+          `
+          : `
+            border-slate-200
+            bg-white
+            shadow-lg
+          `
+      }
+    `}
+  >
+
+    <div className="flex items-center justify-between">
+
+      <div>
+
+        <p className="text-sm opacity-70">
+          EDIT ITEM
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-yellow-400">
+          {activityStats.update}
+        </h2>
+
+      </div>
+
+      <div
+        className="
+          w-16 h-16
+          rounded-full
+
+          flex
+          items-center
+          justify-center
+
+          bg-yellow-500/10
+          border
+          border-yellow-400/20
+        "
+      >
+        <Pencil
+          size={30}
+          className="text-yellow-400"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* DELETE */}
+
+  <div
+    className={`
+      rounded-[28px]
+      border
+      p-6
+
+      ${
+        theme === "dark"
+          ? `
+            border-red-400/20
+            bg-white/5
+          `
+          : `
+            border-slate-200
+            bg-white
+            shadow-lg
+          `
+      }
+    `}
+  >
+
+    <div className="flex items-center justify-between">
+
+      <div>
+
+        <p className="text-sm opacity-70">
+          DELETE ITEM
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-red-400">
+          {activityStats.delete}
+        </h2>
+
+      </div>
+
+      <div
+        className="
+          w-16 h-16
+          rounded-full
+
+          flex
+          items-center
+          justify-center
+
+          bg-red-500/10
+          border
+          border-red-400/20
+        "
+      >
+        <Trash2
+          size={30}
+          className="text-red-400"
+        />
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div className="grid lg:grid-cols-[380px_1fr] gap-8 mb-8">
+
+  {/* LEFT SIDE */}
+
+  <div>
+
+    {/* RECENT ACTIVITY */}
+
+    <div
+      className={`
+        rounded-[32px]
+        border
+        overflow-hidden
+
+        ${
+          theme === "dark"
+            ? `
+              border-cyan-300/20
+              bg-white/5
+              backdrop-blur-xl
+            `
+            : `
+              border-slate-200
+              bg-white/80
+              backdrop-blur-md
+              shadow-xl
+            `
+        }
+      `}
+    >
+
+      <div className="p-6">
+
+        <div className="flex justify-between items-center mb-6">
+
+          <h2
+            className="
+              text-2xl
+              font-bold
+            "
+          >
+            Recent Activity
+          </h2>
+
+          <button
+            onClick={() =>
+              router.push(
+                "/admin/history"
+              )
+            }
+            className={`
+              text-sm
+              font-medium
+
+              ${
+                theme === "dark"
+                  ? "text-cyan-300"
+                  : "text-blue-600"
+              }
+
+              hover:underline
+            `}
+          >
+            View All →
+          </button>
+
+        </div>
+
+        <div className="space-y-4">
+
+          {recentLogs.map(
+            (log) => (
+
+              <div
+  key={log.id}
+  className={`
+    rounded-2xl
+    border
+    p-4
+
+    ${
+      theme === "dark"
+        ? `
+          border-cyan-300/10
+          bg-white/5
+        `
+        : `
+          border-slate-200
+          bg-slate-50
+        `
+    }
+  `}
+>
+
+  <div className="flex justify-between items-start">
+
+    <div className="flex gap-4">
+
+      {/* ICON */}
+
+      <div
+        className={`
+          w-12
+          h-12
+
+          rounded-xl
+
+          flex
+          items-center
+          justify-center
+
+          ${
+            log.action === "LOGIN"
+              ? "bg-green-500/10 border border-green-400/20"
+              : log.action === "CREATE_ITEM"
+              ? "bg-cyan-500/10 border border-cyan-400/20"
+              : log.action === "UPDATE_ITEM"
+              ? "bg-yellow-500/10 border border-yellow-400/20"
+              : log.action === "DELETE_ITEM"
+              ? "bg-red-500/10 border border-red-400/20"
+              : "bg-slate-500/10 border border-slate-400/20"
+          }
+        `}
+      >
+
+        {log.action === "LOGIN" ? (
+          <User
+            size={22}
+            className="text-green-400"
+          />
+        ) : log.action ===
+          "CREATE_ITEM" ? (
+          <PlusSquare
+            size={22}
+            className="text-cyan-400"
+          />
+        ) : log.action ===
+          "UPDATE_ITEM" ? (
+          <Pencil
+            size={22}
+            className="text-yellow-400"
+          />
+        ) : log.action ===
+          "DELETE_ITEM" ? (
+          <Trash2
+            size={22}
+            className="text-red-400"
+          />
+        ) : (
+          <User
+            size={22}
+            className="text-slate-300"
+          />
+        )}
+
+      </div>
+
+      {/* CONTENT */}
+
+      <div>
+
+        <div
+          className={`
+            font-semibold
+
+            ${
+              log.action === "LOGIN"
+                ? "text-green-400"
+                : log.action ===
+                  "CREATE_ITEM"
+                ? "text-cyan-400"
+                : log.action ===
+                  "UPDATE_ITEM"
+                ? "text-yellow-400"
+                : log.action ===
+                  "DELETE_ITEM"
+                ? "text-red-400"
+                : ""
+            }
+          `}
+        >
+          {getActionBadge(
+            log.action
+          )}
+        </div>
+
+        <div
+          className="
+            text-sm
+            opacity-70
+          "
+        >
+          {log.user_email}
+        </div>
+
+        <div className="text-sm mt-1">
+          {log.item_name || "-"}
+        </div>
+
+      </div>
+
+    </div>
+
+    {/* TIME */}
+
+    <div
+      className="
+        text-right
+        text-xs
+        opacity-60
+      "
+    >
+
+      <div>
+        {new Date(
+          log.created_at
+        ).toLocaleTimeString()}
+      </div>
+
+      <div className="mt-1">
+        {new Date(
+          log.created_at
+        ).toLocaleDateString()}
+      </div>
+
+  </div>
+
+  </div>
+
+</div>
+
+            )
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* RIGHT SIDE */}
+
+  <div>
+
         {/* SEARCH */}
 
 <div
@@ -979,17 +1584,27 @@ getStats();
 
                     {/* PRICE */}
                     <td
-                      className="
-                        p-5 font-bold
-                        text-cyan-300
-drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]
-                      "
-                    >
-                      Rp{" "}
-                      {formatRupiah(
-                        item.price
-                      )}
-                    </td>
+  className={`
+    p-5
+    font-bold
+
+    ${
+      theme === "dark"
+        ? `
+          text-cyan-300
+          drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]
+        `
+        : `
+          text-green-600
+        `
+    }
+  `}
+>
+  Rp{" "}
+  {formatRupiah(
+    item.price
+  )}
+</td>
 
                     {/* ACTION */}
                     <td className="p-5">
@@ -1062,6 +1677,10 @@ transition
           </div>
 
         </div>
+
+  </div>
+
+</div>
 
 {/* PAGINATION */}
 <div className="flex justify-center gap-4 mt-10">
