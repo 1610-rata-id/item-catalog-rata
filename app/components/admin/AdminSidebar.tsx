@@ -5,15 +5,22 @@ import {
   Package,
   PlusSquare,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { createAuditLog } from "@/lib/audit";
 import { useTheme } from "@/app/providers/ThemeProvider";
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  usePathname,
+} from "next/navigation";
 
 export default function AdminSidebar() {
 
   const router = useRouter();
+
+  const pathname =
+  usePathname();
 
   const { theme } = useTheme();
 
@@ -55,10 +62,15 @@ router.push("/admin/login");
     icon: PlusSquare,
   },
   {
-  label: "History",
-  href: "/admin/history",
-  icon: Package,
-},
+    label: "History",
+    href: "/admin/history",
+    icon: Package,
+  },
+  {
+    label: "Suggestions",
+    href: "/admin/suggestions",
+    icon: MessageSquare,
+  },
 ];
 
   return (
@@ -125,7 +137,7 @@ router.push("/admin/login");
   border
 
   ${
-    menu.href === "/admin/dashboard"
+  pathname === menu.href
       ? `
         border-cyan-300/40
         bg-cyan-500/10

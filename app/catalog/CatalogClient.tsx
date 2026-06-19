@@ -5,6 +5,11 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/app/providers/ThemeProvider";
+import {
+  Sun,
+  Moon,
+  Share2
+} from "lucide-react";
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -12,7 +17,10 @@ function formatRupiah(number: number) {
 
 export default function Catalog() {
   const router = useRouter();
-const { theme } = useTheme();
+const {
+  theme,
+  toggleTheme
+} = useTheme();
 const { role } =
   useRequireAuth();
 
@@ -87,6 +95,27 @@ const [
   const [showVendor, setShowVendor] =
     useState(false);
 
+  const [showFeedback, setShowFeedback] =
+  useState(false);
+
+const [
+  suggestionCategory,
+  setSuggestionCategory
+] = useState("FEATURE_REQUEST");
+
+const [
+  suggestionMessage,
+  setSuggestionMessage
+] = useState("");
+
+const [
+  sendingSuggestion,
+  setSendingSuggestion
+] = useState(false);
+
+const [userEmail, setUserEmail] =
+  useState("");
+
   const [catSearch, setCatSearch] =
     useState("");
 
@@ -101,6 +130,85 @@ const [
     totalItems / ITEMS_PER_PAGE
   );
 
+async function submitSuggestion() {
+
+  if (!suggestionMessage.trim()) {
+    alert(
+      "Please enter your suggestion."
+    );
+    return;
+  }
+
+  try {
+
+    setSendingSuggestion(true);
+
+    const { error } =
+      await supabase
+        .from("feedbacks")
+        .insert([
+          {
+            user_email:
+              userEmail,
+
+            category:
+              suggestionCategory,
+
+            message:
+              suggestionMessage,
+
+            status:
+              "OPEN",
+
+            page:
+              window.location.pathname,
+
+            page_url:
+              window.location.href,
+
+            item_name:
+              selectedItem
+                ?.item_name || null,
+
+            item_id:
+              selectedItem
+                ?.id || null,
+          },
+        ]);
+
+    if (error) {
+      throw error;
+    }
+
+    alert(
+      "Suggestion submitted successfully!"
+    );
+
+    setSuggestionMessage("");
+
+    setSuggestionCategory(
+      "FEATURE_REQUEST"
+    );
+
+    setShowFeedback(false);
+
+  } catch (err: any) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+        "Failed to submit suggestion."
+    );
+
+  } finally {
+
+    setSendingSuggestion(false);
+
+  }
+
+}
+
 // AUTH CHECK
 useEffect(() => {
   async function checkUser() {
@@ -109,11 +217,15 @@ useEffect(() => {
     } = await supabase.auth.getSession();
 
     if (!session) {
-      router.replace("/admin/login");
-      return;
-    }
+  router.replace("/admin/login");
+  return;
+}
 
-    setAuthLoading(false);
+setUserEmail(
+  session.user.email || ""
+);
+
+setAuthLoading(false);
   }
 
   checkUser();
@@ -617,6 +729,29 @@ return (
           >
             Beranda
           </button>
+
+          <button
+  onClick={() =>
+    setShowFeedback(true)
+  }
+  className={`
+    transition
+
+    ${
+      theme === "dark"
+        ? `
+            text-white
+            hover:text-cyan-300
+          `
+        : `
+            text-slate-700
+            hover:text-blue-600
+          `
+    }
+`}
+>
+  Suggestions
+</button>
 
           {/* CATEGORY */}
 <div
@@ -1216,6 +1351,65 @@ border-cyan-300/10
 `}
 >
   Logout
+</button>
+
+<button
+  onClick={toggleTheme}
+  className={`
+    w-11
+    h-11
+
+    rounded-xl
+
+    flex
+    items-center
+    justify-center
+
+    transition-all
+    duration-300
+
+    hover:scale-105
+
+    ${
+      theme === "dark"
+        ? `
+            bg-cyan-500/10
+            border
+            border-cyan-400/20
+
+            hover:bg-cyan-500/20
+          `
+        : `
+            bg-blue-50
+            border
+            border-blue-200
+
+            hover:bg-blue-100
+          `
+    }
+  `}
+>
+
+  {theme === "dark" ? (
+
+    <Sun
+      size={20}
+      className="
+        text-yellow-400
+      "
+    />
+
+  ) : (
+
+    <Moon
+      size={20}
+      className="
+        text-blue-600
+      "
+    />
+
+  )}
+
 </button>
 
 </div>
@@ -1830,37 +2024,98 @@ border-cyan-300/10
 `}
           >
 
-            {/* CLOSE */}
-            <button
-              onClick={() =>
-                setSelectedItem(null)
-              }
-              className={`
-  absolute
-  top-4
-  right-5
-  z-50
+            {/* ACTION BUTTONS */}
 
-  text-4xl
-  font-light
+<div
+  className="
+    absolute
+    top-4
+    right-5
+    z-50
 
-  transition
+    flex
+    items-center
+    gap-3
+  "
+>
 
-  ${
-    theme === "dark"
-      ? `
-          text-cyan-300
-          hover:text-cyan-100
-        `
-      : `
-          text-slate-500
-          hover:text-slate-900
-        `
-  }
-`}
-            >
-              ×
-            </button>
+  {/* SHARE */}
+
+  <button
+    onClick={() => {
+
+      const shareUrl =
+        `${window.location.origin}/public-catalog/${selectedItem.slug}`;
+
+      navigator.clipboard.writeText(
+        shareUrl
+      );
+
+      alert(
+        "Link copied to clipboard"
+      );
+    }}
+    className={`
+      w-11
+      h-11
+
+      rounded-xl
+
+      flex
+      items-center
+      justify-center
+
+      transition
+
+      ${
+        theme === "dark"
+          ? `
+              bg-cyan-500/10
+              border border-cyan-300/20
+              text-cyan-300
+            `
+          : `
+              bg-blue-50
+              border border-blue-200
+              text-blue-600
+            `
+      }
+
+      hover:scale-105
+    `}
+  >
+    <Share2 size={20} />
+  </button>
+
+  {/* CLOSE */}
+
+  <button
+    onClick={() =>
+      setSelectedItem(null)
+    }
+    className={`
+      text-4xl
+      font-light
+
+      transition
+
+      ${
+        theme === "dark"
+          ? `
+              text-cyan-300
+              hover:text-cyan-100
+            `
+          : `
+              text-slate-500
+              hover:text-slate-900
+            `
+      }
+    `}
+  >
+    ×
+  </button>
+
+</div>
 
             <div className="grid md:grid-cols-2 gap-10 p-8 md:p-12">
 
@@ -2232,7 +2487,239 @@ hover:bg-orange-500
           </div>
 
         </div>
+            )}
+
+      {showFeedback && (
+
+        <div
+          className="
+            fixed
+            inset-0
+            z-[999]
+
+            bg-black/70
+
+            flex
+            items-center
+            justify-center
+
+            p-4
+          "
+        >
+
+          <div
+            className={`
+              w-full
+              max-w-xl
+
+              rounded-3xl
+
+              p-8
+
+              relative
+
+              ${
+                theme === "dark"
+                  ? `
+                      bg-[#071d33]
+                      text-white
+                      border border-cyan-300/20
+                    `
+                  : `
+                      bg-white
+                      text-slate-900
+                      border border-slate-200
+                    `
+              }
+            `}
+          >
+
+            <button
+              onClick={() =>
+                setShowFeedback(false)
+              }
+              className="
+                absolute
+                top-4
+                right-5
+
+                text-3xl
+              "
+            >
+              ×
+            </button>
+
+            <h2
+              className="
+                text-3xl
+                font-bold
+                mb-6
+              "
+            >
+              Suggestion Box
+            </h2>
+
+            <div className="mb-4">
+
+              <label
+                className="
+                  block
+                  mb-2
+                  text-sm
+                  opacity-70
+                "
+              >
+                Category
+              </label>
+
+              <select
+                value={suggestionCategory}
+                onChange={(e) =>
+                  setSuggestionCategory(
+  e.target.value
+)
+                }
+                className={`
+                  w-full
+
+                  px-4
+                  py-3
+
+                  rounded-xl
+
+                  border
+
+                  ${
+                    theme === "dark"
+                      ? `
+                          bg-[#0d2742]
+                          border-cyan-300/20
+                        `
+                      : `
+                          bg-white
+                          border-slate-300
+                        `
+                  }
+                `}
+              >
+                <option value="BUG">
+                  Bug Report
+                </option>
+
+                <option value="FEATURE_REQUEST">
+                  Feature Request
+                </option>
+
+                <option value="CATALOG_DATA">
+                  Catalog Data Issue
+                </option>
+
+                <option value="UI_SUGGESTION">
+                  UI/UX Suggestion
+                </option>
+
+                <option value="OTHER">
+                  Other
+                </option>
+
+              </select>
+
+            </div>
+
+            <div>
+
+              <label
+                className="
+                  block
+                  mb-2
+                  text-sm
+                  opacity-70
+                "
+              >
+                Message
+              </label>
+
+              <textarea
+                rows={6}
+                value={suggestionMessage}
+                onChange={(e) =>
+                  setSuggestionMessage(
+                    e.target.value
+                  )
+                }
+                placeholder="Describe your suggestion..."
+                className={`
+                  w-full
+
+                  px-4
+                  py-3
+
+                  rounded-xl
+
+                  border
+
+                  resize-none
+
+                  ${
+                    theme === "dark"
+                      ? `
+                          bg-[#0d2742]
+                          border-cyan-300/20
+                          text-white
+                        `
+                      : `
+                          bg-white
+                          border-slate-300
+                          text-slate-900
+                        `
+                  }
+                `}
+              />
+
+            </div>
+
+            <button
+  onClick={
+    submitSuggestion
+  }
+  disabled={
+    sendingSuggestion
+  }
+  className="
+    mt-6
+
+    w-full
+
+    py-3
+
+    rounded-xl
+
+    bg-cyan-500
+
+    text-white
+
+    font-semibold
+
+    hover:bg-cyan-600
+
+    transition
+
+    disabled:opacity-50
+  "
+>
+
+  {sendingSuggestion
+    ? "Submitting..."
+    : "Submit Suggestion"}
+
+</button>
+
+          </div>
+
+        </div>
+
       )}
+
       </div>
     </main>
   );

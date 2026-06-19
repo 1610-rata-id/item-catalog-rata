@@ -4,6 +4,11 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { useTheme } from "@/app/providers/ThemeProvider";
+import {
+  Sun,
+  Moon,
+  Share2
+} from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +19,10 @@ export default function PublicCatalogClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-const { theme } = useTheme();
+const {
+  theme,
+  toggleTheme
+} = useTheme();
 
   const [items, setItems] = useState<any[]>([]);
 
@@ -61,6 +69,24 @@ const { theme } = useTheme();
 
   const [showCategory, setShowCategory] =
     useState(false);
+
+  const [showSuggestion, setShowSuggestion] =
+  useState(false);
+
+const [
+  suggestionCategory,
+  setSuggestionCategory
+] = useState("FEATURE_REQUEST");
+
+const [
+  suggestionMessage,
+  setSuggestionMessage
+] = useState("");
+
+const [
+  sendingSuggestion,
+  setSendingSuggestion
+] = useState(false);
 
   const [catSearch, setCatSearch] =
     useState("");
@@ -349,6 +375,85 @@ const { theme } = useTheme();
     page,
   ]);
 
+  async function submitSuggestion() {
+
+  if (!suggestionMessage.trim()) {
+    alert(
+      "Please enter your suggestion."
+    );
+    return;
+  }
+
+  try {
+
+    setSendingSuggestion(true);
+
+    const { error } =
+      await supabase
+        .from("feedbacks")
+        .insert([
+          {
+            user_email:
+              "PUBLIC_USER",
+
+            category:
+              suggestionCategory,
+
+            message:
+              suggestionMessage,
+
+            status:
+              "OPEN",
+
+            page:
+              window.location.pathname,
+
+            page_url:
+              window.location.href,
+
+            item_name:
+              selectedItem
+                ?.item_name || null,
+
+            item_id:
+              selectedItem
+                ?.id || null,
+          },
+        ]);
+
+    if (error) {
+      throw error;
+    }
+
+    alert(
+      "Suggestion submitted successfully!"
+    );
+
+    setSuggestionMessage("");
+
+    setSuggestionCategory(
+      "FEATURE_REQUEST"
+    );
+
+    setShowSuggestion(false);
+
+  } catch (err: any) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "Failed to submit suggestion."
+    );
+
+  } finally {
+
+    setSendingSuggestion(false);
+
+  }
+
+}
+
   useEffect(() => {
     const close = (e: any) => {
       if (
@@ -432,10 +537,19 @@ const { theme } = useTheme();
             onClick={() =>
               router.push("/")
             }
-            className="hover:text-red-600 transition"
+            className="hover:text-cyan-600 transition"
           >
             Beranda
           </button>
+
+          <button
+  onClick={() =>
+    setShowSuggestion(true)
+  }
+  className="hover:text-cyan-600 transition"
+>
+  Suggestions
+</button>
 
           {/* CATEGORY */}
           <div
@@ -448,7 +562,7 @@ const { theme } = useTheme();
                   !showCategory
                 )
               }
-              className="hover:text-red-600 transition"
+              className="hover:text-cyan-600 transition"
             >
               Category ▾
             </button>
@@ -747,6 +861,66 @@ className={`
   }
 `}
           />
+
+<button
+  onClick={toggleTheme}
+  className={`
+    w-11
+    h-11
+
+    rounded-xl
+
+    flex
+    items-center
+    justify-center
+
+    transition-all
+    duration-300
+
+    hover:scale-105
+
+    ${
+      theme === "dark"
+        ? `
+            bg-cyan-500/10
+            border
+            border-cyan-400/20
+
+            hover:bg-cyan-500/20
+          `
+        : `
+            bg-blue-50
+            border
+            border-blue-200
+
+            hover:bg-blue-100
+          `
+    }
+  `}
+>
+
+  {theme === "dark" ? (
+
+    <Sun
+      size={20}
+      className="
+        text-yellow-400
+      "
+    />
+
+  ) : (
+
+    <Moon
+      size={20}
+      className="
+        text-blue-600
+      "
+    />
+
+  )}
+
+</button>
+
         </div>
       </div>
 
@@ -1247,24 +1421,88 @@ className={`
   `}
 >
 
-              {/* CLOSE */}
-              <button
-                onClick={() =>
-                  setSelectedItem(null)
-                }
-                className="
-                  absolute
-                  top-5
-                  right-6
-                  text-5xl
-                  font-light
-                  z-50
-                  hover:text-red-500
-                  transition
-                "
-              >
-                ×
-              </button>
+        {/* ACTION BUTTONS */}
+
+<div
+  className="
+    absolute
+    top-5
+    right-6
+    z-50
+
+    flex
+    items-center
+    gap-3
+  "
+>
+
+  {/* SHARE */}
+
+  <button
+    onClick={() => {
+
+      const shareUrl =
+        `${window.location.origin}/public-catalog/${selectedItem.slug}`;
+
+      navigator.clipboard.writeText(
+        shareUrl
+      );
+
+      alert(
+        "Link copied to clipboard"
+      );
+    }}
+    className={`
+      w-11
+      h-11
+
+      rounded-xl
+
+      flex
+      items-center
+      justify-center
+
+      transition
+
+      ${
+        theme === "dark"
+          ? `
+              bg-cyan-500/10
+              border border-cyan-300/20
+              text-cyan-300
+            `
+          : `
+              bg-blue-50
+              border border-blue-200
+              text-blue-600
+            `
+      }
+
+      hover:scale-105
+    `}
+  >
+    <Share2 size={20} />
+  </button>
+
+  {/* CLOSE */}
+
+  <button
+    onClick={() =>
+      setSelectedItem(null)
+    }
+    className="
+      text-5xl
+      font-light
+
+      hover:text-red-500
+
+      transition
+    "
+  >
+    ×
+  </button>
+
+</div>
 
               <div className="grid md:grid-cols-2 gap-10 p-6 md:p-10">
 
@@ -1470,6 +1708,240 @@ className={`
 
       )}
 
+{showSuggestion && (
+
+  <div
+    className="
+      fixed
+      inset-0
+      z-[999]
+
+      bg-black/70
+
+      flex
+      items-center
+      justify-center
+
+      p-4
+    "
+  >
+
+    <div
+      className={`
+        w-full
+        max-w-xl
+
+        rounded-3xl
+
+        p-8
+
+        relative
+
+        ${
+          theme === "dark"
+            ? `
+              bg-[#071d33]
+              text-white
+              border border-cyan-300/20
+            `
+            : `
+              bg-white
+              text-slate-900
+              border border-slate-200
+            `
+        }
+      `}
+    >
+
+      <button
+        onClick={() =>
+          setShowSuggestion(false)
+        }
+        className="
+          absolute
+          top-4
+          right-5
+
+          text-3xl
+        "
+      >
+        ×
+      </button>
+
+      <h2
+        className="
+          text-3xl
+          font-bold
+          mb-6
+        "
+      >
+        Suggestion Box
+      </h2>
+
+      {/* CATEGORY */}
+
+      <div className="mb-4">
+
+        <label
+          className="
+            block
+            mb-2
+            text-sm
+            opacity-70
+          "
+        >
+          Category
+        </label>
+
+        <select
+          value={suggestionCategory}
+          onChange={(e) =>
+            setSuggestionCategory(
+              e.target.value
+            )
+          }
+          className={`
+            w-full
+
+            px-4
+            py-3
+
+            rounded-xl
+
+            border
+
+            ${
+              theme === "dark"
+                ? `
+                    bg-[#0d2742]
+                    border-cyan-300/20
+                    text-white
+                  `
+                : `
+                    bg-white
+                    border-slate-300
+                    text-slate-900
+                  `
+            }
+          `}
+        >
+          <option value="BUG">
+                  Bug Report
+                </option>
+
+                <option value="FEATURE_REQUEST">
+                  Feature Request
+                </option>
+
+                <option value="CATALOG_DATA">
+                  Catalog Data Issue
+                </option>
+
+                <option value="UI_SUGGESTION">
+                  UI/UX Suggestion
+                </option>
+
+                <option value="OTHER">
+                  Other
+                </option>
+
+
+        </select>
+
+      </div>
+
+      {/* MESSAGE */}
+
+      <div>
+
+        <label
+          className="
+            block
+            mb-2
+            text-sm
+            opacity-70
+          "
+        >
+          Message
+        </label>
+
+        <textarea
+          rows={6}
+          value={suggestionMessage}
+          onChange={(e) =>
+            setSuggestionMessage(
+              e.target.value
+            )
+          }
+          placeholder="Describe your suggestion..."
+          className={`
+            w-full
+
+            px-4
+            py-3
+
+            rounded-xl
+
+            border
+
+            resize-none
+
+            ${
+              theme === "dark"
+                ? `
+                    bg-[#0d2742]
+                    border-cyan-300/20
+                    text-white
+                  `
+                : `
+                    bg-white
+                    border-slate-300
+                    text-slate-900
+                  `
+            }
+          `}
+        />
+      </div>
+
+      <button
+        onClick={
+          submitSuggestion
+        }
+        disabled={
+          sendingSuggestion
+        }
+        className="
+          mt-6
+
+          w-full
+
+          py-3
+
+          rounded-xl
+
+          bg-cyan-500
+
+          text-white
+
+          font-semibold
+
+          hover:bg-cyan-600
+
+          transition
+
+          disabled:opacity-50
+        "
+      >
+        {sendingSuggestion
+          ? "Submitting..."
+          : "Submit Suggestion"}
+      </button>
+
+    </div>
+
+  </div>
+
+)}
     </main>
   );
 }
