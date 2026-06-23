@@ -1074,35 +1074,36 @@ transition
 
           {/* DESCRIPTION */}
           <textarea
-            name="description"
-            placeholder="Description"
-            value={
-              form.description
-            }
-            onChange={handleChange}
-            className="
-              w-full
+  name="description"
+  placeholder="Description"
+  value={form.description}
+  onChange={handleChange}
+  rows={12}
+  className="
+    w-full
 
-border border-cyan-300/20
+    min-h-[300px]
+    resize-y
 
-p-4
+    border border-cyan-300/20
 
-rounded-2xl
+    p-4
 
-bg-white/5
+    rounded-2xl
 
-text-white
+    bg-white/5
 
-placeholder:text-white/40
+    text-white
 
-outline-none
+    placeholder:text-white/40
 
-focus:border-cyan-400
+    outline-none
 
-transition
+    focus:border-cyan-400
 
-            "
-          />
+    transition
+  "
+/>
 
           {/* SUBMIT */}
           <button

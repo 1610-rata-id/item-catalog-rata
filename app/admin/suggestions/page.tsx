@@ -20,6 +20,9 @@ export default function SuggestionsPage() {
   const [statusFilter, setStatusFilter] =
     useState("ALL");
 
+  const [sourceFilter, setSourceFilter] =
+  useState("ALL");
+
   const [selectedSuggestion, setSelectedSuggestion] =
     useState<any | null>(null);
 
@@ -41,6 +44,46 @@ export default function SuggestionsPage() {
     setSuggestions(data || []);
     setLoading(false);
   }
+
+    async function updateStatus(
+  id: number,
+  status: string
+) {
+
+  const { error } =
+    await supabase
+      .from("feedbacks")
+      .update({
+        status,
+      })
+      .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setSuggestions((prev) =>
+    prev.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            status,
+          }
+        : item
+    )
+  );
+
+  setSelectedSuggestion(
+    (prev: any) =>
+      prev
+        ? {
+            ...prev,
+            status,
+          }
+        : null
+  );
+}
 
   useEffect(() => {
     getSuggestions();
@@ -76,10 +119,16 @@ export default function SuggestionsPage() {
           ? true
           : item.status === statusFilter;
 
+      const matchSource =
+  sourceFilter === "ALL"
+    ? true
+    : item.source === sourceFilter;
+
       return (
-        matchSearch &&
-        matchStatus
-      );
+  matchSearch &&
+  matchStatus &&
+  matchSource
+);
     });
 
   return (
@@ -193,6 +242,92 @@ export default function SuggestionsPage() {
                 Open
               </button>
 
+               <button
+  onClick={() =>
+    setStatusFilter(
+      "IN_PROGRESS"
+    )
+  }
+  className={`
+    px-4 py-2 rounded-xl
+
+    ${
+      statusFilter ===
+      "IN_PROGRESS"
+        ? "bg-yellow-500 text-white"
+        : theme === "dark"
+        ? "bg-white/10"
+        : "bg-white border"
+    }
+  `}
+>
+  In Progress
+</button>
+
+<button
+  onClick={() =>
+    setStatusFilter(
+      "CLOSED"
+    )
+  }
+  className={`
+    px-4 py-2 rounded-xl
+
+    ${
+      statusFilter ===
+      "CLOSED"
+        ? "bg-green-500 text-white"
+        : theme === "dark"
+        ? "bg-white/10"
+        : "bg-white border"
+    }
+  `}
+>
+  Closed
+</button>
+
+           <button
+  onClick={() =>
+    setSourceFilter(
+      "INTERNAL"
+    )
+  }
+  className={`
+    px-4 py-2 rounded-xl
+
+    ${
+      sourceFilter === "INTERNAL"
+        ? "bg-green-500 text-white"
+        : theme === "dark"
+        ? "bg-white/10"
+        : "bg-white border"
+    }
+  `}
+>
+  Internal
+</button>
+
+<button
+  onClick={() =>
+    setSourceFilter(
+      "EXTERNAL"
+    )
+  }
+  className={`
+    px-4 py-2 rounded-xl
+
+    ${
+      sourceFilter === "EKSTERNAL"
+        ? "bg-blue-500 text-white"
+        : theme === "dark"
+        ? "bg-white/10"
+        : "bg-white border"
+    }
+  `}
+>
+  External
+</button>
+
             </div>
 
             {loading ? (
@@ -285,6 +420,18 @@ export default function SuggestionsPage() {
 
                           <div>
 
+  <div className="text-sm opacity-70">
+    Source
+  </div>
+
+  <div>
+    {item.source}
+  </div>
+
+</div>
+
+                          <div>
+
                             <div className="text-sm opacity-70">
                               Status
                             </div>
@@ -355,6 +502,9 @@ export default function SuggestionsPage() {
 
               relative
 
+              max-h-[90vh]
+    overflow-y-auto
+
               ${
                 theme === "dark"
                   ? `
@@ -404,14 +554,88 @@ export default function SuggestionsPage() {
               </div>
 
               <div>
+  <strong>Name:</strong>{" "}
+  {selectedSuggestion.sender_name || "-"}
+</div>
+
+<div>
+  <strong>Email:</strong>{" "}
+  {selectedSuggestion.sender_email || "-"}
+</div>
+
+<div>
+  <strong>Division:</strong>{" "}
+  {selectedSuggestion.division || "-"}
+</div>
+
+<div>
+  <strong>Office:</strong>{" "}
+  {selectedSuggestion.office || "-"}
+</div>
+
+<div>
+  <strong>Source:</strong>{" "}
+  {selectedSuggestion.source || "-"}
+</div>
+
+              <div>
                 <strong>Category:</strong>{" "}
                 {selectedSuggestion.category}
               </div>
 
               <div>
-                <strong>Status:</strong>{" "}
-                {selectedSuggestion.status}
-              </div>
+
+  <strong>Status:</strong>
+
+  <select
+    value={
+      selectedSuggestion.status
+    }
+    onChange={(e) =>
+      updateStatus(
+        selectedSuggestion.id,
+        e.target.value
+      )
+    }
+    className={`
+      ml-3
+
+      px-3
+      py-2
+
+      rounded-lg
+
+      ${
+        theme === "dark"
+          ? `
+            bg-[#0d2742]
+            text-white
+            border border-cyan-300/20
+          `
+          : `
+            bg-white
+            text-slate-900
+            border border-slate-300
+          `
+      }
+    `}
+  >
+
+    <option value="OPEN">
+      OPEN
+    </option>
+
+    <option value="IN_PROGRESS">
+      IN PROGRESS
+    </option>
+
+    <option value="CLOSED">
+      CLOSED
+    </option>
+
+  </select>
+
+</div>
 
               <div>
                 <strong>Page:</strong>{" "}
@@ -437,22 +661,26 @@ export default function SuggestionsPage() {
                 </strong>
 
                 <div
-                  className={`
-                    mt-3
+  className={`
+    mt-3
 
-                    p-4
+    p-4
 
-                    rounded-xl
+    rounded-xl
 
-                    ${
-                      theme === "dark"
-                        ? "bg-white/5"
-                        : "bg-slate-100"
-                    }
-                  `}
-                >
-                  {selectedSuggestion.message}
-                </div>
+    break-words
+    whitespace-pre-wrap
+    overflow-hidden
+
+    ${
+      theme === "dark"
+        ? "bg-white/5"
+        : "bg-slate-100"
+    }
+  `}
+>
+  {selectedSuggestion.message}
+</div>
 
               </div>
 

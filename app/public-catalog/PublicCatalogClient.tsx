@@ -88,6 +88,26 @@ const [
   setSendingSuggestion
 ] = useState(false);
 
+const [
+  senderName,
+  setSenderName
+] = useState("");
+
+const [
+  senderEmail,
+  setSenderEmail
+] = useState("");
+
+const [
+  division,
+  setDivision
+] = useState("");
+
+const [
+  office,
+  setOffice
+] = useState("");
+
   const [catSearch, setCatSearch] =
     useState("");
 
@@ -232,7 +252,6 @@ const [
         [
           `item_name.ilike.%${keyword}%`,
           `category.ilike.%${keyword}%`,
-          `description.ilike.%${keyword}%`,
           `item_code.ilike.%${keyword}%`,
           `main_category.ilike.%${keyword}%`,
           `sub_category.ilike.%${keyword}%`,
@@ -377,12 +396,18 @@ const [
 
   async function submitSuggestion() {
 
-  if (!suggestionMessage.trim()) {
-    alert(
-      "Please enter your suggestion."
-    );
-    return;
-  }
+  if (
+  !senderName.trim() ||
+  !senderEmail.trim() ||
+  !division.trim() ||
+  !office.trim() ||
+  !suggestionMessage.trim()
+) {
+  alert(
+    "Please complete all fields."
+  );
+  return;
+}
 
   try {
 
@@ -416,8 +441,23 @@ const [
                 ?.item_name || null,
 
             item_id:
-              selectedItem
-                ?.id || null,
+  selectedItem
+    ?.id || null,
+
+source:
+  "EXTERNAL",
+
+sender_name:
+  senderName,
+
+sender_email:
+  senderEmail,
+
+division:
+  division,
+
+office:
+  office,
           },
         ]);
 
@@ -431,11 +471,19 @@ const [
 
     setSuggestionMessage("");
 
-    setSuggestionCategory(
-      "FEATURE_REQUEST"
-    );
+setSuggestionCategory(
+  "FEATURE_REQUEST"
+);
 
-    setShowSuggestion(false);
+setSenderName("");
+
+setSenderEmail("");
+
+setDivision("");
+
+setOffice("");
+
+setShowSuggestion(false);
 
   } catch (err: any) {
 
@@ -1730,12 +1778,11 @@ className={`
       className={`
         w-full
         max-w-xl
-
         rounded-3xl
-
         p-8
-
         relative
+        max-h-[90vh]
+        overflow-y-auto
 
         ${
           theme === "dark"
@@ -1758,12 +1805,14 @@ className={`
           setShowSuggestion(false)
         }
         className="
-          absolute
-          top-4
-          right-5
+  absolute
+  top-4
+  right-5
 
-          text-3xl
-        "
+  text-3xl
+
+  z-50
+"
       >
         ×
       </button>
@@ -1777,6 +1826,211 @@ className={`
       >
         Suggestion Box
       </h2>
+
+      {/* NAME */}
+
+<div className="mb-4">
+
+  <label
+    className="
+      block
+      mb-2
+      text-sm
+      opacity-70
+    "
+  >
+    Name *
+  </label>
+
+  <input
+    value={senderName}
+    onChange={(e) =>
+      setSenderName(
+        e.target.value
+      )
+    }
+    placeholder="Your name"
+    className={`
+      w-full
+
+      px-4
+      py-3
+
+      rounded-xl
+
+      border
+
+      ${
+        theme === "dark"
+          ? `
+              bg-[#0d2742]
+              border-cyan-300/20
+              text-white
+            `
+          : `
+              bg-white
+              border-slate-300
+              text-slate-900
+            `
+      }
+    `}
+  />
+
+</div>
+
+{/* EMAIL */}
+
+<div className="mb-4">
+
+  <label
+    className="
+      block
+      mb-2
+      text-sm
+      opacity-70
+    "
+  >
+    Email *
+  </label>
+
+  <input
+    type="email"
+    value={senderEmail}
+    onChange={(e) =>
+      setSenderEmail(
+        e.target.value
+      )
+    }
+    placeholder="your@email.com"
+    className={`
+      w-full
+
+      px-4
+      py-3
+
+      rounded-xl
+
+      border
+
+      ${
+        theme === "dark"
+          ? `
+              bg-[#0d2742]
+              border-cyan-300/20
+              text-white
+            `
+          : `
+              bg-white
+              border-slate-300
+              text-slate-900
+            `
+      }
+    `}
+  />
+
+</div>
+
+{/* DIVISION */}
+
+<div className="mb-4">
+
+  <label
+    className="
+      block
+      mb-2
+      text-sm
+      opacity-70
+    "
+  >
+    Division *
+  </label>
+
+  <input
+    value={division}
+    onChange={(e) =>
+      setDivision(
+        e.target.value
+      )
+    }
+    placeholder="Procurement"
+    className={`
+      w-full
+
+      px-4
+      py-3
+
+      rounded-xl
+
+      border
+
+      ${
+        theme === "dark"
+          ? `
+              bg-[#0d2742]
+              border-cyan-300/20
+              text-white
+            `
+          : `
+              bg-white
+              border-slate-300
+              text-slate-900
+            `
+      }
+    `}
+  />
+
+</div>
+
+{/* OFFICE */}
+
+<div className="mb-4">
+
+  <label
+    className="
+      block
+      mb-2
+      text-sm
+      opacity-70
+    "
+  >
+    Office *
+  </label>
+
+  <input
+    value={office}
+    onChange={(e) =>
+      setOffice(
+        e.target.value
+      )
+    }
+    placeholder="Jakarta"
+    className={`
+      w-full
+
+      px-4
+      py-3
+
+      rounded-xl
+
+      border
+
+      ${
+        theme === "dark"
+          ? `
+              bg-[#0d2742]
+              border-cyan-300/20
+              text-white
+            `
+          : `
+              bg-white
+              border-slate-300
+              text-slate-900
+            `
+      }
+    `}
+  />
+
+</div>
 
       {/* CATEGORY */}
 

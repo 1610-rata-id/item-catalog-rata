@@ -173,6 +173,15 @@ async function submitSuggestion() {
             item_id:
               selectedItem
                 ?.id || null,
+           
+           source:
+  "INTERNAL",
+
+sender_email:
+  userEmail,
+
+sender_name:
+  userEmail,
           },
         ]);
 
@@ -409,7 +418,7 @@ setVendors([
   // SEARCH
   if (debouncedSearch.trim()) {
   query = query.or(
-    `item_name.ilike.%${debouncedSearch}%,vendor.ilike.%${debouncedSearch}%,category.ilike.%${debouncedSearch}%,description.ilike.%${debouncedSearch}%,item_code.ilike.%${debouncedSearch}%,Manufacture.ilike.%${debouncedSearch}%,type.ilike.%${debouncedSearch}%,Term.ilike.%${debouncedSearch}%,Remarks.ilike.%${debouncedSearch}%`
+    `item_name.ilike.%${debouncedSearch}%,vendor.ilike.%${debouncedSearch}%,category.ilike.%${debouncedSearch}%,item_code.ilike.%${debouncedSearch}%,Manufacture.ilike.%${debouncedSearch}%,type.ilike.%${debouncedSearch}%,Term.ilike.%${debouncedSearch}%,Remarks.ilike.%${debouncedSearch}%`
   );
 }
 
