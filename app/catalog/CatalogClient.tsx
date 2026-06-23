@@ -1416,52 +1416,40 @@ border-cyan-300/10
       </div>
 
       {/* HERO BANNER */}
-<div className="px-8 pt-8">
-
-  <div
-    className={`
+      <div className="max-w-7xl mx-auto px-6 pt-6">
+        <div
+          className={`
   relative
   overflow-hidden
   rounded-[32px]
 
-  border
-
-  mb-8
-
   ${
     theme === "dark"
       ? `
-          border-cyan-300/20
-          bg-white/5
-          backdrop-blur-xl
-        `
+        border border-cyan-300/10
+        shadow-[0_0_30px_rgba(0,255,255,0.08)]
+      `
       : `
-          border-slate-200
-          bg-white/70
-          backdrop-blur-md
-          shadow-xl
-        `
+        border border-slate-200
+        shadow-xl
+      `
   }
 `}
-  >
-
-    <img
-      src={
-  theme === "dark"
-    ? "/dark/catalog-banner.jpg"
-    : "/light/catalog-banner.jpg"
-}
-      alt="Catalog Banner"
-      className="
-        w-full
-        h-[420px]
-        object-cover
-      "
-    />
-
-  </div>
-
-</div>
+        >
+          <img
+  src={
+    theme === "dark"
+      ? "/dark/catalog-banner.jpg"
+      : "/light/catalog-banner.jpg"
+  }
+            className="
+              w-full
+              h-[220px] md:h-[300px]
+              object-cover
+            "
+          />
+        </div>
+      </div>
 
       {/* TOTAL RESULT */}
       <div className="max-w-7xl mx-auto px-6 pt-10 flex justify-between items-center flex-wrap gap-3">
@@ -1597,7 +1585,7 @@ border-cyan-300/10
 
       {/* GRID */}
       {!loading && (
-        <div className="max-w-[1700px] mx-auto p-6 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+        <div className="max-w-7xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
 
           {items.map((item) => (
             <div
