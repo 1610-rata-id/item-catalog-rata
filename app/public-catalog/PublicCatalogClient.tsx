@@ -9,6 +9,8 @@ import {
   Moon,
   Share2
 } from "lucide-react";
+import ImageViewer from "@/app/components/catalog/ImageViewer";
+import ShareMenu from "@/app/components/catalog/ShareMenu";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -48,6 +50,16 @@ const {
 
   const [activeImage, setActiveImage] =
   useState<string | null>(null);
+
+const [
+  showImageViewer,
+  setShowImageViewer,
+] = useState(false);
+
+const [
+  showShareMenu,
+  setShowShareMenu,
+] = useState(false);
 
   const [page, setPage] = useState(
     Number(searchParams.get("page")) || 1
@@ -1102,8 +1114,9 @@ className={`
 
             <div
               key={item.id}
-              onClick={() => {
 
+              onClick={() => {
+               setShowShareMenu(false);
                 setSelectedItem(item);
 
                 if (
@@ -1486,58 +1499,68 @@ className={`
 
   {/* SHARE */}
 
-  <button
-    onClick={() => {
+<button
+  onClick={() =>
+    setShowShareMenu(
+      (prev) => !prev
+    )
+  }
+  className={`
+    w-11
+    h-11
 
-      const shareUrl =
-        `${window.location.origin}/public-catalog/${selectedItem.slug}`;
+    rounded-xl
 
-      navigator.clipboard.writeText(
-        shareUrl
-      );
+    flex
+    items-center
+    justify-center
 
-      alert(
-        "Link copied to clipboard"
-      );
-    }}
-    className={`
-      w-11
-      h-11
+    transition
 
-      rounded-xl
+    ${
+      theme === "dark"
+        ? `
+            bg-cyan-500/10
+            border border-cyan-300/20
+            text-cyan-300
+          `
+        : `
+            bg-blue-50
+            border border-blue-200
+            text-blue-600
+          `
+    }
 
-      flex
-      items-center
-      justify-center
+    hover:scale-105
+  `}
+>
+  <Share2 size={20} />
+</button>
 
-      transition
-
-      ${
-        theme === "dark"
-          ? `
-              bg-cyan-500/10
-              border border-cyan-300/20
-              text-cyan-300
-            `
-          : `
-              bg-blue-50
-              border border-blue-200
-              text-blue-600
-            `
+{showShareMenu && (
+  <div className="absolute top-16 right-0 z-[9999]">
+    <ShareMenu
+      open={showShareMenu}
+      shareUrl={`${window.location.origin}/public-catalog/${selectedItem.slug}`}
+      itemName={selectedItem.item_name}
+      theme={theme}
+      onClose={() =>
+        setShowShareMenu(false)
       }
-
-      hover:scale-105
-    `}
-  >
-    <Share2 size={20} />
-  </button>
+    />
+  </div>
+)}
 
   {/* CLOSE */}
 
   <button
-    onClick={() =>
-      setSelectedItem(null)
-    }
+    onClick={() => {
+
+  setShowShareMenu(false);
+
+  setSelectedItem(null);
+
+}}
     className="
       text-5xl
       font-light
@@ -1576,16 +1599,23 @@ className={`
 
                     {activeImage ? (
   <img
-    src={activeImage}
-    alt={selectedItem.item_name}
-    className="
-      max-h-full
-      object-contain
-      transition-all
-      duration-300
-      hover:scale-105
-    "
-  />
+  src={activeImage}
+  alt={selectedItem.item_name}
+  onClick={() =>
+    setShowImageViewer(true)
+  }
+  className="
+    max-h-full
+    object-contain
+
+    cursor-zoom-in
+
+    transition-all
+    duration-300
+
+    hover:scale-105
+  "
+/>
 ) : (
   <div
     className="
@@ -1623,9 +1653,13 @@ className={`
                         <img
                           key={index}
                           src={img}
-                          onClick={() =>
-                            setActiveImage(img)
-                          }
+                          onClick={() => {
+
+  setShowShareMenu(false);
+
+  setActiveImage(img);
+
+}}
                           className={`
                             w-24
                             h-24
@@ -2196,6 +2230,23 @@ className={`
   </div>
 
 )}
+
+<ImageViewer
+  open={showImageViewer}
+  image={activeImage || ""}
+  images={
+    selectedItem?.image_urls &&
+    selectedItem.image_urls.length > 0
+      ? selectedItem.image_urls
+      : selectedItem?.image_url
+      ? [selectedItem.image_url]
+      : []
+  }
+  onClose={() =>
+    setShowImageViewer(false)
+  }
+/>
+
     </main>
   );
 }

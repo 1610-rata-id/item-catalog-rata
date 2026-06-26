@@ -4,12 +4,14 @@ import { useEffect, useState, useRef } from "react";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import ImageViewer from "@/app/components/catalog/ImageViewer";
 import { useTheme } from "@/app/providers/ThemeProvider";
 import {
   Sun,
   Moon,
   Share2
 } from "lucide-react";
+import ShareMenu from "@/app/components/catalog/ShareMenu";
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -62,6 +64,16 @@ const [
   const [activeImage, setActiveImage] =
     useState("");
 
+  const [
+  showImageViewer,
+  setShowImageViewer
+] = useState(false);
+
+const [
+  imageZoom,
+  setImageZoom
+] = useState(1);
+
   // PAGINATION
   const [page, setPage] = useState(
     Number(searchParams.get("page")) || 1
@@ -97,6 +109,11 @@ const [
 
   const [showFeedback, setShowFeedback] =
   useState(false);
+
+  const [
+  showShareMenu,
+  setShowShareMenu,
+] = useState(false);
 
 const [
   suggestionCategory,
@@ -2038,20 +2055,14 @@ border-cyan-300/10
 
   {/* SHARE */}
 
+<div className="relative">
+
   <button
-    onClick={() => {
-
-      const shareUrl =
-        `${window.location.origin}/public-catalog/${selectedItem.slug}`;
-
-      navigator.clipboard.writeText(
-        shareUrl
-      );
-
-      alert(
-        "Link copied to clipboard"
-      );
-    }}
+    onClick={() =>
+      setShowShareMenu(
+        (prev) => !prev
+      )
+    }
     className={`
       w-11
       h-11
@@ -2083,6 +2094,35 @@ border-cyan-300/10
   >
     <Share2 size={20} />
   </button>
+
+  {showShareMenu && (
+
+    <div
+      className="
+        absolute
+
+        top-14
+        right-0
+
+        z-[9999]
+      "
+    >
+
+      <ShareMenu
+        open={showShareMenu}
+        shareUrl={`${window.location.origin}/public-catalog/${selectedItem.slug}`}
+        itemName={selectedItem.item_name}
+        theme={theme}
+        onClose={() =>
+          setShowShareMenu(false)
+        }
+      />
+
+    </div>
+
+  )}
+
+</div>
 
   {/* CLOSE */}
 
@@ -2137,14 +2177,23 @@ border-cyan-300/10
 >
 
                   <img
-                    src={activeImage}
-                    className="
-                      max-h-[500px]
-                      object-contain
-                      transition-all duration-300
-                      hover:scale-105
-                    "
-                  />
+  src={activeImage}
+  onClick={() => {
+    setShowImageViewer(true);
+    setImageZoom(1);
+  }}
+  className="
+    max-h-[500px]
+    object-contain
+
+    cursor-zoom-in
+
+    transition-all
+    duration-300
+
+    hover:scale-105
+  "
+/>
 
                 </div>
 
@@ -2485,6 +2534,22 @@ hover:bg-orange-500
 
         </div>
             )}
+
+       <ImageViewer
+  open={showImageViewer}
+  image={activeImage}
+  images={
+    selectedItem?.image_urls &&
+    selectedItem.image_urls.length > 0
+      ? selectedItem.image_urls
+      : selectedItem?.image_url
+      ? [selectedItem.image_url]
+      : []
+  }
+  onClose={() =>
+    setShowImageViewer(false)
+  }
+/>
 
       {showFeedback && (
 
