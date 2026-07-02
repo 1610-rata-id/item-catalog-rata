@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   useEffect,
   useState,
+  useRef,
 } from "react";
 
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -46,6 +47,7 @@ export default function EditItemPage() {
     vendor: "",
 
     // CATEGORY
+    category: "",
     main_category: "",
     sub_category: "",
 
@@ -65,6 +67,39 @@ export default function EditItemPage() {
     Term: "",
     Remarks: "",
   });
+
+  const [
+  categories,
+  setCategories,
+] = useState<string[]>([]);
+
+const [
+  mainCategories,
+  setMainCategories,
+] = useState<string[]>([]);
+
+const [
+  subCategories,
+  setSubCategories,
+] = useState<string[]>([]);
+
+const [showCategory, setShowCategory] =
+  useState(false);
+
+const [showMainCategory, setShowMainCategory] =
+  useState(false);
+
+const [showSubCategory, setShowSubCategory] =
+  useState(false);
+
+const categoryRef =
+  useRef<HTMLDivElement>(null);
+
+const mainCategoryRef =
+  useRef<HTMLDivElement>(null);
+
+const subCategoryRef =
+  useRef<HTMLDivElement>(null);
 
   function handleChange(
     e: React.ChangeEvent<
@@ -141,6 +176,9 @@ export default function EditItemPage() {
         data.vendor || "",
 
       // CATEGORY
+      category:
+        data.category || "",
+
       main_category:
         data.main_category || "",
 
@@ -191,6 +229,78 @@ export default function EditItemPage() {
     setLoading(false);
   }
 
+  async function getCategories() {
+
+  const { data, error } =
+    await supabase
+
+      .from("items")
+
+      .select(`
+  category,
+  main_category,
+  sub_category
+`);
+
+  if (error) {
+
+    console.log(error);
+
+    return;
+
+  }
+
+  const categorySet =
+  new Set<string>();
+
+  const mainSet =
+    new Set<string>();
+
+  const subSet =
+  new Set<string>();
+
+  data?.forEach((item: any) => {
+
+  if (item.category) {
+
+    categorySet.add(
+      item.category
+    );
+
+  }
+
+  if (item.main_category) {
+
+    mainSet.add(
+      item.main_category
+    );
+
+  }
+
+  if (item.sub_category) {
+
+  subSet.add(
+    item.sub_category
+  );
+
+}
+
+});
+
+  setCategories(
+  Array.from(categorySet).sort()
+);
+
+setMainCategories(
+  Array.from(mainSet).sort()
+);
+
+setSubCategories(
+  Array.from(subSet).sort()
+);
+
+}
+
   async function handleSubmit(
     e: React.FormEvent
   ) {
@@ -223,6 +333,9 @@ export default function EditItemPage() {
             form.vendor,
 
           // CATEGORY
+          category:
+            form.category,
+
           main_category:
             form.main_category,
 
@@ -314,8 +427,40 @@ export default function EditItemPage() {
   useEffect(() => {
   if (!authLoading) {
     getItem();
+    getCategories();
   }
 }, [authLoading]);
+
+useEffect(() => {
+
+  function handleClick(
+    e: MouseEvent
+  ) {
+
+    if (
+      !categoryRef.current?.contains(
+        e.target as Node
+      )
+    ) {
+
+      setShowCategory(false);
+
+    }
+
+  }
+
+  window.addEventListener(
+    "click",
+    handleClick
+  );
+
+  return () =>
+    window.removeEventListener(
+      "click",
+      handleClick
+    );
+
+}, []);
 
   if (authLoading) {
   return (
@@ -477,55 +622,198 @@ transition
             "
           />
 
-          {/* MAIN CATEGORY */}
-          <select
-            name="main_category"
-            value={form.main_category}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                main_category:
-                  e.target.value,
+          {/* CATEGORY */}
 
-                sub_category: "",
-              })
-            }
+<div
+  ref={categoryRef}
+  className="relative"
+>
+
+  <button
+    type="button"
+    onClick={() =>
+      setShowCategory(
+        !showCategory
+      )
+    }
+    className="
+      w-full
+
+      border border-cyan-300/20
+
+      p-4
+
+      rounded-2xl
+
+      bg-[#0d2742]
+
+      text-white
+
+      flex
+      justify-between
+      items-center
+
+      transition
+
+      hover:border-cyan-400
+    "
+  >
+
+    <span>
+
+      {form.category ||
+
+        "Select Category"}
+
+    </span>
+
+    <span>
+
+      ▼
+
+    </span>
+
+  </button>
+
+  {showCategory && (
+
+    <div
+      className="
+        absolute
+
+        top-full
+
+        mt-2
+
+        left-0
+
+        w-full
+
+        max-h-72
+
+        overflow-y-auto
+
+        rounded-2xl
+
+        bg-[#0d2742]
+
+        border border-cyan-300/20
+
+        shadow-xl
+
+        z-50
+      "
+    >
+
+      {categories.map(
+        (category) => (
+
+          <button
+            key={category}
+
+            type="button"
+
+            onClick={() => {
+
+              setForm({
+
+                ...form,
+
+                category,
+
+              });
+
+              setShowCategory(
+                false
+              );
+
+            }}
+
             className="
               w-full
 
-border border-cyan-300/20
+              text-left
 
-p-4
+              px-4
 
-rounded-2xl
+              py-3
 
-bg-white/5
+              text-white
 
-text-white
+              hover:bg-cyan-500/20
 
-placeholder:text-white/40
-
-outline-none
-
-focus:border-cyan-400
-
-transition
+              transition
             "
           >
 
-            <option value="">
-              Select Main Category
-            </option>
+            {category}
 
-            <option value="Main Material">
-              Main Material
-            </option>
+          </button>
 
-            <option value="Asset">
-              Asset
-            </option>
+        )
+      )}
 
-          </select>
+    </div>
+
+  )}
+
+</div>
+
+          {/* MAIN CATEGORY */}
+
+<select
+  name="main_category"
+  value={form.main_category}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      main_category:
+        e.target.value,
+
+      sub_category: "",
+    })
+  }
+  className="
+  w-full
+
+  border border-cyan-300/20
+
+  p-4
+
+  rounded-2xl
+
+  bg-[#0d2742]
+
+  text-white
+
+  outline-none
+
+  focus:border-cyan-400
+
+  transition
+"
+>
+
+  <option
+  value=""
+  className="bg-[#0d2742] text-white"
+>
+  Select Main Category
+</option>
+
+{mainCategories.map(
+  (category) => (
+    <option
+      key={category}
+      value={category}
+      className="bg-[#0d2742] text-white"
+    >
+      {category}
+    </option>
+  )
+)}
+
+</select>
 
           {/* SUB CATEGORY */}
           <select
@@ -539,26 +827,24 @@ transition
               })
             }
             className="
-              w-full
+  w-full
 
-border border-cyan-300/20
+  border border-cyan-300/20
 
-p-4
+  p-4
 
-rounded-2xl
+  rounded-2xl
 
-bg-white/5
+  bg-[#0d2742]
 
-text-white
+  text-white
 
-placeholder:text-white/40
+  outline-none
 
-outline-none
+  focus:border-cyan-400
 
-focus:border-cyan-400
-
-transition
-            "
+  transition
+"
           >
 
             <option value="">
