@@ -12,7 +12,7 @@ import {
   Share2
 } from "lucide-react";
 import ShareMenu from "@/app/components/catalog/ShareMenu";
-import MobileCatalog from "@/app/components/catalog/mobile/MobileCatalog";
+import MobileCatalog from "@/components/catalog/mobile/MobileCatalog";
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -689,46 +689,6 @@ return (
     />
 
     <div className="relative z-10">
-
-  {/* MOBILE */}
-<div className="block md:hidden">
-  <MobileCatalog
-    theme={theme}
-    items={items}
-    totalItems={totalItems}
-    search={search}
-    handleSearch={handleSearch}
-    toggleTheme={toggleTheme}
-
-    selectedCategory={selectedCategory}
-    handleCategoryChange={handleCategoryChange}
-    hierarchicalCategories={hierarchicalCategories}
-
-    vendors={vendors}
-    selectedVendor={selectedVendor}
-    handleVendorChange={handleVendorChange}
-
-    onSuggestionClick={() =>
-      setShowFeedback(true)
-    }
-
-    onLogout={async () => {
-      await supabase.auth.signOut();
-      router.push("/");
-    }}
-
-    onDashboardClick={() =>
-  router.push("/admin/dashboard")
-}
-
-onAddItemClick={() =>
-  router.push("/admin/add-item")
-}
-  />
-</div>
-
-  {/* DESKTOP */}
-  <div className="hidden md:block">
 
       {/* HEADER */}
       <div
@@ -2592,12 +2552,7 @@ hover:bg-orange-500
   }
 />
 
-      </div>
-
-      {/* END DESKTOP */}
-    </div>
-
-{showFeedback && (
+      {showFeedback && (
 
         <div
           className="
@@ -2826,8 +2781,9 @@ hover:bg-orange-500
 
         </div>
 
-            )}
+      )}
 
-</main>
+      </div>
+    </main>
   );
 }

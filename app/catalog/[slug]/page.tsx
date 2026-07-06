@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
+import ItemDetail from "./components/ItemDetail";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

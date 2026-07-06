@@ -1,0 +1,39 @@
+item-catalog/
+
+app/
+components/
+hooks/
+lib/
+public/
+
+analytics/
+│
+├── engines/
+├── calculators/
+├── mappers/
+├── models/
+└── index.ts
+
+repositories/
+│
+├── google/
+├── supabase/
+├── procurement/
+└── index.ts
+
+services/
+│
+├── dashboard/
+└── index.ts
+
+types/
+│
+├── analytics.ts
+├── transaction.ts
+└── filters.ts
+
+constants/
+│
+├── filters.ts
+├── charts.ts
+└── dashboard.ts
