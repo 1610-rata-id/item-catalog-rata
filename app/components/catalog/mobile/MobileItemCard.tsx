@@ -95,7 +95,7 @@ export default function MobileItemCard({
             ${
               theme === "dark"
                 ? "text-cyan-300"
-                : "text-green-600"
+                : "text-blue-600"
             }
           `}
         >
