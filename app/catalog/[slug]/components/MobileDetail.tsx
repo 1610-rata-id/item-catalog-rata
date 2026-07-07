@@ -1,4 +1,4 @@
-"use client";
+import MobileDetailClient from "./MobileDetailClient";
 
 type MobileDetailProps = {
   data: any;
@@ -8,8 +8,8 @@ export default function MobileDetail({
   data,
 }: MobileDetailProps) {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      Mobile Detail
-    </main>
+    <MobileDetailClient
+      data={data}
+    />
   );
 }

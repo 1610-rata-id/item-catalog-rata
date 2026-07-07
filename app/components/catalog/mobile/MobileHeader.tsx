@@ -72,9 +72,16 @@ export default function MobileHeader({
         {/* LOGO */}
 
         <img
-          src="/logo.png"
-          className="h-10 object-contain"
-        />
+  src="/logo-mobile.png"
+  alt="RATA Catalog"
+  className="
+    h-14
+    w-auto
+    object-contain
+    select-none
+  "
+  draggable={false}
+/>
 
         {/* THEME */}
 
