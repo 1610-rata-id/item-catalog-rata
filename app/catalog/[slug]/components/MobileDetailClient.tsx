@@ -78,7 +78,7 @@ export default function MobileDetailClient({
   async function handleShare() {
 
     const shareUrl =
-      window.location.href;
+  `${window.location.origin}/public-catalog/${data.slug}`;
 
     try {
 
@@ -86,15 +86,13 @@ export default function MobileDetailClient({
 
         await navigator.share({
 
-          title:
-            data.item_name,
+  title: data.item_name,
 
-          text:
-            data.item_name,
+  text: `Lihat item "${data.item_name}" di RATA Item Catalog`,
 
-          url: shareUrl,
+  url: shareUrl,
 
-        });
+});
 
         return;
 
@@ -104,7 +102,7 @@ export default function MobileDetailClient({
         shareUrl
       );
 
-      alert("Link copied.");
+      alert("Public catalog link copied.");
 
     } catch (err) {
 
@@ -180,8 +178,13 @@ export default function MobileDetailClient({
           >
 
             <ArrowLeft
-              size={22}
-            />
+  size={22}
+  className={
+    theme === "dark"
+      ? "text-white"
+      : "text-slate-700"
+  }
+/>
 
           </button>
 
@@ -206,8 +209,13 @@ export default function MobileDetailClient({
           >
 
             <Share2
-              size={20}
-            />
+  size={20}
+  className={
+    theme === "dark"
+      ? "text-white"
+      : "text-slate-700"
+  }
+/>
 
           </button>
 

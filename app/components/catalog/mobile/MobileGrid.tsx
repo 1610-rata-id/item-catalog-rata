@@ -1,7 +1,7 @@
 "use client";
 
 import MobileItemCard from "./MobileItemCard";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
@@ -18,7 +18,7 @@ export default function MobileGrid({
   theme,
   items,
 }: MobileGridProps) { 
-const router = useRouter();
+
   return (
     <section className="px-4 pb-8">
 
@@ -26,14 +26,18 @@ const router = useRouter();
 
         {items.map((item) => (
 
-          <MobileItemCard
-    key={item.id}
+          <Link
+  key={item.id}
+  href={`/catalog/${item.slug}`}
+  className="block"
+>
+
+  <MobileItemCard
     item={item}
     theme={theme}
-    onClick={() => {
-    router.push(`/catalog/${item.slug}`);
-}}
-/>
+  />
+
+</Link>
 
         ))}
 

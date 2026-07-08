@@ -66,9 +66,34 @@ onAddItemClick,
   ] = useState(false);
 
   const [
+  expandedCategory,
+  setExpandedCategory,
+] = useState<string | null>(null);
+
+const [
+  categorySearch,
+  setCategorySearch,
+] = useState("");
+
+  const [
     showVendor,
     setShowVendor,
   ] = useState(false);
+
+  const [
+  vendorSearch,
+  setVendorSearch,
+] = useState("");
+
+  function toggleCategory(
+  category: string
+) {
+  setExpandedCategory((prev) =>
+    prev === category
+      ? null
+      : category
+  );
+}
 
   if (!open) return null;
 
@@ -194,141 +219,437 @@ onAddItemClick,
 
           {/* CATEGORY */}
 
-          <button
-            onClick={() =>
-              setShowCategory(!showCategory)
-            }
-            className="
-              w-full
-              flex
-              justify-between
-              items-center
-              py-4
-              text-lg
-            "
-          >
-            <span>Category</span>
+<button
+  onClick={() =>
+    setShowCategory(!showCategory)
+  }
+  className="
+    w-full
+    flex
+    justify-between
+    items-center
+    py-4
+    text-lg
+  "
+>
+  <span>Category</span>
 
-            <span>
-              {showCategory ? "▾" : "▸"}
-            </span>
+  <span>
+    {showCategory ? "▾" : "▸"}
+  </span>
+</button>
+
+{showCategory && (
+
+<div className="mb-5">
+
+  <input
+    type="text"
+    placeholder="Search category..."
+    value={categorySearch}
+    onChange={(e) =>
+      setCategorySearch(
+        e.target.value
+      )
+    }
+    className={`
+      w-full
+
+      rounded-xl
+
+      px-4
+      py-3
+
+      text-sm
+
+      mb-4
+
+      ${
+        theme === "dark"
+          ? "bg-[#08233b] border border-cyan-500/20"
+          : "bg-slate-100 border"
+      }
+    `}
+  />
+
+  <div
+    className="
+      max-h-[45vh]
+
+      overflow-y-auto
+
+      rounded-xl
+    "
+  >
+
+<button
+  onClick={() => {
+    handleCategoryChange("All");
+    onClose();
+  }}
+  className={`
+    w-full
+
+    text-left
+
+    px-4
+    py-3
+
+    rounded-xl
+
+    mb-2
+
+    transition
+
+    ${
+      selectedCategory === "All"
+        ? theme === "dark"
+          ? "bg-cyan-900 text-cyan-200 font-semibold"
+          : "bg-blue-100 text-blue-700 font-semibold"
+        : ""
+    }
+  `}
+>
+  All
+</button>
+
+{Object.entries(hierarchicalCategories)
+
+  .filter(([main, subs]) => {
+
+    const keyword =
+      categorySearch.toLowerCase();
+
+    const mainMatch =
+      main
+        .toLowerCase()
+        .includes(keyword);
+
+    const subMatch =
+      subs.some((sub) =>
+        sub
+          .toLowerCase()
+          .includes(keyword)
+      );
+
+    return (
+      keyword === "" ||
+      mainMatch ||
+      subMatch
+    );
+
+  })
+
+  .sort(([a], [b]) =>
+    a.localeCompare(b)
+  )
+
+  .map(([main, subs]) => (
+
+    <div
+      key={main}
+      className="mb-2"
+    >
+
+      <button
+        onClick={() =>
+          toggleCategory(main)
+        }
+        className={`
+          w-full
+
+          flex
+          items-center
+          justify-between
+
+          px-4
+          py-3
+
+          rounded-xl
+
+          transition
+
+          ${
+            selectedCategory === main
+              ? theme === "dark"
+                ? "bg-cyan-900 text-cyan-200 font-semibold"
+                : "bg-blue-100 text-blue-700 font-semibold"
+              : ""
+          }
+        `}
+      >
+
+        <span>
+          {main}
+        </span>
+
+        <span>
+          {expandedCategory === main
+            ? "−"
+            : "+"}
+        </span>
+
+      </button>
+
+      {expandedCategory === main && (
+
+  <div className="ml-5 mt-2">
+
+    {subs.length === 0 ? (
+
+      <button
+        onClick={() => {
+
+          handleCategoryChange(main);
+
+          onClose();
+
+        }}
+        className={`
+          w-full
+
+          text-left
+
+          px-3
+          py-3
+
+          rounded-lg
+
+          transition
+
+          ${
+            selectedCategory === main
+              ? theme === "dark"
+                ? "text-cyan-300 font-semibold"
+                : "text-blue-600 font-semibold"
+              : ""
+          }
+        `}
+      >
+        View All
+      </button>
+
+    ) : (
+
+      subs
+        .sort()
+
+        .map((sub) => (
+
+          <button
+            key={sub}
+            onClick={() => {
+
+              handleCategoryChange(
+                sub
+              );
+
+              onClose();
+
+            }}
+            className={`
+              w-full
+
+              text-left
+
+              px-3
+              py-3
+
+              rounded-lg
+
+              transition
+
+              ${
+                selectedCategory === sub
+                  ? theme === "dark"
+                    ? "text-cyan-300 font-semibold"
+                    : "text-blue-600 font-semibold"
+                  : ""
+              }
+            `}
+          >
+
+            └ {sub}
+
           </button>
 
-          {showCategory && (
+        ))
 
-            <div className="ml-4 mb-3">
+    )}
 
-              <button
-                onClick={() => {
-                  handleCategoryChange("All");
-                  onClose();
-                }}
-                className={`
-                  w-full
-                  text-left
-                  py-2
+  </div>
 
-                  ${
-                    selectedCategory === "All"
-                      ? theme === "dark"
-                        ? "text-cyan-300 font-semibold"
-                        : "text-blue-600 font-semibold"
-                      : ""
-                  }
-                `}
-              >
-                All
-              </button>
+)}
 
-              {Object.keys(hierarchicalCategories)
-                .sort()
-                .map((cat) => (
+    </div>
 
-                  <button
-                    key={cat}
-                    onClick={() => {
-                      handleCategoryChange(cat);
-                      onClose();
-                    }}
-                    className={`
-                      w-full
-                      text-left
-                      py-2
+  ))}
 
-                      ${
-                        selectedCategory === cat
-                          ? theme === "dark"
-                            ? "text-cyan-300 font-semibold"
-                            : "text-blue-600 font-semibold"
-                          : ""
-                      }
-                    `}
-                  >
-                    {cat}
-                  </button>
+  </div>
 
-                ))}
+</div>
 
-            </div>
-
-          )}
+)}
 
           {/* VENDOR */}
 
-          <button
-            onClick={() =>
-              setShowVendor(!showVendor)
-            }
-            className="
-              w-full
-              flex
-              justify-between
-              items-center
-              py-4
-              text-lg
-            "
-          >
-            <span>Vendor</span>
+<button
+  onClick={() =>
+    setShowVendor(!showVendor)
+  }
+  className="
+    w-full
+    flex
+    justify-between
+    items-center
+    py-4
+    text-lg
+  "
+>
+  <span>Vendor</span>
 
-            <span>
-              {showVendor ? "▾" : "▸"}
-            </span>
-          </button>
+  <span>
+    {showVendor ? "▾" : "▸"}
+  </span>
 
-          {showVendor && (
+</button>
 
-            <div className="ml-4 mb-3">
+{showVendor && (
 
-              {vendors.map((vendor) => (
+<div className="mb-5">
 
-                <button
-                  key={vendor}
-                  onClick={() => {
-                    handleVendorChange(vendor);
-                    onClose();
-                  }}
-                  className={`
-                    w-full
-                    text-left
-                    py-2
+  <input
+    type="text"
+    placeholder="Search vendor..."
+    value={vendorSearch}
+    onChange={(e) =>
+      setVendorSearch(
+        e.target.value
+      )
+    }
+    className={`
+      w-full
 
-                    ${
-                      selectedVendor === vendor
-                        ? theme === "dark"
-                          ? "text-cyan-300 font-semibold"
-                          : "text-blue-600 font-semibold"
-                        : ""
-                    }
-                  `}
-                >
-                  {vendor}
-                </button>
+      rounded-xl
 
-              ))}
+      px-4
+      py-3
 
-            </div>
+      text-sm
 
-          )}
+      mb-4
+
+      ${
+        theme === "dark"
+          ? "bg-[#08233b] border border-cyan-500/20"
+          : "bg-slate-100 border"
+      }
+    `}
+  />
+
+  <div
+    className="
+      max-h-[40vh]
+
+      overflow-y-auto
+
+      rounded-xl
+    "
+  >
+
+<button
+  onClick={() => {
+    handleVendorChange("All");
+    onClose();
+  }}
+  className={`
+    w-full
+
+    text-left
+
+    px-4
+    py-3
+
+    rounded-xl
+
+    mb-2
+
+    transition
+
+    ${
+      selectedVendor === "All"
+        ? theme === "dark"
+          ? "bg-cyan-900 text-cyan-200 font-semibold"
+          : "bg-blue-100 text-blue-700 font-semibold"
+        : ""
+    }
+  `}
+>
+  All Vendors
+</button>
+
+{vendors
+
+  .filter(
+    (vendor) =>
+      vendor !== "All" &&
+      vendor
+        .toLowerCase()
+        .includes(
+          vendorSearch.toLowerCase()
+        )
+  )
+
+  .sort()
+
+  .map((vendor) => (
+
+    <button
+      key={vendor}
+      onClick={() => {
+
+        handleVendorChange(
+          vendor
+        );
+
+        onClose();
+
+      }}
+      className={`
+        w-full
+
+        text-left
+
+        px-4
+        py-3
+
+        rounded-xl
+
+        mb-2
+
+        transition
+
+        ${
+          selectedVendor === vendor
+            ? theme === "dark"
+              ? "bg-cyan-900 text-cyan-200 font-semibold"
+              : "bg-blue-100 text-blue-700 font-semibold"
+            : ""
+        }
+      `}
+    >
+
+      {vendor}
+
+    </button>
+
+  ))}
+
+</div>
+
+</div>
+
+)}
 
           {/* SUGGESTIONS */}
 

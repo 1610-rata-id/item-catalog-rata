@@ -471,10 +471,17 @@ if (selectedCategory !== "All") {
   } = await query;
 
   if (error) {
-    console.error(error);
-    setLoading(false);
-    return;
-  }
+  console.error(
+    "Supabase Error:",
+    error.message,
+    error.details,
+    error.hint
+  );
+
+  setLoading(false);
+
+  return;
+}
 
   setItems(data || []);
 
@@ -696,6 +703,9 @@ return (
     theme={theme}
     items={items}
     totalItems={totalItems}
+    page={page}
+    totalPages={totalPages}
+    setPage={setPage}
     search={search}
     handleSearch={handleSearch}
     toggleTheme={toggleTheme}

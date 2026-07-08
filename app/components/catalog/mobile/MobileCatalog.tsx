@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { X } from "lucide-react";
 
 import MobileHeader from "./MobileHeader";
 import MobileDrawer from "./MobileDrawer";
 import MobileHero from "./MobileHero";
 import MobileResult from "./MobileResult";
 import MobileGrid from "./MobileGrid";
+import MobilePagination from "./MobilePagination";
 
 import type { CatalogItem } from "@/types/catalog";
 
@@ -16,6 +18,14 @@ type MobileCatalogProps = {
   items: CatalogItem[];
 
   totalItems: number;
+
+  page: number;
+
+totalPages: number;
+
+setPage: (
+  page: number
+) => void;
 
   search: string;
 
@@ -60,6 +70,12 @@ export default function MobileCatalog({
   items,
 
   totalItems,
+
+  page,
+
+totalPages,
+
+setPage,
 
   search,
 
@@ -162,6 +178,87 @@ onAddItemClick={
         theme={theme}
       />
 
+      {(selectedCategory ||
+  selectedVendor) && (
+
+  <div className="px-4 pt-4 flex flex-wrap gap-2">
+
+    {selectedCategory &&
+ selectedCategory !== "All" && (
+
+      <button
+        onClick={() =>
+          handleCategoryChange("All")
+        }
+        className={`
+          flex
+          items-center
+          gap-2
+
+          px-3
+          py-2
+
+          rounded-full
+
+          text-sm
+          font-medium
+
+          ${
+            theme === "dark"
+              ? "bg-cyan-900 text-cyan-200"
+              : "bg-blue-100 text-blue-700"
+          }
+        `}
+      >
+
+        {selectedCategory}
+
+        <X size={14} />
+
+      </button>
+
+    )}
+
+    {selectedVendor &&
+ selectedVendor !== "All" && (
+
+      <button
+        onClick={() =>
+          handleVendorChange("All")
+        }
+        className={`
+          flex
+          items-center
+          gap-2
+
+          px-3
+          py-2
+
+          rounded-full
+
+          text-sm
+          font-medium
+
+          ${
+            theme === "dark"
+              ? "bg-cyan-900 text-cyan-200"
+              : "bg-blue-100 text-blue-700"
+          }
+        `}
+      >
+
+        {selectedVendor}
+
+        <X size={14} />
+
+      </button>
+
+    )}
+
+  </div>
+
+)}
+
       <MobileResult
         theme={theme}
         currentItems={items.length}
@@ -169,10 +266,17 @@ onAddItemClick={
       />
 
       <MobileGrid
-        theme={theme}
-        items={items}
-      />
+  theme={theme}
+  items={items}
+/>
 
-    </main>
+<MobilePagination
+  theme={theme}
+  page={page}
+  totalPages={totalPages}
+  setPage={setPage}
+/>
+
+</main>
   );
 }
