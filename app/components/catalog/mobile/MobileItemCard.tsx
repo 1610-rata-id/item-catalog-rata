@@ -1,52 +1,49 @@
 "use client";
 
+import type { CatalogItem } from "@/types/catalog";
+
 function formatRupiah(number: number) {
   return new Intl.NumberFormat("id-ID").format(number || 0);
 }
 
-import type { CatalogItem } from "@/types/catalog";
-
 type MobileItemCardProps = {
   theme: "light" | "dark";
   item: CatalogItem;
-  onClick: () => void;
 };
 
 export default function MobileItemCard({
   theme,
   item,
-  onClick,
-}: MobileItemCardProps) 
-{
+}: MobileItemCardProps) {
   return (
     <div
-  onClick={onClick}
-  className={`
-    rounded-3xl
-    overflow-hidden
+      className={`
+        rounded-3xl
+        overflow-hidden
 
-    transition-all
-    duration-300
+        transition-all
+        duration-300
 
-    active:scale-[0.98]
+        active:scale-[0.98]
 
-    ${
-      theme === "dark"
-        ? `
-            bg-[#08233d]
-            border border-cyan-400/10
-            shadow-[0_0_25px_rgba(0,255,255,0.05)]
-          `
-        : `
-            bg-white
-            border border-slate-200
-            shadow-md
-          `
-    }
-  `}
->
+        ${
+          theme === "dark"
+            ? `
+                bg-[#08233d]
+                border border-cyan-400/10
+                shadow-[0_0_25px_rgba(0,255,255,0.05)]
+              `
+            : `
+                bg-white
+                border border-slate-200
+                shadow-md
+              `
+        }
+      `}
+    >
       <img
         src={item.image_url || "/no-image.png"}
+        alt={item.item_name}
         className="
           w-full
           aspect-square
@@ -57,32 +54,25 @@ export default function MobileItemCard({
       <div className="p-4">
 
         <h3
-  className="
-    text-sm
-
-    font-semibold
-
-    leading-5
-
-    line-clamp-2
-
-    min-h-[40px]
-  "
->
+          className="
+            text-sm
+            font-semibold
+            leading-5
+            line-clamp-2
+            min-h-[40px]
+          "
+        >
           {item.item_name}
         </h3>
 
         <p
-  className="
-    mt-2
-
-    text-xs
-
-    opacity-70
-
-    truncate
-  "
->
+          className="
+            mt-2
+            text-xs
+            opacity-70
+            truncate
+          "
+        >
           {item.vendor}
         </p>
 
