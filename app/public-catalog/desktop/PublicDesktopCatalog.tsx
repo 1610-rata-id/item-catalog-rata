@@ -65,12 +65,6 @@ interface PublicDesktopCatalogProps {
     React.SetStateAction<string>
   >;
 
-  selectedItem: any;
-
-activeImage: string | null;
-
-showShareMenu: boolean;
-
   setSelectedItem: React.Dispatch<any>;
 
   setActiveImage: React.Dispatch<any>;
@@ -110,14 +104,12 @@ const {
   setPage,
 
   setSelectedCategory,
-  selectedItem,
-  setSelectedItem,
 
-  activeImage,
-  setActiveImage,
+setSelectedItem,
 
-  showShareMenu,
-  setShowShareMenu,
+setActiveImage,
+
+setShowShareMenu,
 
 } = props;
 
