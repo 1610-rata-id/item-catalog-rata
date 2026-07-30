@@ -65,27 +65,30 @@ export function useDashboardFilter() {
   };
 
   const handleYearChange = (
-    value: string
+    value: string | null
   ) => {
+    if (!value) return;
+
     const params = new URLSearchParams(
       searchParams.toString()
     );
 
     params.set("year", value);
 
+    // Reset vendor ketika tahun berubah
     params.delete("vendor");
 
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleMonthChange = (
-    value: string
+    value: string | null
   ) => {
     updateQuery("month", value);
   };
 
   const handleVendorChange = (
-    value: string
+    value: string | null
   ) => {
     updateQuery("vendor", value);
   };
