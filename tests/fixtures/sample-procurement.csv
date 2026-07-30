@@ -1,0 +1,4 @@
+milestone_pr,pr_number,po_number,sub_pr_id,order_date,vendor_name,item_code,item_name,qty,uom,unit_price,total_price,qcf_name,receive_date,payment_request_id
+Payment Request Sudah Dikirim,001/PR/MKT/I/2026,002/PO/MKT/I/2026,001/PR/MKT/I/2026 - 11,1/5/2026,Putra Sarana Media,New Item,Lealfet Tanam,100,pcs,3500,350000,Rinta Pradiptyasuci,1/14/2026,1843/PRQ/FAT/I/2026
+Payment Request Sudah Dikirim,001/PR/MKT/I/2026,002/PO/MKT/I/2026,001/PR/MKT/I/2026 - 12,1/5/2026,Putra Sarana Media,New Item,Leaflet Tanam Serahang,100,pcs,6500,650000,Rinta Pradiptyasuci,1/14/2026,1843/PRQ/FAT/I/2026
+Payment Request Sudah Dikirim,001/PR/MKT/I/2026,002/PO/MKT/I/2026,001/PR/MKT/I/2026 - 13,1/5/2026,Putra Sarana Media,New Item,Kartu Nama Tanam,1,box,55000,55000,Rinta Pradiptyasuci,1/14/2026,1843/PRQ/FAT/I/2026

@@ -1,27 +1,33 @@
 export interface Transaction {
-  id: string;
+  id?: string;
 
-  poNumber: string;
-  prNumber?: string;
+  businessKey: string;
 
-  orderDate: Date;
+  milestonePr: string;
 
-  vendor: string;
+  prNumber: string;
+
+  poNumber?: string;
+
+  orderDate?: Date;
+
+  vendorName: string;
 
   itemCode: string;
+
   itemName: string;
 
   qty: number;
+
   uom: string;
 
   unitPrice: number;
+
   totalPrice: number;
 
-  // Future:
-  // requestor
-  // department
-  // approvalStatus
-  // receiveDate
-  // podStatus
-  // paymentId
+  qcfName?: string;
+
+  receiveDate?: Date;
+
+  paymentRequestId?: string;
 }

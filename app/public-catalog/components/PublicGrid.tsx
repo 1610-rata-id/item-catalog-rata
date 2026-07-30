@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import type { CatalogItem } from "@/types/catalog";
 
 import PublicItemCard from "./PublicItemCard";

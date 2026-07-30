@@ -4,6 +4,7 @@ import "./globals.css";
 import {
   ThemeProvider,
 } from "./providers/ThemeProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
 
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <TooltipProvider>
+  <ThemeProvider>
+    {children}
+  </ThemeProvider>
+</TooltipProvider>
 
       </body>
     </html>
