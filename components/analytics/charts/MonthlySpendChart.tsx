@@ -111,21 +111,25 @@ export default function MonthlySpendChart({
             />
 
             <Tooltip
-              formatter={(value: number) => [
-                formatCurrency(value),
-                "Total Spend",
-              ]}
-              cursor={{
-                stroke: "#94A3B8",
-                strokeDasharray: "4 4",
-              }}
-              contentStyle={{
-                borderRadius: 16,
-                border: "none",
-                boxShadow: "0 10px 30px rgba(0,0,0,.12)",
-                padding: "12px 16px",
-              }}
-            />
+  formatter={(value: unknown) => {
+    const amount =
+      typeof value === "number"
+        ? value
+        : Number(value ?? 0);
+
+    return [formatCurrency(amount), "Total Spend"];
+  }}
+  cursor={{
+    stroke: "#94A3B8",
+    strokeDasharray: "4 4",
+  }}
+  contentStyle={{
+    borderRadius: 16,
+    border: "none",
+    boxShadow: "0 10px 30px rgba(0,0,0,.12)",
+    padding: "12px 16px",
+  }}
+/>
 
             <Area
               type="monotone"

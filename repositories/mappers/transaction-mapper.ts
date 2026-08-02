@@ -4,23 +4,51 @@ import { SHEET_COLUMNS } from "@/constants/sheet-columns";
 export function mapTransaction(
   row: Record<string, any>
 ): Transaction {
+  const poNumber =
+    row[SHEET_COLUMNS.poNumber] ?? "";
+
+  const prNumber =
+    row[SHEET_COLUMNS.prNumber] ?? "";
+
+  const itemCode =
+    row[SHEET_COLUMNS.itemCode] ?? "";
+
   return {
     id: crypto.randomUUID(),
 
-    poNumber: row[SHEET_COLUMNS.poNumber],
-    prNumber: row[SHEET_COLUMNS.prNumber] || undefined,
+    businessKey: `${poNumber}-${itemCode}`,
 
-    orderDate: new Date(row[SHEET_COLUMNS.orderDate]),
+    milestonePr: "",
 
-    vendor: row[SHEET_COLUMNS.vendor],
+    prNumber,
 
-    itemCode: row[SHEET_COLUMNS.itemCode],
-    itemName: row[SHEET_COLUMNS.itemName],
+    poNumber,
 
-    qty: Number(row[SHEET_COLUMNS.qty]),
-    uom: row[SHEET_COLUMNS.uom],
+    orderDate: row[SHEET_COLUMNS.orderDate]
+      ? new Date(row[SHEET_COLUMNS.orderDate])
+      : undefined,
 
-    unitPrice: Number(row[SHEET_COLUMNS.unitPrice]),
-    totalPrice: Number(row[SHEET_COLUMNS.totalPrice]),
+    vendorName:
+      row[SHEET_COLUMNS.vendor] ?? "",
+
+    itemCode,
+
+    itemName:
+      row[SHEET_COLUMNS.itemName] ?? "",
+
+    qty: Number(
+      row[SHEET_COLUMNS.qty] ?? 0
+    ),
+
+    uom:
+      row[SHEET_COLUMNS.uom] ?? "",
+
+    unitPrice: Number(
+      row[SHEET_COLUMNS.unitPrice] ?? 0
+    ),
+
+    totalPrice: Number(
+      row[SHEET_COLUMNS.totalPrice] ?? 0
+    ),
   };
 }

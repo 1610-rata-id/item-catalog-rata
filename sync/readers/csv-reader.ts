@@ -10,11 +10,11 @@ export async function readCsv(
   const content = await fs.readFile(path, "utf-8");
 
   const records = parse(content, {
-    columns: (header) =>
-      header.map((column: string) => column.trim()),
-    skip_empty_lines: true,
-    trim: true,
-  });
+  columns: (header: string[]) =>
+    header.map((column) => column.trim()),
+  skip_empty_lines: true,
+  trim: true,
+}) as RawTransactionRow[];
 
-  return records;
+return records;
 }
