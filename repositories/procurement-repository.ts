@@ -8,6 +8,11 @@ import { RecentTransaction } from "@/types/recent-transaction";
 import { VendorList } from "@/types/vendor-list";
 import { DashboardFilterState } from "@/types/dashboard-filter";	
 
+import {
+  buildCurrentRange,
+  formatDateOnly,
+} from "@/lib/date-range";
+
 export class ProcurementRepository {
   async getTransactions(query?: ProcurementQuery) {
     let builder = supabaseAdmin
@@ -54,15 +59,29 @@ export class ProcurementRepository {
   async getDashboardOverview(
   filters: DashboardFilterState
 ): Promise<DashboardOverview> {
-  const { data, error } = await supabaseAdmin.rpc(
-    "get_procurement_overview",
-    {
-      p_year: filters.year,
-      p_month: filters.month,
-      p_vendor: filters.vendor,
-      p_search: filters.search,
-    }
+
+  const range = buildCurrentRange(
+    filters.year,
+    filters.months
   );
+
+  const { data, error } =
+    await supabaseAdmin.rpc(
+      "get_procurement_overview",
+      {
+        p_start_date: formatDateOnly(
+  range.startDate
+),
+
+p_end_date: formatDateOnly(
+  range.endDate
+),
+
+        p_vendor: filters.vendor,
+
+        p_search: filters.search,
+      }
+    );
 
   if (error) {
     throw new Error(
@@ -72,18 +91,33 @@ export class ProcurementRepository {
 
   return data[0];
 }
+
   async getMonthlySpend(
   filters: DashboardFilterState
 ): Promise<MonthlySpend[]> {
-  const { data, error } = await supabaseAdmin.rpc(
-    "get_monthly_spend",
-    {
-      p_year: filters.year,
-      p_month: filters.month,
-      p_vendor: filters.vendor,
-      p_search: filters.search,
-    }
+
+  const range = buildCurrentRange(
+    filters.year,
+    filters.months
   );
+
+  const { data, error } =
+    await supabaseAdmin.rpc(
+      "get_monthly_spend",
+      {
+        p_start_date: formatDateOnly(
+  range.startDate
+),
+
+p_end_date: formatDateOnly(
+  range.endDate
+),
+
+        p_vendor: filters.vendor,
+
+        p_search: filters.search,
+      }
+    );
 
   if (error) {
     throw new Error(
@@ -97,16 +131,31 @@ export class ProcurementRepository {
   async getTopSpendItems(
   filters: DashboardFilterState
 ): Promise<TopSpendItem[]> {
-  const { data, error } = await supabaseAdmin.rpc(
-    "get_top_spend_items",
-    {
-      p_year: filters.year,
-      p_month: filters.month,
-      p_vendor: filters.vendor,
-      p_search: filters.search,
-      p_limit: 10,
-    }
+
+  const range = buildCurrentRange(
+    filters.year,
+    filters.months
   );
+
+  const { data, error } =
+    await supabaseAdmin.rpc(
+      "get_top_spend_items",
+      {
+        p_start_date: formatDateOnly(
+  range.startDate
+),
+
+p_end_date: formatDateOnly(
+  range.endDate
+),
+
+        p_vendor: filters.vendor,
+
+        p_search: filters.search,
+
+        p_limit: 10,
+      }
+    );
 
   if (error) {
     throw new Error(
@@ -120,16 +169,31 @@ export class ProcurementRepository {
   async getTopVendors(
   filters: DashboardFilterState
 ): Promise<TopVendor[]> {
-  const { data, error } = await supabaseAdmin.rpc(
-  "get_vendor_performance",
-  {
-    p_year: filters.year,
-    p_month: filters.month,
-    p_vendor: filters.vendor,
-    p_search: filters.search,
-    p_limit: 10,
-  }
-);
+
+  const range = buildCurrentRange(
+    filters.year,
+    filters.months
+  );
+
+  const { data, error } =
+    await supabaseAdmin.rpc(
+      "get_vendor_performance",
+      {
+        p_start_date: formatDateOnly(
+  range.startDate
+),
+
+p_end_date: formatDateOnly(
+  range.endDate
+),
+
+        p_vendor: filters.vendor,
+
+        p_search: filters.search,
+
+        p_limit: 10,
+      }
+    );
 
   if (error) {
     throw new Error(
@@ -143,16 +207,31 @@ export class ProcurementRepository {
   async getRecentTransactions(
   filters: DashboardFilterState
 ): Promise<RecentTransaction[]> {
-  const { data, error } = await supabaseAdmin.rpc(
-    "get_recent_transactions",
-    {
-      p_year: filters.year,
-      p_month: filters.month,
-      p_vendor: filters.vendor,
-      p_search: filters.search,
-      p_limit: 10,
-    }
+
+  const range = buildCurrentRange(
+    filters.year,
+    filters.months
   );
+
+  const { data, error } =
+    await supabaseAdmin.rpc(
+      "get_recent_transactions",
+      {
+        p_start_date: formatDateOnly(
+  range.startDate
+),
+
+p_end_date: formatDateOnly(
+  range.endDate
+),
+
+        p_vendor: filters.vendor,
+
+        p_search: filters.search,
+
+        p_limit: 10,
+      }
+    );
 
   if (error) {
     throw new Error(

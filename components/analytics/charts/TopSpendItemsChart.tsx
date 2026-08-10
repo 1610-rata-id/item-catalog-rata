@@ -46,9 +46,9 @@ export default function TopSpendItemsChart({
 
             return (
               <div
-                key={item.item_name}
-                className="rounded-xl border border-slate-100 p-4 transition-all duration-200 hover:shadow-md"
-              >
+  key={`${item.item_code ?? "item"}-${item.item_name}-${index}`}
+  className="rounded-xl border border-slate-100 p-4 transition-all duration-200 hover:shadow-md"
+>
                 <div className="mb-3 flex items-center justify-between">
 
                   <div className="flex items-center gap-3">

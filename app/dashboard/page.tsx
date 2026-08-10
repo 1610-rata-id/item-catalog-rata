@@ -9,6 +9,12 @@ import {
   DEFAULT_DASHBOARD_FILTER,
 } from "@/types/dashboard-filter";
 
+import {
+  buildCurrentRange,
+  buildPreviousRange,
+  buildComparisonLabel,
+} from "@/lib/date-range";
+
 interface DashboardPageProps {
   searchParams: Promise<{
     year?: string;
@@ -27,23 +33,31 @@ export default async function DashboardPage({
 
   const selectedYear = Number(params.year);
 
-  const filters = {
-    year: Number.isNaN(selectedYear)
-      ? DEFAULT_DASHBOARD_FILTER.year
-      : selectedYear,
+const filters = {
+  year: Number.isNaN(selectedYear)
+    ? DEFAULT_DASHBOARD_FILTER.year
+    : selectedYear,
 
-    month:
-      params.month && params.month !== "all"
-        ? Number(params.month)
-        : null,
+  months:
+    params.month
+      ? params.month
+          .split(",")
+          .filter(Boolean)
+          .map(Number)
+          .filter((month) =>
+            Number.isInteger(month) &&
+            month >= 1 &&
+            month <= 12
+          )
+      : [],
 
-    vendor:
-      params.vendor && params.vendor !== "all"
-        ? params.vendor
-        : null,
+  vendor:
+    params.vendor && params.vendor !== "all"
+      ? params.vendor
+      : null,
 
-    search: params.search ?? "",
-  };
+  search: params.search ?? "",
+};
 
   const overview =
     await analyticsService.getDashboardOverview(filters);
@@ -62,6 +76,17 @@ export default async function DashboardPage({
 
   const recentTransactions =
     await analyticsService.getRecentTransactions(filters);
+
+  const currentRange = buildCurrentRange(
+  filters.year,
+  filters.months
+);
+
+const previousRange =
+  buildPreviousRange(currentRange);
+
+const comparisonLabel =
+  buildComparisonLabel(previousRange);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-neutral-950">

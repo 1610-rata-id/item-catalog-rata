@@ -16,6 +16,8 @@ import {
 
 import { useDashboardFilter } from "@/hooks/use-dashboard-filter";
 import { VendorList } from "@/types/vendor-list";
+import SearchableSelect from "@/components/ui/searchable-select";
+import MultiSelect from "@/components/ui/multi-select";
 
 interface DashboardFilterProps {
   vendors: VendorList[];
@@ -25,22 +27,37 @@ export default function DashboardFilter({
   vendors,
 }: DashboardFilterProps) {
   const {
-    selectedYear,
-    selectedMonth,
-    selectedVendor,
+  selectedYear,
+  selectedMonths,
+  selectedVendor,
 
-    searchValue,
-    setSearchValue,
+  searchValue,
+  setSearchValue,
 
-    handleYearChange,
-    handleMonthChange,
-    handleVendorChange,
-    handleReset,
-  } = useDashboardFilter();
+  handleYearChange,
+  handleMonthChange,
+  handleVendorChange,
+  handleReset,
+} = useDashboardFilter();
+
+   const monthOptions = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
 
   return (
     <Card className="mb-8 rounded-2xl border-0 bg-white p-6 shadow-sm dark:bg-neutral-900">
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[180px_180px_1fr_1fr_170px]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[220px_220px_320px_400px_170px]">
 
   {/* YEAR */}
   <div>
@@ -65,70 +82,48 @@ export default function DashboardFilter({
   </div>
 
   {/* MONTH */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
-      Month
-    </label>
 
-    <Select
-      value={selectedMonth}
-      onValueChange={handleMonthChange}
-    >
-      <SelectTrigger className="h-11 rounded-xl">
-        <SelectValue />
-      </SelectTrigger>
+<div>
 
-      <SelectContent>
-        <SelectItem value="all">
-          All Months
-        </SelectItem>
+  <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+    Month
+  </label>
 
-        <SelectItem value="1">January</SelectItem>
-        <SelectItem value="2">February</SelectItem>
-        <SelectItem value="3">March</SelectItem>
-        <SelectItem value="4">April</SelectItem>
-        <SelectItem value="5">May</SelectItem>
-        <SelectItem value="6">June</SelectItem>
-        <SelectItem value="7">July</SelectItem>
-        <SelectItem value="8">August</SelectItem>
-        <SelectItem value="9">September</SelectItem>
-        <SelectItem value="10">October</SelectItem>
-        <SelectItem value="11">November</SelectItem>
-        <SelectItem value="12">December</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+  <MultiSelect
+  className="w-full"
+  placeholder="All Months"
+  options={monthOptions}
+  value={selectedMonths}
+  onApply={handleMonthChange}
+/>
+
+</div>
 
   {/* VENDOR */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
-      Vendor
-    </label>
+<div>
+  <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+    Vendor
+  </label>
 
-    <Select
-      value={selectedVendor}
-      onValueChange={handleVendorChange}
-    >
-      <SelectTrigger className="h-11 rounded-xl">
-        <SelectValue />
-      </SelectTrigger>
-
-      <SelectContent>
-        <SelectItem value="all">
-          All Vendors
-        </SelectItem>
-
-        {vendors.map((vendor) => (
-          <SelectItem
-            key={vendor.vendor_name}
-            value={vendor.vendor_name}
-          >
-            {vendor.vendor_name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>
+  <SearchableSelect
+    className="w-full"
+    value={selectedVendor}
+    onChange={handleVendorChange}
+    placeholder="All Vendors"
+    searchPlaceholder="Search vendor..."
+    emptyMessage="Vendor not found."
+    options={[
+      {
+        value: "all",
+        label: "All Vendors",
+      },
+      ...vendors.map((vendor) => ({
+        value: vendor.vendor_name,
+        label: vendor.vendor_name,
+      })),
+    ]}
+  />
+</div>
 
   {/* SEARCH */}
   <div>

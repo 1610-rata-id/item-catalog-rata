@@ -24,9 +24,17 @@ export function useDashboardFilter() {
       : year;
   }, [searchParams]);
 
-  const selectedMonth = useMemo(() => {
-    return searchParams.get("month") ?? "all";
-  }, [searchParams]);
+  const selectedMonths = useMemo(() => {
+  const monthParam = searchParams.get("month");
+
+  if (!monthParam) {
+    return [];
+  }
+
+  return monthParam
+    .split(",")
+    .filter(Boolean);
+}, [searchParams]);
 
   const selectedVendor = useMemo(() => {
     return searchParams.get("vendor") ?? "all";
@@ -82,10 +90,20 @@ export function useDashboardFilter() {
   };
 
   const handleMonthChange = (
-    value: string | null
-  ) => {
-    updateQuery("month", value);
-  };
+  values: string[]
+) => {
+
+  if (values.length === 0) {
+    updateQuery("month", null);
+    return;
+  }
+
+  updateQuery(
+    "month",
+    values.join(",")
+  );
+
+};
 
   const handleVendorChange = (
     value: string | null
@@ -108,9 +126,9 @@ export function useDashboardFilter() {
   };
 
   return {
-    selectedYear,
-    selectedMonth,
-    selectedVendor,
+  selectedYear,
+  selectedMonths,
+  selectedVendor,
 
     searchValue,
     setSearchValue,
