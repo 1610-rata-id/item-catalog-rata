@@ -9,21 +9,37 @@ export async function GET(
   const { searchParams } =
     new URL(request.url);
 
-  const filters = {
-    year:
-      Number(searchParams.get("year")) ||
-      new Date().getFullYear(),
+  const year =
+  Number(searchParams.get("year")) ||
+  new Date().getFullYear();
 
-    month: searchParams.get("month")
-      ? Number(searchParams.get("month"))
-      : null,
+const monthParam =
+  searchParams.get("months") ??
+  searchParams.get("month");
 
-    vendor:
-      searchParams.get("vendor") || null,
+const months = monthParam
+  ? monthParam
+      .split(",")
+      .map(Number)
+      .filter(
+        (month) =>
+          Number.isInteger(month) &&
+          month >= 1 &&
+          month <= 12
+      )
+  : [];
 
-    search:
-      searchParams.get("search") || "",
-  };
+const filters = {
+  year,
+
+  months,
+
+  vendor:
+    searchParams.get("vendor") || null,
+
+  search:
+    searchParams.get("search") || "",
+};
 
   const analytics =
     new AnalyticsService();
