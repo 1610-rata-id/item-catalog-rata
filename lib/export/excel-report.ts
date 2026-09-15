@@ -11,11 +11,11 @@ import { DashboardOverview } from "@/types/dashboard-overview";
 
 interface ExcelReportData {
   filters: {
-    year: number;
-    month: number | null;
-    vendor: string | null;
-    search: string;
-  };
+  year: number;
+  months: number[];
+  vendor: string | null;
+  search: string;
+};
 
   overview: DashboardOverview;
 
@@ -37,12 +37,12 @@ export async function generateExcelReport(
   workbook.created = new Date();
 
   createSummarySheet(workbook, {
-    year: data.filters.year,
-    month: data.filters.month,
-    vendor: data.filters.vendor,
-    search: data.filters.search,
-    overview: data.overview,
-  });
+  year: data.filters.year,
+  months: data.filters.months,
+  vendor: data.filters.vendor,
+  search: data.filters.search,
+  overview: data.overview,
+});
 
   const totalSpend =
   Number(data.overview.total_spend ?? 0);

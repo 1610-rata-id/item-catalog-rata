@@ -2,17 +2,17 @@ import ExcelJS from "exceljs";
 
 interface SummaryData {
   year: number;
-  month: number | null;
+  months: number[];
   vendor: string | null;
   search: string;
 
   overview: {
-    totalSpend: number;
-    totalTransactions: number;
-    totalPurchaseRequests: number;
-    totalPurchaseOrders: number;
-    totalVendors: number;
-  };
+  total_spend: number;
+  total_transactions: number;
+  total_purchase_requests: number;
+  total_purchase_orders: number;
+  total_vendors: number;
+};
 }
 
 export function createSummarySheet(
@@ -78,9 +78,19 @@ export function createSummarySheet(
   ]);
 
   sheet.addRow([
-    "Month",
-    data.month ?? "All Months",
-  ]);
+  "Months",
+  data.months.length > 0
+    ? data.months
+        .sort((a, b) => a - b)
+        .map((month) =>
+          new Date(2000, month - 1, 1).toLocaleString(
+            "en-US",
+            { month: "short" }
+          )
+        )
+        .join(", ")
+    : "All Months",
+]);
 
   sheet.addRow([
     "Vendor",
@@ -141,27 +151,27 @@ export function createSummarySheet(
 
   sheet.addRow([
     "Total Spend",
-    data.overview.totalSpend,
+    data.overview.total_spend,
   ]);
 
   sheet.addRow([
     "Transactions",
-    data.overview.totalTransactions,
+    data.overview.total_transactions,
   ]);
 
   sheet.addRow([
     "Purchase Requests",
-    data.overview.totalPurchaseRequests,
+    data.overview.total_purchase_requests,
   ]);
 
   sheet.addRow([
     "Purchase Orders",
-    data.overview.totalPurchaseOrders,
+    data.overview.total_purchase_orders,
   ]);
 
   sheet.addRow([
     "Active Vendors",
-    data.overview.totalVendors,
+    data.overview.total_vendors,
   ]);
 
   for (let i = 13; i <= 17; i++) {
