@@ -42,10 +42,33 @@ export class ProcurementRepository {
     return data;
   }
 
-  async getVendorPerformance() {
-  const { data, error } = await supabaseAdmin.rpc(
-    "get_vendor_performance"
+  async getVendorPerformance(
+  filters: DashboardFilterState
+) {
+  const range = buildCurrentRange(
+    filters.year,
+    filters.months
   );
+
+  const { data, error } =
+    await supabaseAdmin.rpc(
+      "get_vendor_performance",
+      {
+        p_start_date: formatDateOnly(
+          range.startDate
+        ),
+
+        p_end_date: formatDateOnly(
+          range.endDate
+        ),
+
+        p_vendor: filters.vendor,
+
+        p_search: filters.search,
+
+        p_limit: 10,
+      }
+    );
 
   if (error) {
     throw new Error(

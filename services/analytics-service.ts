@@ -16,9 +16,11 @@ export class AnalyticsService {
     return await this.repository.getTransactions(query);
   }
 
-  async getVendorPerformance(): Promise<VendorPerformance[]> {
-    return await this.repository.getVendorPerformance();
-  }
+  async getVendorPerformance(
+  filters: DashboardFilterState
+): Promise<VendorPerformance[]> {
+  return await this.repository.getVendorPerformance(filters);
+}
 
   async getDashboardOverview(
   filters: DashboardFilterState

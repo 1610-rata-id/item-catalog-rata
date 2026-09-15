@@ -3,7 +3,12 @@ import { AnalyticsService } from "@/services/analytics-service";
 export default async function AnalyticsTestPage() {
   const service = new AnalyticsService();
 
-  const vendors = await service.getVendorPerformance();
+  const vendors = await service.getVendorPerformance({
+  year: 2026,
+  months: [],
+  vendor: null,
+  search: "",
+});
 
   return (
     <main className="p-8">
