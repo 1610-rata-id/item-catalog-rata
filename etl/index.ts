@@ -188,6 +188,25 @@ logger.info(
       loadResult
     );
 
+   // ==========================
+// Update ETL Sync Status
+// ==========================
+if (!loadResult.dryRun) {
+  const syncedAt = new Date();
+
+  await procurementRepository.updateLastSuccessfulSync(
+    syncedAt
+  );
+
+  logger.info(
+    "ETL sync status updated",
+    {
+      lastSuccessfulSync:
+        syncedAt.toISOString(),
+    }
+  );
+}
+
     // ==========================
     // Report
     // ==========================

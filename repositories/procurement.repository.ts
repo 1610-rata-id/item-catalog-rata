@@ -64,6 +64,29 @@ export class ProcurementRepository {
       throw error;
     }
   }
+
+  // ==========================
+  // ETL Sync Status
+  // ==========================
+  async updateLastSuccessfulSync(syncDate: Date) {
+    const { error } = await supabaseAdmin
+      .from("etl_sync_status")
+      .upsert(
+        {
+          id: 1,
+          last_successful_sync: syncDate.toISOString(),
+        },
+        {
+          onConflict: "id",
+        }
+      );
+
+    if (error) {
+      throw new Error(
+        `Failed to update ETL sync status: ${error.message}`
+      );
+    }
+  }
 }
 
 export const procurementRepository =
