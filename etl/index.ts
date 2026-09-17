@@ -1,40 +1,36 @@
-import { extractCSV } from "./extract/csv";
+import { extractGoogleSheets } from "./extract/google-sheets-api";
 import { mapProcurementRow } from "./mappers/procurement";
 import { validateProcurementRecord } from "./validate/procurement";
 import { loadProcurement } from "./load/procurement.loader";
 import { logger } from "./logger";
 import { writeReport } from "./report";
-
 import { ProcurementRecord } from "./types/procurement";
 import { deduplicateRecords } from "./transform/deduplicate";
-
 import { ETLResult } from "./types/etl";
+import { ProcurementRepository } from "../repositories/procurement.repository";
 
-export async function runETL(
-  filePath: string
-): Promise<ETLResult> {
+export async function runETL(): Promise<ETLResult> {
   const startedAt = new Date();
 
   logger.info("Starting ETL", {
-    filePath,
+    source: "Google Sheets API",
   });
 
   try {
     // ==========================
     // Extract
     // ==========================
-    const rawRows = extractCSV(filePath);
+    const rawRows = await extractGoogleSheets();
 
-    logger.info("CSV extracted", {
+    logger.info("Google Sheets extracted", {
       rows: rawRows.length,
     });
 
     // ==========================
     // Transform (Mapping)
     // ==========================
-    const records: ProcurementRecord[] = rawRows.map(
-      mapProcurementRow
-    );
+    const records: ProcurementRecord[] =
+      rawRows.map(mapProcurementRow);
 
     // ==========================
     // Validation
@@ -47,7 +43,8 @@ export async function runETL(
     }[] = [];
 
     for (const record of records) {
-      const result = validateProcurementRecord(record);
+      const result =
+        validateProcurementRecord(record);
 
       if (result.valid) {
         validRecords.push(record);
@@ -68,7 +65,8 @@ export async function runETL(
     // ==========================
     // Deduplication
     // ==========================
-    const deduplication = deduplicateRecords(validRecords);
+    const deduplication =
+      deduplicateRecords(validRecords);
 
     logger.info("Deduplication completed", {
       before: validRecords.length,
@@ -77,13 +75,118 @@ export async function runETL(
     });
 
     // ==========================
-    // Load
+    // Preflight Reconciliation
     // ==========================
-    const loadResult = await loadProcurement(
+    const procurementRepository =
+      new ProcurementRepository();
+
+    const sourceSubPrIds =
       deduplication.records
+        .map((record) => record.sub_pr_id)
+        .filter(
+          (id): id is string =>
+            Boolean(id)
+        );
+
+    const existingSubPrIds =
+      await procurementRepository.getExistingSubPrIds(
+        sourceSubPrIds
+      );
+
+    // Record source yang sudah ada di Supabase
+    const existingSourceSubPrIds =
+      sourceSubPrIds.filter(
+        (id) => existingSubPrIds.has(id)
+      );
+
+    // Record source yang belum ada di Supabase
+    const newSubPrIds =
+      sourceSubPrIds.filter(
+        (id) => !existingSubPrIds.has(id)
+      );
+
+    const dbOnlySubPrIds =
+  Array.from(existingSubPrIds).filter(
+    (id) => !sourceSubPrIds.includes(id)
+  );
+
+logger.info(
+  "Database-only reconciliation",
+  {
+    count: dbOnlySubPrIds.length,
+    subPrIds: dbOnlySubPrIds,
+  }
+);
+
+    logger.info(
+      "Preflight reconciliation completed",
+      {
+        sourceUnique: sourceSubPrIds.length,
+
+        // Semua unique sub_pr_id yang saat ini ada
+        // di Supabase
+        existingInSupabase:
+          existingSubPrIds.size,
+
+        // Hanya existing record yang MATCH
+        // dengan source terbaru
+        existingSourceRecords:
+          existingSourceSubPrIds.length,
+
+        // Record baru dari source
+        newRecords:
+          newSubPrIds.length,
+      }
     );
 
-    logger.info("Load completed", loadResult);
+    // ==========================
+    // Reconciliation Check
+    // ==========================
+    const reconciledCount =
+      existingSourceSubPrIds.length +
+      newSubPrIds.length;
+
+    if (
+      reconciledCount !==
+      sourceSubPrIds.length
+    ) {
+      throw new Error(
+        `Preflight reconciliation failed: ` +
+        `existingSourceRecords (${existingSourceSubPrIds.length}) + ` +
+        `newRecords (${newSubPrIds.length}) = ` +
+        `${reconciledCount}, ` +
+        `but sourceUnique = ${sourceSubPrIds.length}.`
+      );
+    }
+
+    logger.info(
+      "Preflight reconciliation check passed",
+      {
+        sourceUnique:
+          sourceSubPrIds.length,
+
+        existingSourceRecords:
+          existingSourceSubPrIds.length,
+
+        newRecords:
+          newSubPrIds.length,
+
+        reconciledCount,
+      }
+    );
+
+    // ==========================
+    // Load
+    // ==========================
+    const loadResult =
+      await loadProcurement(
+        deduplication.records
+      );
+
+    logger.info(
+      "Load completed",
+      loadResult
+    );
 
     // ==========================
     // Report
@@ -93,23 +196,29 @@ export async function runETL(
     const reportPath = writeReport({
       startedAt: startedAt.toISOString(),
       finishedAt: finishedAt.toISOString(),
+
       durationMs:
-        finishedAt.getTime() - startedAt.getTime(),
+        finishedAt.getTime() -
+        startedAt.getTime(),
 
       total: records.length,
       valid: validRecords.length,
       invalid: errors.length,
 
       uploaded: loadResult.total,
-      batches: loadResult.batches ?? 1,
+      batches:
+        loadResult.batches ?? 1,
       dryRun: loadResult.dryRun,
 
       errors,
     });
 
-    logger.info("Report generated", {
-      reportPath,
-    });
+    logger.info(
+      "Report generated",
+      {
+        reportPath,
+      }
+    );
 
     // ==========================
     // Return
@@ -126,7 +235,10 @@ export async function runETL(
       reportPath,
     };
   } catch (error) {
-    logger.error("ETL failed", error);
+    logger.error(
+      "ETL failed",
+      error
+    );
 
     throw error;
   }

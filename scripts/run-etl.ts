@@ -9,15 +9,13 @@ async function main() {
   try {
     const { runETL } = await import("../etl");
 
-    const filePath = path.resolve(process.cwd(), "input.csv");
-
     console.log("=====================================");
     console.log(" Procurement ETL");
     console.log("=====================================");
-    console.log(`Input : ${filePath}`);
+    console.log("Source : Google Sheets API");
     console.log("");
 
-    const result = await runETL(filePath);
+    const result = await runETL();
 
     console.log("ETL Finished");
     console.log("------------------------------");
@@ -25,13 +23,18 @@ async function main() {
     console.log(`Valid Records : ${result.valid}`);
     console.log(`Invalid       : ${result.invalid}`);
     console.log(`Uploaded      : ${result.load.total}`);
+    console.log(
+      `Dry Run       : ${result.load.dryRun}`
+    );
 
     if (result.errors.length > 0) {
       console.log("");
       console.log("Validation Errors");
 
       result.errors.forEach((err, index) => {
-        console.log(`${index + 1}. ${err.errors.join(", ")}`);
+        console.log(
+          `${index + 1}. ${err.errors.join(", ")}`
+        );
       });
     }
 
