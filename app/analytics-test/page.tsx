@@ -6,8 +6,8 @@ export default async function AnalyticsTestPage() {
   const vendors = await service.getVendorPerformance({
   year: 2026,
   months: [],
-  vendor: null,
-  search: "",
+  vendors: [],
+  items: [],
 });
 
   return (

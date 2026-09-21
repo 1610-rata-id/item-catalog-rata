@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   usePathname,
   useRouter,
@@ -25,31 +25,40 @@ export function useDashboardFilter() {
   }, [searchParams]);
 
   const selectedMonths = useMemo(() => {
-  const monthParam = searchParams.get("month");
+    const monthParam = searchParams.get("month");
 
-  if (!monthParam) {
-    return [];
-  }
+    if (!monthParam) {
+      return [];
+    }
 
-  return monthParam
-    .split(",")
-    .filter(Boolean);
-}, [searchParams]);
-
-  const selectedVendor = useMemo(() => {
-    return searchParams.get("vendor") ?? "all";
+    return monthParam
+      .split(",")
+      .filter(Boolean);
   }, [searchParams]);
 
-  const selectedSearch = useMemo(() => {
-    return searchParams.get("search") ?? "";
+  const selectedVendors = useMemo(() => {
+    const vendorParam = searchParams.get("vendors");
+
+    if (!vendorParam) {
+      return [];
+    }
+
+    return vendorParam
+      .split(",")
+      .filter(Boolean);
   }, [searchParams]);
 
-  const [searchValue, setSearchValue] =
-    useState(selectedSearch);
+  const selectedItems = useMemo(() => {
+    const itemParam = searchParams.get("items");
 
-  useEffect(() => {
-    setSearchValue(selectedSearch);
-  }, [selectedSearch]);
+    if (!itemParam) {
+      return [];
+    }
+
+    return itemParam
+      .split(",")
+      .filter(Boolean);
+  }, [searchParams]);
 
   const updateQuery = (
     key: string,
@@ -59,17 +68,15 @@ export function useDashboardFilter() {
       searchParams.toString()
     );
 
-    if (
-      value === null ||
-      value === "" ||
-      value === "all"
-    ) {
+    if (!value) {
       params.delete(key);
     } else {
       params.set(key, value);
     }
 
-    router.replace(`${pathname}?${params.toString()}`);
+    router.replace(
+      `${pathname}?${params.toString()}`
+    );
   };
 
   const handleYearChange = (
@@ -83,41 +90,58 @@ export function useDashboardFilter() {
 
     params.set("year", value);
 
-    // Reset vendor ketika tahun berubah
-    params.delete("vendor");
+    /*
+     * Vendor dan Item tetap valid secara konsep
+     * ketika tahun berubah, jadi jangan dihapus
+     * dulu.
+     */
 
-    router.replace(`${pathname}?${params.toString()}`);
+    router.replace(
+      `${pathname}?${params.toString()}`
+    );
   };
 
   const handleMonthChange = (
-  values: string[]
-) => {
-
-  if (values.length === 0) {
-    updateQuery("month", null);
-    return;
-  }
-
-  updateQuery(
-    "month",
-    values.join(",")
-  );
-
-};
-
-  const handleVendorChange = (
-    value: string | null
+    values: string[]
   ) => {
-    updateQuery("vendor", value);
+    if (values.length === 0) {
+      updateQuery("month", null);
+      return;
+    }
+
+    updateQuery(
+      "month",
+      values.join(",")
+    );
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      updateQuery("search", searchValue);
-    }, 300);
+  const handleVendorChange = (
+    values: string[]
+  ) => {
+    if (values.length === 0) {
+      updateQuery("vendors", null);
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [searchValue]);
+    updateQuery(
+      "vendors",
+      values.join(",")
+    );
+  };
+
+  const handleItemChange = (
+    values: string[]
+  ) => {
+    if (values.length === 0) {
+      updateQuery("items", null);
+      return;
+    }
+
+    updateQuery(
+      "items",
+      values.join(",")
+    );
+  };
 
   const handleReset = () => {
     router.replace(
@@ -126,16 +150,15 @@ export function useDashboardFilter() {
   };
 
   return {
-  selectedYear,
-  selectedMonths,
-  selectedVendor,
-
-    searchValue,
-    setSearchValue,
+    selectedYear,
+    selectedMonths,
+    selectedVendors,
+    selectedItems,
 
     handleYearChange,
     handleMonthChange,
     handleVendorChange,
+    handleItemChange,
     handleReset,
   };
 }

@@ -3,9 +3,9 @@ export interface DashboardFilterState {
 
   months: number[];
 
-  vendor: string | null;
+  vendors: string[];
 
-  search: string;
+  items: string[];
 }
 
 export interface DashboardDateRange {
@@ -21,6 +21,6 @@ export interface DashboardDateRange {
 export const DEFAULT_DASHBOARD_FILTER: DashboardFilterState = {
   year: 2026,
   months: [],
-  vendor: null,
-  search: "",
+  vendors: [],
+  items: [],
 };

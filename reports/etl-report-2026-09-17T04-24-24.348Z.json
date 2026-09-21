@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-09-17T04:24:03.930Z",
+  "finishedAt": "2026-09-17T04:24:24.348Z",
+  "durationMs": 20418,
+  "total": 11084,
+  "valid": 11084,
+  "invalid": 0,
+  "uploaded": 11052,
+  "batches": 12,
+  "dryRun": false,
+  "errors": []
+}

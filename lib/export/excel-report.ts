@@ -11,11 +11,11 @@ import { DashboardOverview } from "@/types/dashboard-overview";
 
 interface ExcelReportData {
   filters: {
-  year: number;
-  months: number[];
-  vendor: string | null;
-  search: string;
-};
+    year: number;
+    months: number[];
+    vendors: string[];
+    items: string[];
+  };
 
   overview: DashboardOverview;
 
@@ -37,15 +37,15 @@ export async function generateExcelReport(
   workbook.created = new Date();
 
   createSummarySheet(workbook, {
-  year: data.filters.year,
-  months: data.filters.months,
-  vendor: data.filters.vendor,
-  search: data.filters.search,
-  overview: data.overview,
-});
+    year: data.filters.year,
+    months: data.filters.months,
+    vendors: data.filters.vendors,
+    items: data.filters.items,
+    overview: data.overview,
+  });
 
   const totalSpend =
-  Number(data.overview.total_spend ?? 0);
+    Number(data.overview.total_spend ?? 0);
 
   const safeTotalSpend =
     totalSpend > 0 ? totalSpend : 1;
@@ -120,17 +120,9 @@ export async function generateExcelReport(
   ];
 
   data.topItems.forEach((item, index) => {
-
     const contribution =
       Number(item.total_spend) /
       safeTotalSpend;
-
-   console.log({
-  totalSpend,
-  safeTotalSpend,
-  itemSpend: item.total_spend,
-  contribution,
-});
 
     itemSheet.addRow({
       rank: index + 1,
@@ -141,11 +133,9 @@ export async function generateExcelReport(
       transactions:
         item.transaction_count,
     });
-
   });
 
   itemSheet.eachRow((row, index) => {
-
     if (index === 1) return;
 
     row.getCell(4).numFmt =
@@ -153,12 +143,11 @@ export async function generateExcelReport(
 
     row.getCell(5).numFmt =
       "0.00%";
-
   });
 
   styleWorksheet(itemSheet, [4]);
 
-    // ======================
+  // ======================
   // TOP VENDORS
   // ======================
 
@@ -199,16 +188,9 @@ export async function generateExcelReport(
   ];
 
   data.topVendors.forEach((vendor, index) => {
-
     const contribution =
       Number(vendor.total_spend) /
       safeTotalSpend;
-
-   console.log({
-  totalSpend,
-  vendorSpend: vendor.total_spend,
-  contribution,
-});
 
     vendorSheet.addRow({
       rank: index + 1,
@@ -220,11 +202,9 @@ export async function generateExcelReport(
       items:
         vendor.unique_items,
     });
-
   });
 
   vendorSheet.eachRow((row, index) => {
-
     if (index === 1) return;
 
     row.getCell(3).numFmt =
@@ -232,7 +212,6 @@ export async function generateExcelReport(
 
     row.getCell(4).numFmt =
       "0.00%";
-
   });
 
   styleWorksheet(vendorSheet, [3]);
@@ -288,7 +267,6 @@ export async function generateExcelReport(
   ];
 
   data.recentTransactions.forEach((trx) => {
-
     trxSheet.addRow({
       date: trx.order_date,
       vendor: trx.vendor_name,
@@ -299,16 +277,13 @@ export async function generateExcelReport(
       po: trx.po_number,
       pr: trx.pr_number,
     });
-
   });
 
   trxSheet.eachRow((row, index) => {
-
     if (index === 1) return;
 
     row.getCell(6).numFmt =
       '"Rp" #,##0';
-
   });
 
   styleWorksheet(trxSheet, [6]);

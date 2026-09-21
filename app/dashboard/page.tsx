@@ -19,8 +19,8 @@ interface DashboardPageProps {
   searchParams: Promise<{
     year?: string;
     month?: string;
-    vendor?: string;
-    search?: string;
+    vendors?: string;
+    items?: string;
   }>;
 }
 
@@ -33,31 +33,39 @@ export default async function DashboardPage({
 
   const selectedYear = Number(params.year);
 
-const filters = {
-  year: Number.isNaN(selectedYear)
-    ? DEFAULT_DASHBOARD_FILTER.year
-    : selectedYear,
+  const filters = {
+    year: Number.isNaN(selectedYear)
+      ? DEFAULT_DASHBOARD_FILTER.year
+      : selectedYear,
 
-  months:
-    params.month
-      ? params.month
-          .split(",")
-          .filter(Boolean)
-          .map(Number)
-          .filter((month) =>
-            Number.isInteger(month) &&
-            month >= 1 &&
-            month <= 12
-          )
-      : [],
+    months:
+      params.month
+        ? params.month
+            .split(",")
+            .filter(Boolean)
+            .map(Number)
+            .filter(
+              (month) =>
+                Number.isInteger(month) &&
+                month >= 1 &&
+                month <= 12
+            )
+        : [],
 
-  vendor:
-    params.vendor && params.vendor !== "all"
-      ? params.vendor
-      : null,
+    vendors:
+      params.vendors
+        ? params.vendors
+            .split(",")
+            .filter(Boolean)
+        : [],
 
-  search: params.search ?? "",
-};
+    items:
+      params.items
+        ? params.items
+            .split(",")
+            .filter(Boolean)
+        : [],
+  };
 
   const overview =
     await analyticsService.getDashboardOverview(filters);
@@ -78,15 +86,15 @@ const filters = {
     await analyticsService.getRecentTransactions(filters);
 
   const currentRange = buildCurrentRange(
-  filters.year,
-  filters.months
-);
+    filters.year,
+    filters.months
+  );
 
-const previousRange =
-  buildPreviousRange(currentRange);
+  const previousRange =
+    buildPreviousRange(currentRange);
 
-const comparisonLabel =
-  buildComparisonLabel(previousRange);
+  const comparisonLabel =
+    buildComparisonLabel(previousRange);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-neutral-950">

@@ -34,11 +34,9 @@ const filters = {
 
   months,
 
-  vendor:
-    searchParams.get("vendor") || null,
+  vendors: [],
 
-  search:
-    searchParams.get("search") || "",
+  items: [],
 };
 
   const analytics =

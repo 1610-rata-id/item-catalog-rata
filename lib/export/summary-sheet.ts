@@ -3,16 +3,16 @@ import ExcelJS from "exceljs";
 interface SummaryData {
   year: number;
   months: number[];
-  vendor: string | null;
-  search: string;
+  vendors: string[];
+  items: string[];
 
   overview: {
-  total_spend: number;
-  total_transactions: number;
-  total_purchase_requests: number;
-  total_purchase_orders: number;
-  total_vendors: number;
-};
+    total_spend: number;
+    total_transactions: number;
+    total_purchase_requests: number;
+    total_purchase_orders: number;
+    total_vendors: number;
+  };
 }
 
 export function createSummarySheet(
@@ -24,7 +24,7 @@ export function createSummarySheet(
 
   sheet.columns = [
     { width: 28 },
-    { width: 30 },
+    { width: 50 },
   ];
 
   sheet.mergeCells("A1:B1");
@@ -72,37 +72,65 @@ export function createSummarySheet(
     bold: true,
   };
 
+  // ======================
+  // YEAR
+  // ======================
+
   sheet.addRow([
     "Year",
     data.year,
   ]);
 
-  sheet.addRow([
-  "Months",
-  data.months.length > 0
-    ? data.months
-        .sort((a, b) => a - b)
-        .map((month) =>
-          new Date(2000, month - 1, 1).toLocaleString(
-            "en-US",
-            { month: "short" }
-          )
-        )
-        .join(", ")
-    : "All Months",
-]);
+  // ======================
+  // MONTHS
+  // ======================
 
   sheet.addRow([
-    "Vendor",
-    data.vendor ?? "All Vendors",
+    "Months",
+    data.months.length > 0
+      ? data.months
+          .sort((a, b) => a - b)
+          .map((month) =>
+            new Date(
+              2000,
+              month - 1,
+              1
+            ).toLocaleString(
+              "en-US",
+              { month: "short" }
+            )
+          )
+          .join(", ")
+      : "All Months",
   ]);
 
+  // ======================
+  // VENDORS
+  // ======================
+
   sheet.addRow([
-    "Search",
-    data.search || "-",
+    "Vendors",
+    data.vendors.length > 0
+      ? data.vendors.join(", ")
+      : "All Vendors",
+  ]);
+
+  // ======================
+  // ITEMS
+  // ======================
+
+  sheet.addRow([
+    "Items",
+    data.items.length > 0
+      ? data.items.join(", ")
+      : "All Items",
   ]);
 
   sheet.addRow([]);
+
+  // ======================
+  // KPI SUMMARY
+  // ======================
 
   sheet.addRow([
     "KPI SUMMARY",
