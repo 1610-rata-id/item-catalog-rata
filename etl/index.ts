@@ -1,7 +1,9 @@
 import { extractGoogleSheets } from "./extract/google-sheets-api";
+import { extractRiskMatrix } from "./extract/risk-matrix";
 import { mapProcurementRow } from "./mappers/procurement";
 import { validateProcurementRecord } from "./validate/procurement";
 import { loadProcurement } from "./load/procurement.loader";
+import { loadVendorRiskMatrix } from "./load/vendor-risk-matrix.loader";
 import { logger } from "./logger";
 import { writeReport } from "./report";
 import { ProcurementRecord } from "./types/procurement";
@@ -25,6 +27,15 @@ export async function runETL(): Promise<ETLResult> {
     logger.info("Google Sheets extracted", {
       rows: rawRows.length,
     });
+
+    // ==========================
+// Extract Risk Matrix
+// ==========================
+const riskMatrixRecords = await extractRiskMatrix();
+
+logger.info("Risk Matrix extracted", {
+  rows: riskMatrixRecords.length,
+});
 
     // ==========================
     // Transform (Mapping)
@@ -187,6 +198,19 @@ logger.info(
       "Load completed",
       loadResult
     );
+
+    // ==========================
+// Load Risk Matrix
+// ==========================
+const riskMatrixLoadResult =
+  await loadVendorRiskMatrix(
+    riskMatrixRecords
+  );
+
+logger.info(
+  "Risk Matrix load completed",
+  riskMatrixLoadResult
+);
 
    // ==========================
 // Update ETL Sync Status

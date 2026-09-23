@@ -31,7 +31,7 @@ export default async function AnalyticsTestPage() {
               <td className="border p-2">{vendor.vendor_name}</td>
 
               <td className="border p-2 text-right">
-                {vendor.total_transactions}
+                {vendor.transaction_count}
               </td>
 
               <td className="border p-2 text-right">
