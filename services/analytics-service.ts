@@ -247,28 +247,4 @@ async getEvaluationPeriods(
     year
   );
 }
-
-async getVendorEvaluations(
-  filters: VendorEvaluationFilters = {}
-): Promise<VendorEvaluation[]> {
-  return await vendorEvaluationRepository.getAll(filters);
-}
-
-async getEvaluationVendors(
-  year?: number,
-  period?: string
-): Promise<string[]> {
-  return await vendorEvaluationRepository.getVendors(
-    year,
-    period
-  );
-}
-
-async getEvaluationPeriods(
-  year?: number
-): Promise<string[]> {
-  return await vendorEvaluationRepository.getPeriods(
-    year
-  );
-}
 }
