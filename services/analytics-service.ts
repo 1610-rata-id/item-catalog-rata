@@ -14,6 +14,17 @@ import {
   VendorEvaluationFilters,
   VendorEvaluation,
 } from "@/repositories/vendor-evaluation.repository";
+import {
+  vendorDocumentsRepository,
+  VendorDocumentsFilters,
+} from "@/repositories/vendor-documents.repository";
+
+import {
+  DocumentsKpi,
+  VendorComplianceContract,
+  VendorDetails,
+  VendorMaterialDocument,
+} from "@/types/vendor-documents";
 
 export class AnalyticsService {
   private repository =
@@ -247,4 +258,31 @@ async getEvaluationPeriods(
     year
   );
 }
+
+async getDocumentsKpi(): Promise<DocumentsKpi> {
+  return await vendorDocumentsRepository.getKpi();
 }
+
+async getVendorComplianceContracts(
+  filters: VendorDocumentsFilters = {}
+): Promise<VendorComplianceContract[]> {
+  return await vendorDocumentsRepository.getComplianceContracts(filters);
+}
+
+async getVendorMaterialDocuments(
+  filters: VendorDocumentsFilters = {}
+): Promise<VendorMaterialDocument[]> {
+  return await vendorDocumentsRepository.getMaterialDocuments(filters);
+}
+
+async getVendorDetails(
+  vendorId: string
+): Promise<VendorDetails | null> {
+  return await vendorDocumentsRepository.getVendorDetails(vendorId);
+}
+
+async getDocumentVendors(): Promise<string[]> {
+  return await vendorDocumentsRepository.getVendors();
+}
+}
+export const analyticsService = new AnalyticsService();
