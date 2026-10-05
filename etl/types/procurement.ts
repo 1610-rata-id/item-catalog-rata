@@ -18,6 +18,9 @@ export interface ProcurementRawRow {
   receive_date: string;
   payment_request_id: string;
   sub_pr_id: string | null;
+
+  // Procurement Type
+  type: string;
 }
 
 /**
@@ -48,4 +51,7 @@ export interface ProcurementRecord {
   payment_request_id: string | null;
 
   sub_pr_id: string | null;
+
+  // Procurement Type
+  type: string | null;
 }

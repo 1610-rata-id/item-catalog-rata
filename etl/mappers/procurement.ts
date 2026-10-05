@@ -42,5 +42,8 @@ export function mapProcurementRow(
     payment_request_id: row.payment_request_id || null,
 
     sub_pr_id: row.sub_pr_id || null,
+
+    // Procurement Type
+    type: row.type || null,
   };
 }

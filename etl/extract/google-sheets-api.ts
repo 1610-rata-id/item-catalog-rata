@@ -68,5 +68,8 @@ export async function extractGoogleSheets(): Promise<ProcurementRawRow[]> {
       String(row.sub_pr_id).trim() === ""
         ? null
         : String(row.sub_pr_id),
+
+    // Procurement Type
+    type: String(row.type ?? "").trim(),
   }));
 }

@@ -26,6 +26,38 @@ import {
   VendorMaterialDocument,
 } from "@/types/vendor-documents";
 
+import {
+  itemPerformanceRepository,
+  ItemPerformanceFilters,
+} from "@/repositories/item-performance.repository";
+
+import {
+  ItemPerformanceKpi,
+  ItemTopSpend,
+  ItemProcurementSummary,
+  ItemTransactionHistory,
+} from "@/types/item-performance";
+
+import {
+  ItemPriceHistory,
+  ItemPriceKpi,
+  ItemPriceTrend,
+  ItemVendorPriceComparison,
+  ItemPriceDistribution,
+} from "@/types/item-price-analysis";
+
+import {
+  ItemPriceAnalysisFilters,
+  itemPriceAnalysisRepository,
+} from "@/repositories/item-price-analysis.repository";
+
+import {
+  ItemAbcAnalysis,
+  ItemAbcKpi,
+} from "@/types/item-abc-analysis";
+
+import { itemAbcAnalysisRepository } from "@/repositories/item-abc-analysis.repository";
+
 export class AnalyticsService {
   private repository =
     new ProcurementRepository();
@@ -283,6 +315,176 @@ async getVendorDetails(
 
 async getDocumentVendors(): Promise<string[]> {
   return await vendorDocumentsRepository.getVendors();
+}
+
+  // ============================================================
+  // ITEM ANALYTICS - PERFORMANCE
+  // ============================================================
+
+  async getItemPerformanceKpi(
+    filters: ItemPerformanceFilters
+  ): Promise<ItemPerformanceKpi> {
+    return await itemPerformanceRepository.getKpi(filters);
+  }
+
+  async getItemTopSpend(
+    filters: ItemPerformanceFilters
+  ): Promise<ItemTopSpend[]> {
+    return await itemPerformanceRepository.getTopSpend(
+      filters,
+      10
+    );
+  }
+
+  async getItemProcurementSummary(
+    filters: ItemPerformanceFilters
+  ): Promise<ItemProcurementSummary[]> {
+    return await itemPerformanceRepository.getProcurementSummary(
+      filters,
+      1000
+    );
+  }
+
+  async getItemTransactionHistory(
+    filters: ItemPerformanceFilters
+  ): Promise<ItemTransactionHistory[]> {
+    return await itemPerformanceRepository.getTransactionHistory(
+      filters,
+      100
+    );
+  }
+
+// ============================================================
+  // ITEM ANALYTICS - PRICE
+  // ============================================================
+
+async getItemPriceKpi(
+  filters: ItemPriceAnalysisFilters
+): Promise<ItemPriceKpi> {
+  return await itemPriceAnalysisRepository.getKpi(filters);
+}
+
+async getItemPriceTrend(
+  filters: ItemPriceAnalysisFilters
+): Promise<ItemPriceTrend[]> {
+  return await itemPriceAnalysisRepository.getPriceTrend(filters);
+}
+
+async getItemVendorPriceComparison(
+  filters: ItemPriceAnalysisFilters
+): Promise<ItemVendorPriceComparison[]> {
+  return await itemPriceAnalysisRepository.getVendorPriceComparison(
+    filters,
+    10
+  );
+}
+
+async getItemPriceDistribution(
+  filters: ItemPriceAnalysisFilters
+): Promise<ItemPriceDistribution[]> {
+  const { year, months, vendors, items } = filters;
+
+  const sortedMonths = [...(months ?? [])].sort(
+    (a, b) => a - b
+  );
+
+  let startDate = `${year}-01-01`;
+  let endDate = `${year}-12-31`;
+
+  if (sortedMonths.length > 0) {
+    const startMonth = sortedMonths[0];
+    const endMonth =
+      sortedMonths[sortedMonths.length - 1];
+
+    startDate = `${year}-${String(
+      startMonth
+    ).padStart(2, "0")}-01`;
+
+    const lastDay = new Date(
+      Date.UTC(year, endMonth, 0)
+    ).getUTCDate();
+
+    endDate = `${year}-${String(
+      endMonth
+    ).padStart(2, "0")}-${String(
+      lastDay
+    ).padStart(2, "0")}`;
+  }
+
+  return await itemPriceAnalysisRepository.getPriceDistribution(
+    startDate,
+    endDate,
+    vendors ?? [],
+    items ?? [],
+    10
+  );
+}
+
+async getItemPriceHistory(
+  filters: ItemPriceAnalysisFilters
+): Promise<ItemPriceHistory[]> {
+  return await itemPriceAnalysisRepository.getPriceHistory(
+    filters,
+    100
+  );
+}
+
+async getItemAbcAnalysis(
+  year: number,
+  months: number[] = []
+): Promise<{
+  kpi: ItemAbcKpi;
+  items: ItemAbcAnalysis[];
+}> {
+  const sortedMonths = [...months].sort((a, b) => a - b);
+
+  let startDate = `${year}-01-01`;
+  let endDate = `${year}-12-31`;
+
+  if (sortedMonths.length > 0) {
+    const startMonth = sortedMonths[0];
+    const endMonth = sortedMonths[sortedMonths.length - 1];
+
+    startDate = `${year}-${String(startMonth).padStart(2, "0")}-01`;
+
+    const lastDay = new Date(
+      Date.UTC(year, endMonth, 0)
+    ).getUTCDate();
+
+    endDate = `${year}-${String(endMonth).padStart(2, "0")}-${String(
+      lastDay
+    ).padStart(2, "0")}`;
+  }
+
+  const items =
+    await itemAbcAnalysisRepository.getAnalysis(
+      startDate,
+      endDate
+    );
+
+  const kpi: ItemAbcKpi = {
+    class_a_items: items.filter(
+      (item) => item.abc_class === "A"
+    ).length,
+
+    class_b_items: items.filter(
+      (item) => item.abc_class === "B"
+    ).length,
+
+    class_c_items: items.filter(
+      (item) => item.abc_class === "C"
+    ).length,
+
+    total_spend: items.reduce(
+      (sum, item) => sum + Number(item.total_spend || 0),
+      0
+    ),
+  };
+
+  return {
+    kpi,
+    items,
+  };
 }
 }
 export const analyticsService = new AnalyticsService();

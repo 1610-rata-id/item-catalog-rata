@@ -11,6 +11,9 @@ import {
   ChevronDown,
   Star,
   FileText,
+  Package,
+  DollarSign,
+  PieChart,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,8 +26,15 @@ export default function DashboardSidebar() {
   const [vendorAnalyticsOpen, setVendorAnalyticsOpen] =
     useState(false);
 
+  const [itemAnalyticsOpen, setItemAnalyticsOpen] =
+    useState(false);
+
   const router = useRouter();
   const pathname = usePathname();
+
+  // =========================================================
+  // LAST UPDATED
+  // =========================================================
 
   useEffect(() => {
     async function fetchLastUpdated() {
@@ -71,6 +81,10 @@ export default function DashboardSidebar() {
     fetchLastUpdated();
   }, []);
 
+  // =========================================================
+  // AUTO OPEN ANALYTICS MENUS BASED ON PATH
+  // =========================================================
+
   useEffect(() => {
     if (
       pathname.startsWith(
@@ -79,11 +93,24 @@ export default function DashboardSidebar() {
     ) {
       setVendorAnalyticsOpen(true);
     }
+
+    if (
+      pathname.startsWith(
+        "/dashboard/item-analytics"
+      )
+    ) {
+      setItemAnalyticsOpen(true);
+    }
   }, [pathname]);
+
+  // =========================================================
+  // ACTIVE STATES
+  // =========================================================
 
   const isOverview =
     pathname === "/dashboard";
 
+  // Vendor Analytics
   const isPerformance =
     pathname ===
     "/dashboard/vendor-analytics/performance";
@@ -101,10 +128,34 @@ export default function DashboardSidebar() {
       "/dashboard/vendor-analytics"
     );
 
+  // Item Analytics
+  const isItemPerformance =
+    pathname ===
+    "/dashboard/item-analytics/performance";
+
+  const isPriceAnalysis =
+    pathname ===
+    "/dashboard/item-analytics/price-analysis";
+
+  const isABCAnalysis =
+    pathname ===
+    "/dashboard/item-analytics/abc-analysis";
+
+  const isItemAnalytics =
+    pathname.startsWith(
+      "/dashboard/item-analytics"
+    );
+
+  // =========================================================
+  // RENDER
+  // =========================================================
+
   return (
     <aside className="flex h-screen w-[280px] flex-col bg-[#0F172A] text-white">
 
-      {/* LOGO */}
+      {/* =====================================================
+          LOGO
+      ===================================================== */}
 
       <div className="border-b border-slate-700 px-6 py-7">
         <div className="flex items-center gap-3">
@@ -126,11 +177,15 @@ export default function DashboardSidebar() {
         </div>
       </div>
 
-      {/* NAVIGATION */}
+      {/* =====================================================
+          NAVIGATION
+      ===================================================== */}
 
       <div className="flex-1 overflow-y-auto px-4 py-6">
 
-        {/* OVERVIEW */}
+        {/* ===================================================
+            OVERVIEW
+        =================================================== */}
 
         <button
           onClick={() =>
@@ -160,7 +215,9 @@ export default function DashboardSidebar() {
           Overview
         </button>
 
-        {/* VENDOR ANALYTICS */}
+        {/* ===================================================
+            VENDOR ANALYTICS
+        =================================================== */}
 
         <div className="mt-3">
 
@@ -316,13 +373,175 @@ export default function DashboardSidebar() {
 
         </div>
 
+        {/* ===================================================
+            ITEM ANALYTICS
+        =================================================== */}
+
+        <div className="mt-3">
+
+          <button
+            onClick={() =>
+              setItemAnalyticsOpen(
+                (prev) => !prev
+              )
+            }
+            className={`
+              flex
+              w-full
+              items-center
+              justify-between
+              gap-3
+              rounded-xl
+              px-4
+              py-3
+              text-sm
+              font-medium
+              transition-all
+
+              ${
+                isItemAnalytics
+                  ? "bg-slate-800 text-white"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }
+            `}
+          >
+
+            <div className="flex items-center gap-3">
+              <Package className="h-5 w-5" />
+
+              <span>
+                Item Analytics
+              </span>
+            </div>
+
+            <ChevronDown
+              className={`
+                h-4 w-4
+                transition-transform
+                ${
+                  itemAnalyticsOpen
+                    ? "rotate-180"
+                    : ""
+                }
+              `}
+            />
+
+          </button>
+
+          {/* SUBMENU */}
+
+          {itemAnalyticsOpen && (
+            <div className="mt-2 ml-4 space-y-1">
+
+              {/* ITEM PERFORMANCE */}
+
+              <button
+                onClick={() =>
+                  router.push(
+                    "/dashboard/item-analytics/performance"
+                  )
+                }
+                className={`
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  rounded-lg
+                  px-4
+                  py-2.5
+                  text-sm
+                  transition-all
+
+                  ${
+                    isItemPerformance
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }
+                `}
+              >
+                <BarChart3 className="h-4 w-4" />
+
+                Performance
+              </button>
+
+              {/* PRICE ANALYSIS */}
+
+              <button
+                onClick={() =>
+                  router.push(
+                    "/dashboard/item-analytics/price-analysis"
+                  )
+                }
+                className={`
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  rounded-lg
+                  px-4
+                  py-2.5
+                  text-sm
+                  transition-all
+
+                  ${
+                    isPriceAnalysis
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }
+                `}
+              >
+                <DollarSign className="h-4 w-4" />
+
+                Price Analysis
+              </button>
+
+              {/* ABC ANALYSIS */}
+
+              <button
+                onClick={() =>
+                  router.push(
+                    "/dashboard/item-analytics/abc-analysis"
+                  )
+                }
+                className={`
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  rounded-lg
+                  px-4
+                  py-2.5
+                  text-sm
+                  transition-all
+
+                  ${
+                    isABCAnalysis
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }
+                `}
+              >
+                <PieChart className="h-4 w-4" />
+
+                ABC Analysis
+              </button>
+
+            </div>
+          )}
+
+        </div>
+
       </div>
 
-      {/* FOOTER */}
+      {/* =====================================================
+          FOOTER
+      ===================================================== */}
 
       <div className="border-t border-slate-700 p-5">
 
-        {/* THEME */}
+        {/* ===================================================
+            THEME
+        =================================================== */}
 
         <div className="mb-6">
 
@@ -347,7 +566,9 @@ export default function DashboardSidebar() {
 
         </div>
 
-        {/* LAST UPDATED */}
+        {/* ===================================================
+            LAST UPDATED
+        =================================================== */}
 
         <div className="rounded-xl bg-slate-800 p-4">
 

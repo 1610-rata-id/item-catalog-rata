@@ -17,12 +17,18 @@ export function useDashboardFilter() {
   const searchParams = useSearchParams();
 
   const selectedYear = useMemo(() => {
-    const year = Number(searchParams.get("year"));
+  const yearParam = searchParams.get("year");
 
-    return Number.isNaN(year)
-      ? DEFAULT_DASHBOARD_FILTER.year
-      : year;
-  }, [searchParams]);
+  if (!yearParam) {
+    return DEFAULT_DASHBOARD_FILTER.year;
+  }
+
+  const year = Number(yearParam);
+
+  return Number.isNaN(year)
+    ? DEFAULT_DASHBOARD_FILTER.year
+    : year;
+}, [searchParams]);
 
   const selectedMonths = useMemo(() => {
     const monthParam = searchParams.get("month");
