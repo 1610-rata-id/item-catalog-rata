@@ -40,11 +40,20 @@ export default function ItemAbcFilter() {
   ];
 
   return (
-    <Card className="mb-8 rounded-2xl border-0 bg-white p-6 shadow-sm dark:bg-neutral-900">
+    <Card
+      className="
+        mb-8
+        rounded-2xl
+        border-0
+        bg-[#1D63B3]
+        p-6
+        shadow-sm
+      "
+    >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-[220px_320px_170px]">
         {/* YEAR */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label className="mb-2 block text-sm font-medium text-white">
             Year
           </label>
 
@@ -52,7 +61,18 @@ export default function ItemAbcFilter() {
             value={selectedYear.toString()}
             onValueChange={handleYearChange}
           >
-            <SelectTrigger className="h-11 rounded-xl">
+            <SelectTrigger
+              className="
+                h-11
+                rounded-xl
+                border-white/20
+                bg-white
+                text-slate-900
+                shadow-sm
+                focus:ring-2
+                focus:ring-white/40
+              "
+            >
               <SelectValue />
             </SelectTrigger>
 
@@ -74,12 +94,19 @@ export default function ItemAbcFilter() {
 
         {/* MONTH */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label className="mb-2 block text-sm font-medium text-white">
             Month
           </label>
 
           <MultiSelect
-            className="w-full"
+            className="
+              w-full
+              rounded-xl
+              border-white/20
+              bg-white
+              text-slate-900
+              shadow-sm
+            "
             placeholder="All Months"
             searchPlaceholder="Search month..."
             emptyMessage="No month found."
@@ -90,16 +117,28 @@ export default function ItemAbcFilter() {
         </div>
 
         {/* RESET */}
-        <div className="flex items-end">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-            className="h-11 w-full rounded-xl"
-          >
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Reset Filter
-          </Button>
-        </div>
+<div className="flex items-end">
+  <Button
+    variant="outline"
+    onClick={handleReset}
+    className="
+      h-11
+      w-full
+      rounded-xl
+      border-white/30
+      bg-white
+      text-slate-900
+      shadow-sm
+      transition-all
+      duration-200
+      hover:bg-slate-50
+      hover:text-slate-900
+    "
+  >
+    <RotateCcw className="mr-2 h-4 w-4" />
+    Reset Filter
+  </Button>
+</div>
       </div>
     </Card>
   );

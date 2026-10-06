@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import {
+  ExternalLink,
+  Search,
+} from "lucide-react";
 
 import DocumentsHeader from "./DocumentsHeader";
 import DocumentsKpiGrid from "./DocumentsKpiGrid";
@@ -77,6 +80,12 @@ export default function DocumentsPage() {
   const [selectedContractStatus, setSelectedContractStatus] =
     useState("");
 
+  const [complianceSearch, setComplianceSearch] =
+    useState("");
+
+  const [materialSearch, setMaterialSearch] =
+    useState("");
+
   const [selectedVendorId, setSelectedVendorId] =
     useState<string | null>(null);
 
@@ -84,6 +93,7 @@ export default function DocumentsPage() {
     useState(false);
 
   const [loading, setLoading] = useState(true);
+
   const [error, setError] =
     useState<string | null>(null);
 
@@ -115,10 +125,13 @@ export default function DocumentsPage() {
         }
 
         setKpi(result.data.kpi);
+
         setVendors(result.data.vendors);
+
         setComplianceContracts(
           result.data.complianceContracts
         );
+
         setMaterialDocuments(
           result.data.materialDocuments
         );
@@ -140,6 +153,8 @@ export default function DocumentsPage() {
     setSelectedVendors([]);
     setSelectedDocumentStatus("");
     setSelectedContractStatus("");
+    setComplianceSearch("");
+    setMaterialSearch("");
   };
 
   const handleOpenVendorDetail = (
@@ -159,8 +174,27 @@ export default function DocumentsPage() {
    * FILTER COMPLIANCE & CONTRACT
    * ============================================================
    */
+
   const filteredComplianceContracts = useMemo(() => {
+    const query =
+      complianceSearch.trim().toLowerCase();
+
     return complianceContracts.filter((item) => {
+      const matchesSearch =
+        !query ||
+        item.vendor_id
+          .toLowerCase()
+          .includes(query) ||
+        item.vendor_name
+          .toLowerCase()
+          .includes(query) ||
+        item.document_status
+          .toLowerCase()
+          .includes(query) ||
+        item.contract_active
+          .toLowerCase()
+          .includes(query);
+
       const matchesVendor =
         selectedVendors.length === 0 ||
         selectedVendors.includes(item.vendor_name);
@@ -176,6 +210,7 @@ export default function DocumentsPage() {
           selectedContractStatus;
 
       return (
+        matchesSearch &&
         matchesVendor &&
         matchesDocumentStatus &&
         matchesContractStatus
@@ -183,6 +218,7 @@ export default function DocumentsPage() {
     });
   }, [
     complianceContracts,
+    complianceSearch,
     selectedVendors,
     selectedDocumentStatus,
     selectedContractStatus,
@@ -193,8 +229,24 @@ export default function DocumentsPage() {
    * FILTER MATERIAL DOCUMENTS
    * ============================================================
    */
+
   const filteredMaterialDocuments = useMemo(() => {
+    const query =
+      materialSearch.trim().toLowerCase();
+
     return materialDocuments.filter((item) => {
+      const matchesSearch =
+        !query ||
+        item.item_type
+          .toLowerCase()
+          .includes(query) ||
+        item.vendor
+          .toLowerCase()
+          .includes(query) ||
+        item.document_status
+          .toLowerCase()
+          .includes(query);
+
       const matchesVendor =
         selectedVendors.length === 0 ||
         selectedVendors.includes(item.vendor);
@@ -205,12 +257,14 @@ export default function DocumentsPage() {
           selectedDocumentStatus;
 
       return (
+        matchesSearch &&
         matchesVendor &&
         matchesDocumentStatus
       );
     });
   }, [
     materialDocuments,
+    materialSearch,
     selectedVendors,
     selectedDocumentStatus,
   ]);
@@ -228,6 +282,7 @@ export default function DocumentsPage() {
           {/* ========================================================
               FILTERS
           ======================================================== */}
+
           <DocumentsFilters
             vendors={vendors}
             selectedVendors={selectedVendors}
@@ -250,6 +305,7 @@ export default function DocumentsPage() {
           {/* ========================================================
               KPI
           ======================================================== */}
+
           <DocumentsKpiGrid
             totalVendors={
               loading ? 0 : kpi.total_vendors
@@ -263,123 +319,182 @@ export default function DocumentsPage() {
           />
 
           {/* ========================================================
-              COMPLIANCE & CONTRACT
+              COMPLIANCE & CONTRACT DOCUMENTS
           ======================================================== */}
-          <div className="rounded-xl border bg-card p-5 shadow-sm">
-            <div className="mb-4">
-              <h2 className="text-base font-semibold">
-                Compliance & Contract Documents
-              </h2>
 
-              <p className="mt-1 text-sm text-muted-foreground">
-                Vendor compliance and contract document
-                status.
-              </p>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+            <div className="mb-5">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+                    Compliance & Contract Documents
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Vendor compliance and contract document status.
+                  </p>
+                </div>
+
+                {/* SEARCH */}
+
+                <div className="relative w-full lg:w-[320px]">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
+                  <input
+                    type="text"
+                    value={complianceSearch}
+                    onChange={(event) =>
+                      setComplianceSearch(
+                        event.target.value
+                      )
+                    }
+                    placeholder="Search vendor or document..."
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#1D63B3] focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-slate-200 dark:focus:border-blue-500 dark:focus:ring-blue-500/10"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="max-h-[520px] overflow-auto rounded-lg border">
-              <table className="w-full min-w-[900px] text-sm">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Vendor ID
-                    </th>
+            <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800">
+              <div className="max-h-[570px] overflow-y-auto overflow-x-auto">
+                <table className="w-full min-w-[900px] border-collapse text-sm">
+                  <thead className="sticky top-0 z-10">
+                    <tr className="bg-[#1D63B3]">
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Vendor ID
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Vendor
-                    </th>
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Vendor
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Status Dokumen
-                    </th>
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Document Status
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Kontrak Aktif
-                    </th>
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Contract Status
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Tanggal Berakhir
-                    </th>
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Expiry Date
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 text-right font-medium">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
+                      <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  {filteredComplianceContracts.map(
-                    (item) => (
-                      <tr
-                        key={item.id}
-                        className="border-b last:border-0 hover:bg-muted/40"
-                      >
-                        <td className="whitespace-nowrap px-3 py-3">
-                          {item.vendor_id}
-                        </td>
-
-                        <td className="px-3 py-3 font-medium">
-                          {item.vendor_name}
-                        </td>
-
-                        <td className="px-3 py-3">
-                          {item.document_status}
-                        </td>
-
-                        <td className="px-3 py-3">
-                          {item.contract_active}
-                        </td>
-
-                        <td className="whitespace-nowrap px-3 py-3">
-                          {item.contract_expiry_date
-                            ? new Date(
-                                item.contract_expiry_date
-                              ).toLocaleDateString(
-                                "id-ID",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )
-                            : "-"}
-                        </td>
-
-                        <td className="px-3 py-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleOpenVendorDetail(
-                                item.vendor_id
-                              )
-                            }
-                            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition hover:bg-muted"
-                          >
-                            Lihat Detail
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  )}
-
-                  {!loading &&
-                    filteredComplianceContracts.length ===
-                      0 && (
-                      <tr>
-                        <td
-                          colSpan={6}
-                          className="px-3 py-8 text-center text-sm text-muted-foreground"
+                  <tbody>
+                    {filteredComplianceContracts.map(
+                      (item) => (
+                        <tr
+                          key={item.id}
+                          className="h-[52px] border-b border-slate-200 bg-white transition-colors hover:bg-slate-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-white/[0.03]"
                         >
-                          No compliance and contract
-                          documents found.
-                        </td>
-                      </tr>
+                          <td className="whitespace-nowrap px-4 text-slate-600 dark:text-slate-300">
+                            {item.vendor_id}
+                          </td>
+
+                          <td className="px-4 font-medium text-slate-700 dark:text-slate-200">
+                            {item.vendor_name}
+                          </td>
+
+                          {/* DOCUMENT STATUS */}
+
+                          <td className="px-4">
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                item.document_status ===
+                                "Lengkap"
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                  : item.document_status ===
+                                      "Belum Lengkap"
+                                    ? "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+                                    : "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400"
+                              }`}
+                            >
+                              {item.document_status}
+                            </span>
+                          </td>
+
+                          {/* CONTRACT STATUS */}
+
+                          <td className="px-4">
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                item.contract_active ===
+                                "Available"
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                  : "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400"
+                              }`}
+                            >
+                              {item.contract_active}
+                            </span>
+                          </td>
+
+                          {/* EXPIRY DATE */}
+
+                          <td className="whitespace-nowrap px-4 text-slate-600 dark:text-slate-300">
+                            {item.contract_expiry_date
+                              ? new Date(
+                                  item.contract_expiry_date
+                                ).toLocaleDateString(
+                                  "id-ID",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )
+                              : "-"}
+                          </td>
+
+                          {/* ACTION */}
+
+                          <td className="px-4 text-center">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleOpenVendorDetail(
+                                  item.vendor_id
+                                )
+                              }
+                              className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-[#1D63B3] transition hover:border-[#1D63B3] hover:bg-blue-50 dark:border-neutral-700 dark:text-blue-400 dark:hover:bg-blue-500/10"
+                            >
+                              View Detail
+                            </button>
+                          </td>
+                        </tr>
+                      )
                     )}
-                </tbody>
-              </table>
+
+                    {!loading &&
+                      filteredComplianceContracts.length ===
+                        0 && (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="px-4 py-16 text-center"
+                          >
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                              No compliance and contract
+                              documents found.
+                            </p>
+
+                            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                              Try adjusting your filters.
+                            </p>
+                          </td>
+                        </tr>
+                      )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div className="mt-3 text-xs text-muted-foreground">
+            <div className="mt-3 text-xs text-slate-400 dark:text-slate-500">
               Showing{" "}
               {filteredComplianceContracts.length} of{" "}
               {complianceContracts.length} records
@@ -389,97 +504,147 @@ export default function DocumentsPage() {
           {/* ========================================================
               MATERIAL DOCUMENTS
           ======================================================== */}
-          <div className="rounded-xl border bg-card p-5 shadow-sm">
-            <div className="mb-4">
-              <h2 className="text-base font-semibold">
-                Material Documents
-              </h2>
 
-              <p className="mt-1 text-sm text-muted-foreground">
-                Material and item document status by
-                vendor.
-              </p>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+            <div className="mb-5">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+                    Material Documents
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Material and item document status by vendor.
+                  </p>
+                </div>
+
+                {/* SEARCH */}
+
+                <div className="relative w-full lg:w-[320px]">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
+                  <input
+                    type="text"
+                    value={materialSearch}
+                    onChange={(event) =>
+                      setMaterialSearch(
+                        event.target.value
+                      )
+                    }
+                    placeholder="Search item or vendor..."
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#1D63B3] focus:ring-2 focus:ring-blue-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-slate-200 dark:focus:border-blue-500 dark:focus:ring-blue-500/10"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="max-h-[520px] overflow-auto rounded-lg border">
-              <table className="w-full min-w-[700px] text-sm">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Item
-                    </th>
+            <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800">
+              <div className="max-h-[570px] overflow-y-auto overflow-x-auto">
+                <table className="w-full min-w-[800px] border-collapse text-sm">
+                  <thead className="sticky top-0 z-10">
+                    <tr className="bg-[#1D63B3]">
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Item
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Vendor
-                    </th>
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Vendor
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 font-medium">
-                      Status Dokumen
-                    </th>
+                      <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
+                        Document Status
+                      </th>
 
-                    <th className="sticky top-0 z-10 bg-card px-3 py-3 text-right font-medium">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
+                      <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  {filteredMaterialDocuments.map(
-                    (item) => (
-                      <tr
-                        key={item.id}
-                        className="border-b last:border-0 hover:bg-muted/40"
-                      >
-                        <td className="px-3 py-3 font-medium">
-                          {item.item_type}
-                        </td>
-
-                        <td className="px-3 py-3">
-                          {item.vendor}
-                        </td>
-
-                        <td className="px-3 py-3">
-                          {item.document_status}
-                        </td>
-
-                        <td className="px-3 py-3 text-right">
-                          {item.drive_url ? (
-                            <a
-                              href={item.drive_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition hover:bg-muted"
-                            >
-                              Lihat Dokumen
-                              <ExternalLink className="h-3.5 w-3.5" />
-                            </a>
-                          ) : (
-                            <span className="text-xs text-muted-foreground">
-                              Tidak tersedia
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  )}
-
-                  {!loading &&
-                    filteredMaterialDocuments.length ===
-                      0 && (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="px-3 py-8 text-center text-sm text-muted-foreground"
+                  <tbody>
+                    {filteredMaterialDocuments.map(
+                      (item) => (
+                        <tr
+                          key={item.id}
+                          className="h-[52px] border-b border-slate-200 bg-white transition-colors hover:bg-slate-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-white/[0.03]"
                         >
-                          No material documents found.
-                        </td>
-                      </tr>
+                          {/* ITEM */}
+
+                          <td className="px-4 font-medium text-slate-700 dark:text-slate-200">
+                            {item.item_type}
+                          </td>
+
+                          {/* VENDOR */}
+
+                          <td className="px-4 text-slate-600 dark:text-slate-300">
+                            {item.vendor}
+                          </td>
+
+                          {/* DOCUMENT STATUS */}
+
+                          <td className="px-4">
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                item.document_status ===
+                                "Lengkap"
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                  : item.document_status ===
+                                      "Belum Lengkap"
+                                    ? "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+                                    : "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400"
+                              }`}
+                            >
+                              {item.document_status}
+                            </span>
+                          </td>
+
+                          {/* ACTION */}
+
+                          <td className="px-4 text-center">
+                            {item.drive_url ? (
+                              <a
+                                href={item.drive_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-[#1D63B3] transition hover:border-[#1D63B3] hover:bg-blue-50 dark:border-neutral-700 dark:text-blue-400 dark:hover:bg-blue-500/10"
+                              >
+                                View Document
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            ) : (
+                              <span className="text-xs text-slate-400 dark:text-slate-500">
+                                Not available
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      )
                     )}
-                </tbody>
-              </table>
+
+                    {!loading &&
+                      filteredMaterialDocuments.length ===
+                        0 && (
+                        <tr>
+                          <td
+                            colSpan={4}
+                            className="px-4 py-16 text-center"
+                          >
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                              No material documents found.
+                            </p>
+
+                            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                              Try adjusting your filters.
+                            </p>
+                          </td>
+                        </tr>
+                      )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div className="mt-3 text-xs text-muted-foreground">
+            <div className="mt-3 text-xs text-slate-400 dark:text-slate-500">
               Showing{" "}
               {filteredMaterialDocuments.length} of{" "}
               {materialDocuments.length} records
@@ -491,6 +656,7 @@ export default function DocumentsPage() {
       {/* ============================================================
           VENDOR DETAIL MODAL
       ============================================================ */}
+
       <VendorDetailModal
         vendorId={selectedVendorId}
         open={detailOpen}

@@ -84,16 +84,19 @@ export class ItemPerformanceRepository {
     const row = data?.[0];
 
     return {
-      total_spend: Number(
-        row?.total_spend ?? 0
-      ),
-      total_items: Number(
-        row?.total_items ?? 0
-      ),
-      total_purchase_orders: Number(
-        row?.total_purchase_orders ?? 0
-      ),
-    };
+  total_spend: Number(
+    row?.total_spend ?? 0
+  ),
+  total_items: Number(
+    row?.total_items ?? 0
+  ),
+  total_purchase_orders: Number(
+    row?.total_purchase_orders ?? 0
+  ),
+  total_purchase_requests: Number(
+    row?.total_purchase_requests ?? 0
+  ),
+};
   }
 
   async getTopSpend(

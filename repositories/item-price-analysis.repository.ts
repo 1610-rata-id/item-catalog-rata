@@ -250,28 +250,30 @@ export class ItemPriceAnalysisRepository {
     }
 
     return (data ?? []).map(
-      (row: {
-        order_date: string;
-        item_name: string;
-        vendor_name: string;
-        uom: string;
-        unit_price: number | string | null;
-        qty: number | string | null;
-        total_price: number | string | null;
-      }) => ({
-        order_date: row.order_date,
-        item_name: row.item_name,
-        vendor_name: row.vendor_name,
-        uom: row.uom,
-        unit_price: Number(
-          row.unit_price ?? 0
-        ),
-        qty: Number(row.qty ?? 0),
-        total_price: Number(
-          row.total_price ?? 0
-        ),
-      })
-    );
+  (row: {
+    order_date: string;
+    item_name: string;
+    vendor_name: string;
+    po_number: string | null;
+    uom: string;
+    unit_price: number | string | null;
+    qty: number | string | null;
+    total_price: number | string | null;
+  }) => ({
+    order_date: row.order_date,
+    item_name: row.item_name,
+    vendor_name: row.vendor_name,
+    po_number: row.po_number ?? "",
+    uom: row.uom,
+    unit_price: Number(
+      row.unit_price ?? 0
+    ),
+    qty: Number(row.qty ?? 0),
+    total_price: Number(
+      row.total_price ?? 0
+    ),
+  })
+);
   }
 }
 

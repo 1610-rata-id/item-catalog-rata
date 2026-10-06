@@ -19,6 +19,7 @@ export interface ItemPriceHistory {
   order_date: string;
   item_name: string;
   vendor_name: string;
+  po_number: string;
   uom: string;
   unit_price: number;
   qty: number;

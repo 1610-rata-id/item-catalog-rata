@@ -48,22 +48,23 @@ export default function PriceDistributionCard({
   }));
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-      {/* Header */}
-      <div className="mb-4">
-        <h2 className="text-[16px] font-semibold leading-6 text-[#172B4D] dark:text-white">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      {/* HEADER */}
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
           Price Distribution
         </h2>
 
-        <p className="mt-1 text-[12px] leading-5 text-[#6B7A90] dark:text-slate-400">
-          Distribusi harga unit untuk item yang dipilih.
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          Unit price distribution for selected items.
         </p>
       </div>
 
+      {/* CONTENT */}
       {chartData.length === 0 ? (
         <div className="flex h-[270px] items-center justify-center">
-          <p className="text-sm text-[#6B7A90] dark:text-slate-400">
-            Tidak ada data harga untuk periode yang dipilih.
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            No price data available for the selected period.
           </p>
         </div>
       ) : (
@@ -83,7 +84,7 @@ export default function PriceDistributionCard({
                 }}
               >
                 <CartesianGrid
-                  stroke="#E5EAF0"
+                  stroke="#E2E8F0"
                   strokeDasharray="3 3"
                   vertical={true}
                 />
@@ -91,10 +92,8 @@ export default function PriceDistributionCard({
                 <XAxis
                   dataKey="label"
                   tick={{
-                    fill: "#6B7A90",
+                    fill: "#64748B",
                     fontSize: 11,
-                    fontFamily:
-                      "Inter, sans-serif",
                   }}
                   axisLine={false}
                   tickLine={false}
@@ -104,10 +103,8 @@ export default function PriceDistributionCard({
                 <YAxis
                   allowDecimals={false}
                   tick={{
-                    fill: "#6B7A90",
+                    fill: "#64748B",
                     fontSize: 11,
-                    fontFamily:
-                      "Inter, sans-serif",
                   }}
                   axisLine={false}
                   tickLine={false}
@@ -119,7 +116,7 @@ export default function PriceDistributionCard({
                     `${Number(value).toLocaleString(
                       "id-ID"
                     )}`,
-                    "Jumlah Transaksi",
+                    "Transaction Count",
                   ]}
                   labelFormatter={(_, payload) => {
                     const item =
@@ -129,40 +126,37 @@ export default function PriceDistributionCard({
                       return "";
                     }
 
-                    return `Rentang: ${formatRange(
+                    return `Range: ${formatRange(
                       Number(item.range_start),
                       Number(item.range_end)
                     )}`;
                   }}
                   contentStyle={{
-                    borderRadius: "10px",
-                    border:
-                      "1px solid #E2E8F0",
+                    borderRadius: "12px",
+                    border: "1px solid #E2E8F0",
                     boxShadow:
                       "0 4px 12px rgba(15, 23, 42, 0.08)",
-                    fontFamily:
-                      "Inter, sans-serif",
                     fontSize: "12px",
                   }}
                 />
 
                 <Bar
                   dataKey="transaction_count"
-                  name="Jumlah Transaksi"
-                  fill="#93C5FD"
-                  radius={[2, 2, 0, 0]}
+                  name="Transaction Count"
+                  fill="#60A5FA"
+                  radius={[4, 4, 0, 0]}
                   barSize={28}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Legend */}
-          <div className="mt-1 flex items-center justify-center gap-2">
-            <span className="h-3 w-3 rounded-[3px] bg-[#3B82F6]" />
+          {/* LEGEND */}
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <span className="h-3 w-3 rounded-[3px] bg-blue-500" />
 
-            <span className="text-[12px] font-medium text-[#6B7A90] dark:text-slate-400">
-              Jumlah Transaksi
+            <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              Transaction Count
             </span>
           </div>
         </>

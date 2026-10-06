@@ -1,10 +1,31 @@
 "use client";
 
-import { ItemPriceHistory as ItemPriceHistoryData } from "@/types/item-price-analysis";
+import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
+
+import {
+  ItemPriceHistory as ItemPriceHistoryData,
+} from "@/types/item-price-analysis";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PriceHistoryProps {
   data: ItemPriceHistoryData[];
 }
+
+type SortOption =
+  | "date-desc"
+  | "date-asc"
+  | "unit-price-desc"
+  | "unit-price-asc"
+  | "total-price-desc"
+  | "total-price-asc";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -36,100 +57,278 @@ function formatDate(value: string) {
   }).format(date);
 }
 
+function getDateValue(value: string) {
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return 0;
+  }
+
+  return date.getTime();
+}
+
 export default function PriceHistory({
   data,
 }: PriceHistoryProps) {
+  const [search, setSearch] = useState("");
+  const [sort, setSort] =
+    useState<SortOption>("date-desc");
+
+  const filteredData = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+
+    const filtered = data.filter((row) => {
+      if (!keyword) {
+        return true;
+      }
+
+      return [
+        row.item_name,
+        row.vendor_name,
+        row.po_number,
+        row.uom,
+      ].some((value) =>
+        String(value ?? "")
+          .toLowerCase()
+          .includes(keyword)
+      );
+    });
+
+    return [...filtered].sort((a, b) => {
+      switch (sort) {
+        case "date-asc":
+          return (
+            getDateValue(a.order_date) -
+            getDateValue(b.order_date)
+          );
+
+        case "unit-price-desc":
+          return (
+            Number(b.unit_price) -
+            Number(a.unit_price)
+          );
+
+        case "unit-price-asc":
+          return (
+            Number(a.unit_price) -
+            Number(b.unit_price)
+          );
+
+        case "total-price-desc":
+          return (
+            Number(b.total_price) -
+            Number(a.total_price)
+          );
+
+        case "total-price-asc":
+          return (
+            Number(a.total_price) -
+            Number(b.total_price)
+          );
+
+        case "date-desc":
+        default:
+          return (
+            getDateValue(b.order_date) -
+            getDateValue(a.order_date)
+          );
+      }
+    });
+  }, [data, search, sort]);
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
-      <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      {/* HEADER */}
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
           Price History
         </h2>
 
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Riwayat harga pembelian item berdasarkan transaksi terbaru.
+          Recent item purchase price history.
         </p>
       </div>
 
       {data.length === 0 ? (
-        <div className="flex h-[240px] items-center justify-center px-6">
+        <div className="flex h-[240px] items-center justify-center">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Tidak ada riwayat harga untuk periode yang dipilih.
+            No price history available for the selected
+            period.
           </p>
         </div>
       ) : (
-        <div className="max-h-[520px] overflow-auto">
-          <table className="min-w-[1050px] w-full border-collapse text-sm">
-            <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900">
-              <tr className="border-b border-slate-200 dark:border-slate-800">
-                <th className="px-6 py-3 text-left font-medium text-slate-500 dark:text-slate-400">
-                  Date
-                </th>
+        <>
+          {/* FILTER ROW */}
+          <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            {/* SEARCH */}
+            <div className="relative w-full md:max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 
-                <th className="px-6 py-3 text-left font-medium text-slate-500 dark:text-slate-400">
-                  Item
-                </th>
+              <input
+                type="text"
+                value={search}
+                onChange={(event) =>
+                  setSearch(event.target.value)
+                }
+                placeholder="Search item, vendor, PO, or UOM..."
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500"
+              />
+            </div>
 
-                <th className="px-6 py-3 text-left font-medium text-slate-500 dark:text-slate-400">
-                  Vendor
-                </th>
+            {/* SORT */}
+            <Select
+              value={sort}
+              onValueChange={(value) =>
+                setSort(value as SortOption)
+              }
+            >
+              <SelectTrigger className="h-10 w-full rounded-xl md:w-[230px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
 
-                <th className="px-6 py-3 text-left font-medium text-slate-500 dark:text-slate-400">
-                  UOM
-                </th>
+              <SelectContent>
+                <SelectItem value="date-desc">
+                  Date: Newest → Oldest
+                </SelectItem>
 
-                <th className="px-6 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
-                  Unit Price
-                </th>
+                <SelectItem value="date-asc">
+                  Date: Oldest → Newest
+                </SelectItem>
 
-                <th className="px-6 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
-                  Qty
-                </th>
+                <SelectItem value="unit-price-desc">
+                  Unit Price: Highest → Lowest
+                </SelectItem>
 
-                <th className="px-6 py-3 text-right font-medium text-slate-500 dark:text-slate-400">
-                  Total Price
-                </th>
-              </tr>
-            </thead>
+                <SelectItem value="unit-price-asc">
+                  Unit Price: Lowest → Highest
+                </SelectItem>
 
-            <tbody>
-              {data.map((row, index) => (
-                <tr
-                  key={`${row.order_date}-${row.item_name}-${row.vendor_name}-${index}`}
-                  className="border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-900 dark:hover:bg-slate-900/60"
-                >
-                  <td className="whitespace-nowrap px-6 py-3.5 text-slate-600 dark:text-slate-300">
-                    {formatDate(row.order_date)}
-                  </td>
+                <SelectItem value="total-price-desc">
+                  Total Price: Highest → Lowest
+                </SelectItem>
 
-                  <td className="max-w-[260px] truncate px-6 py-3.5 font-medium text-slate-900 dark:text-white">
-                    {row.item_name || "-"}
-                  </td>
+                <SelectItem value="total-price-asc">
+                  Total Price: Lowest → Highest
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-                  <td className="max-w-[240px] truncate px-6 py-3.5 text-slate-600 dark:text-slate-300">
-                    {row.vendor_name || "-"}
-                  </td>
+          {/* RESULT COUNT */}
+          <div className="mb-3 text-sm text-slate-500 dark:text-slate-400">
+            Showing{" "}
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              {filteredData.length}
+            </span>{" "}
+            of{" "}
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              {data.length}
+            </span>{" "}
+            records
+          </div>
 
-                  <td className="whitespace-nowrap px-6 py-3.5 text-slate-600 dark:text-slate-300">
-                    {row.uom || "-"}
-                  </td>
+          {/* TABLE */}
+          {filteredData.length === 0 ? (
+            <div className="flex h-[220px] items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                No matching records found.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="max-h-[570px] overflow-y-auto overflow-x-auto">
+                <table className="w-full min-w-[1150px] border-collapse text-sm">
+                  <thead className="sticky top-0 z-10">
+                    <tr className="bg-[#1D63B3]">
+                      <th className="h-[50px] px-5 text-left text-xs font-semibold text-white">
+                        Date
+                      </th>
 
-                  <td className="whitespace-nowrap px-6 py-3.5 text-right font-medium text-slate-900 dark:text-white">
-                    {formatCurrency(row.unit_price)}
-                  </td>
+                      <th className="h-[50px] px-5 text-left text-xs font-semibold text-white">
+                        Item
+                      </th>
 
-                  <td className="whitespace-nowrap px-6 py-3.5 text-right text-slate-600 dark:text-slate-300">
-                    {formatNumber(row.qty)}
-                  </td>
+                      <th className="h-[50px] px-5 text-left text-xs font-semibold text-white">
+                        Vendor
+                      </th>
 
-                  <td className="whitespace-nowrap px-6 py-3.5 text-right font-medium text-slate-900 dark:text-white">
-                    {formatCurrency(row.total_price)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <th className="h-[50px] px-5 text-left text-xs font-semibold text-white">
+                        PO
+                      </th>
+
+                      <th className="h-[50px] px-5 text-left text-xs font-semibold text-white">
+                        UOM
+                      </th>
+
+                      <th className="h-[50px] px-5 text-right text-xs font-semibold text-white">
+                        Unit Price
+                      </th>
+
+                      <th className="h-[50px] px-5 text-right text-xs font-semibold text-white">
+                        Qty
+                      </th>
+
+                      <th className="h-[50px] px-5 text-right text-xs font-semibold text-white">
+                        Total Price
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {filteredData.map((row, index) => (
+                      <tr
+                        key={`${row.order_date}-${row.item_name}-${row.vendor_name}-${index}`}
+                        className="h-[52px] border-b border-slate-200 bg-white transition-colors hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60"
+                      >
+                        <td className="whitespace-nowrap px-5 text-slate-600 dark:text-slate-300">
+                          {formatDate(row.order_date)}
+                        </td>
+
+                        <td className="max-w-[260px] px-5">
+                          <div
+                            className="truncate font-medium text-slate-900 dark:text-white"
+                            title={row.item_name}
+                          >
+                            {row.item_name || "-"}
+                          </div>
+                        </td>
+
+                        <td className="max-w-[240px] px-5">
+                          <div
+                            className="truncate text-slate-600 dark:text-slate-300"
+                            title={row.vendor_name}
+                          >
+                            {row.vendor_name || "-"}
+                          </div>
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 text-slate-600 dark:text-slate-300">
+                          {row.po_number || "-"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 text-slate-600 dark:text-slate-300">
+                          {row.uom || "-"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 text-right font-medium text-slate-900 dark:text-white">
+                          {formatCurrency(row.unit_price)}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 text-right text-slate-600 dark:text-slate-300">
+                          {formatNumber(row.qty)}
+                        </td>
+
+                        <td className="whitespace-nowrap px-5 text-right font-medium text-slate-900 dark:text-white">
+                          {formatCurrency(row.total_price)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import {
   Boxes,
   ClipboardList,
+  FileText,
   WalletCards,
 } from "lucide-react";
 
@@ -31,55 +32,73 @@ export default function ItemPerformanceKpiGrid({
       value: formatCurrency(kpi.total_spend),
       icon: WalletCards,
       cardClass:
-        "border-blue-100 bg-blue-50/70 dark:border-blue-900/50 dark:bg-blue-950/20",
+        "border-blue-500/20 bg-gradient-to-br from-blue-600 to-indigo-700",
       iconClass:
-        "bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-400",
+        "bg-white/15 text-white ring-1 ring-white/20",
     },
     {
       title: "Total Items",
       value: formatNumber(kpi.total_items),
       icon: Boxes,
       cardClass:
-        "border-violet-100 bg-violet-50/70 dark:border-violet-900/50 dark:bg-violet-950/20",
+        "border-violet-500/20 bg-gradient-to-br from-violet-500 to-indigo-600",
       iconClass:
-        "bg-violet-100 text-violet-600 dark:bg-violet-900/60 dark:text-violet-400",
+        "bg-white/15 text-white ring-1 ring-white/20",
     },
     {
       title: "Purchase Orders",
       value: formatNumber(kpi.total_purchase_orders),
       icon: ClipboardList,
       cardClass:
-        "border-emerald-100 bg-emerald-50/70 dark:border-emerald-900/50 dark:bg-emerald-950/20",
+        "border-emerald-500/20 bg-gradient-to-br from-teal-400 to-emerald-500",
       iconClass:
-        "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-400",
+        "bg-white/15 text-white ring-1 ring-white/20",
+    },
+    {
+      title: "Purchase Requests",
+      value: formatNumber(kpi.total_purchase_requests),
+      icon: FileText,
+      cardClass:
+        "border-amber-500/20 bg-gradient-to-br from-amber-400 to-orange-500",
+      iconClass:
+        "bg-white/15 text-white ring-1 ring-white/20",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
 
         return (
           <div
             key={card.title}
-            className={`rounded-2xl border p-6 shadow-sm transition-shadow duration-200 hover:shadow-md ${card.cardClass}`}
+            className={`relative min-h-[150px] overflow-hidden rounded-2xl border p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${card.cardClass}`}
           >
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+            <div className="flex h-full flex-col justify-between pr-20">
+              <p className="text-base font-semibold text-white">
                 {card.title}
               </p>
 
-              <div
-                className={`flex h-11 w-11 items-center justify-center rounded-xl ${card.iconClass}`}
+              <p
+                className={`font-semibold tracking-tight text-white ${
+                  card.title === "Total Spend"
+                    ? "text-2xl"
+                    : "text-3xl"
+                }`}
               >
-                <Icon className="h-5 w-5" strokeWidth={2} />
-              </div>
+                {card.value}
+              </p>
             </div>
 
-            <p className="mt-5 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-              {card.value}
-            </p>
+            <div
+              className={`absolute right-6 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-2xl ${card.iconClass}`}
+            >
+              <Icon
+                className="h-8 w-8"
+                strokeWidth={2}
+              />
+            </div>
           </div>
         );
       })}

@@ -115,101 +115,61 @@ export class AnalyticsService {
   // ============================================================
 
   async getMonthlySpend(
-    filters: DashboardFilterState
-  ): Promise<MonthlySpend[]> {
-    const data =
-      await this.repository.getMonthlySpend(
-        filters
-      );
+  filters: DashboardFilterState
+): Promise<MonthlySpend[]> {
+  const data =
+    await this.repository.getMonthlySpend(filters);
 
-    const months: MonthlySpend[] = [
-      {
-        year: filters.year,
-        month: 1,
-        month_name: "Jan",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 2,
-        month_name: "Feb",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 3,
-        month_name: "Mar",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 4,
-        month_name: "Apr",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 5,
-        month_name: "May",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 6,
-        month_name: "Jun",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 7,
-        month_name: "Jul",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 8,
-        month_name: "Aug",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 9,
-        month_name: "Sep",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 10,
-        month_name: "Oct",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 11,
-        month_name: "Nov",
-        total_spend: 0,
-      },
-      {
-        year: filters.year,
-        month: 12,
-        month_name: "Dec",
-        total_spend: 0,
-      },
-    ];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
-    data.forEach((item) => {
-      const index = months.findIndex(
-        (month) =>
-          month.month === item.month
-      );
+  const months: MonthlySpend[] = monthNames.map(
+    (monthName, index) => ({
+      year: filters.year,
+      month: index + 1,
+      month_name: monthName,
+      total_spend: 0,
+      total_purchase_orders: 0,
+      total_purchase_requests: 0,
+    })
+  );
 
-      if (index !== -1) {
-        months[index] = item;
-      }
-    });
+  data.forEach((item) => {
+    const index = months.findIndex(
+      (month) => month.month === item.month
+    );
 
-    return months;
-  }
+    if (index !== -1) {
+      months[index] = {
+        ...months[index],
+        ...item,
+        total_spend: Number(item.total_spend ?? 0),
+        total_purchase_orders:
+          item.total_purchase_orders == null
+            ? undefined
+            : Number(item.total_purchase_orders),
+        total_purchase_requests:
+          item.total_purchase_requests == null
+            ? undefined
+            : Number(item.total_purchase_requests),
+      };
+    }
+  });
+
+  return months;
+}
 
   // ============================================================
   // TOP SPEND ITEMS

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 interface VendorPerformanceRow {
   vendor_name: string;
   total_spend: number | string;
@@ -45,9 +47,20 @@ function formatCompactCurrency(value: number) {
   return `Rp ${value.toLocaleString("id-ID")}`;
 }
 
+function formatFullCurrency(value: number) {
+  if (!Number.isFinite(value)) {
+    return "Rp 0";
+  }
+
+  return `Rp ${value.toLocaleString("id-ID")}`;
+}
+
 export default function TopVendorCard({
   vendors,
 }: TopVendorCardProps) {
+  const [hoveredIndex, setHoveredIndex] =
+    useState<number | null>(null);
+
   const topVendors = vendors.slice(0, 10);
 
   const maxSpend =
@@ -59,12 +72,6 @@ export default function TopVendorCard({
         )
       : 0;
 
-  /*
-   * IMPORTANT:
-   * Urutan label sengaja dari 100 -> 0
-   * karena flex column justify-between
-   * menempatkan item pertama di bagian ATAS.
-   */
   const yAxisSteps = [100, 75, 50, 25, 0];
 
   return (
@@ -72,7 +79,7 @@ export default function TopVendorCard({
 
       {/* HEADER */}
 
-      <div className="flex items-center justify-between px-6 py-5">
+      <div className="flex items-center px-6 py-5">
 
         <div className="flex items-center gap-3">
 
@@ -98,18 +105,11 @@ export default function TopVendorCard({
             </h2>
 
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Vendor dengan total procurement value tertinggi
+              Vendors with the highest procurement spending.
             </p>
           </div>
 
         </div>
-
-        <button
-          type="button"
-          className="text-sm font-medium text-blue-600 transition hover:text-blue-700 dark:text-blue-400"
-        >
-          Lihat Semua →
-        </button>
 
       </div>
 
@@ -119,7 +119,7 @@ export default function TopVendorCard({
 
         {topVendors.length === 0 ? (
           <div className="flex h-[330px] items-center justify-center rounded-xl border border-dashed border-slate-200 text-sm text-slate-400 dark:border-neutral-800">
-            Tidak ada data vendor.
+            No vendor data available.
           </div>
         ) : (
           <div className="relative">
@@ -164,16 +164,110 @@ export default function TopVendorCard({
                     vendor.total_spend
                   );
 
+                  const purchaseOrders =
+                    Number(
+                      vendor.total_purchase_orders
+                    );
+
                   const percentage =
                     maxSpend > 0
                       ? (spend / maxSpend) * 100
                       : 0;
 
+                  /*
+                   * Tooltip horizontal positioning:
+                   *
+                   * First bars  -> align left
+                   * Last bars   -> align right
+                   * Middle bars -> center
+                   */
+                  const tooltipHorizontalClass =
+                    index === 0
+                      ? "left-0"
+                      : index >=
+                          topVendors.length - 2
+                        ? "right-0"
+                        : "left-1/2 -translate-x-1/2";
+
+                  /*
+                   * Keep tooltip above the bar.
+                   *
+                   * For very tall bars, move the tooltip
+                   * to the upper chart area instead of
+                   * letting it collide with the bar.
+                   */
+                  const barHeight =
+                    Math.max(
+                      percentage,
+                      4
+                    );
+
+                  const tooltipTop =
+                    barHeight >= 75
+                      ? 8
+                      : Math.max(
+                          8,
+                          100 - barHeight - 18
+                        );
+
                   return (
                     <div
                       key={`${vendor.vendor_name}-${index}`}
-                      className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end"
+                      className="group relative flex h-full min-w-0 flex-1 flex-col items-center justify-end"
+                      onMouseEnter={() =>
+                        setHoveredIndex(index)
+                      }
+                      onMouseLeave={() =>
+                        setHoveredIndex(null)
+                      }
                     >
+
+                      {/* TOOLTIP */}
+
+                      {hoveredIndex === index && (
+                        <div
+                          className={`pointer-events-none absolute z-50 w-[250px] rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-xl dark:border-slate-700 dark:bg-slate-900 ${tooltipHorizontalClass}`}
+                          style={{
+                            top: `${tooltipTop}%`,
+                          }}
+                        >
+
+                          {/* VENDOR NAME */}
+
+                          <p className="mb-3 truncate text-sm font-semibold text-slate-900 dark:text-white">
+                            {vendor.vendor_name}
+                          </p>
+
+                          {/* TOTAL SPEND */}
+
+                          <div className="flex items-center justify-between gap-4">
+                            <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
+                              Total Spend
+                            </span>
+
+                            <span className="whitespace-nowrap text-right text-xs font-semibold text-slate-900 dark:text-white">
+                              {formatFullCurrency(
+                                spend
+                              )}
+                            </span>
+                          </div>
+
+                          {/* PURCHASE ORDERS */}
+
+                          <div className="mt-2 flex items-center justify-between gap-4">
+                            <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
+                              Purchase Orders
+                            </span>
+
+                            <span className="whitespace-nowrap text-right text-xs font-semibold text-slate-900 dark:text-white">
+                              {purchaseOrders.toLocaleString(
+                                "id-ID"
+                              )}
+                            </span>
+                          </div>
+
+                        </div>
+                      )}
 
                       {/* VALUE */}
 
@@ -197,10 +291,7 @@ export default function TopVendorCard({
                           group-hover:bg-blue-500
                         "
                         style={{
-                          height: `${Math.max(
-                            percentage,
-                            4
-                          )}%`,
+                          height: `${barHeight}%`,
                         }}
                       />
 
@@ -215,9 +306,7 @@ export default function TopVendorCard({
                       {/* PO */}
 
                       <span className="mt-1 text-[10px] text-slate-400">
-                        {Number(
-                          vendor.total_purchase_orders
-                        ).toLocaleString(
+                        {purchaseOrders.toLocaleString(
                           "id-ID"
                         )}{" "}
                         PO

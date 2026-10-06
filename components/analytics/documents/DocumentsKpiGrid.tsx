@@ -10,68 +10,75 @@ interface DocumentsKpiGridProps {
   completeDocuments: number;
 }
 
+interface KpiCardProps {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  gradient: string;
+}
+
+function KpiCard({
+  title,
+  value,
+  icon,
+  gradient,
+}: KpiCardProps) {
+  return (
+    <div
+      className={`group min-h-[150px] rounded-2xl bg-gradient-to-br ${gradient} p-6 text-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg`}
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-base font-semibold text-white">
+            {title}
+          </p>
+
+          <p className="mt-3 text-3xl font-bold tracking-tight">
+            {value.toLocaleString("id-ID")}
+          </p>
+        </div>
+
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DocumentsKpiGrid({
   totalVendors,
   activeContracts,
   completeDocuments,
 }: DocumentsKpiGridProps) {
-  const cards = [
-    {
-      label: "Vendor Active",
-      value: totalVendors,
-      icon: UsersRound,
-      iconClass:
-        "bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
-    },
-    {
-      label: "Contract Active",
-      value: activeContracts,
-      icon: FileCheck2,
-      iconClass:
-        "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400",
-    },
-    {
-      label: "Document Lengkap",
-      value: completeDocuments,
-      icon: FileText,
-      iconClass:
-        "bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
-    },
-  ];
-
   return (
-    <div className="mb-6 flex flex-wrap gap-4">
-      {cards.map((card) => {
-        const Icon = card.icon;
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      <KpiCard
+        title="Vendor Active"
+        value={totalVendors}
+        gradient="from-blue-600 to-indigo-600"
+        icon={
+          <UsersRound className="h-8 w-8 text-white" />
+        }
+      />
 
-        return (
-          <div
-            key={card.label}
-            className="w-full rounded-xl border bg-card p-4 shadow-sm sm:w-[260px]"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {card.label}
-                </p>
+      <KpiCard
+        title="Contract Active"
+        value={activeContracts}
+        gradient="from-teal-600 to-emerald-600"
+        icon={
+          <FileCheck2 className="h-8 w-8 text-white" />
+        }
+      />
 
-                <p className="mt-2 text-2xl font-semibold tracking-tight">
-                  {card.value.toLocaleString("id-ID")}
-                </p>
-              </div>
-
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg ${card.iconClass}`}
-              >
-                <Icon
-                  className="h-5 w-5"
-                  strokeWidth={2}
-                />
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      <KpiCard
+        title="Document Lengkap"
+        value={completeDocuments}
+        gradient="from-violet-600 to-indigo-600"
+        icon={
+          <FileText className="h-8 w-8 text-white" />
+        }
+      />
     </div>
   );
 }

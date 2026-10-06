@@ -32,7 +32,7 @@ export default function EvaluationPage({
     useState<string[]>([]);
 
   const [selectedPeriod, setSelectedPeriod] =
-    useState(defaultPeriod);
+  useState("");
 
   const [search, setSearch] =
     useState("");
@@ -162,7 +162,7 @@ export default function EvaluationPage({
 
   function handleReset() {
     setSelectedVendors([]);
-    setSelectedPeriod(defaultPeriod);
+    setSelectedPeriod("");
     setSearch("");
   }
 

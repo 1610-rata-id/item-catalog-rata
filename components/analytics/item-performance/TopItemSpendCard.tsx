@@ -44,10 +44,7 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
-function truncateLabel(
-  value: string,
-  maxLength = 30
-) {
+function truncateLabel(value: string, maxLength = 30) {
   if (value.length <= maxLength) {
     return value;
   }
@@ -55,10 +52,7 @@ function truncateLabel(
   return `${value.slice(0, maxLength)}...`;
 }
 
-function TopItemSpendTooltip({
-  active,
-  payload,
-}: any) {
+function TopItemSpendTooltip({ active, payload }: any) {
   if (!active || !payload?.length) {
     return null;
   }
@@ -66,44 +60,38 @@ function TopItemSpendTooltip({
   const item = payload[0].payload as ItemTopSpend;
 
   return (
-    <div
-      className="max-w-sm rounded-xl border border-slate-200 bg-white p-4 shadow-lg"
-      style={{
-        fontFamily:
-          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      }}
-    >
-      <p className="mb-3 break-words text-sm font-semibold text-slate-900">
+    <div className="max-w-sm rounded-xl border border-slate-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+      <p className="mb-3 break-words text-sm font-semibold text-slate-900 dark:text-white">
         {item.item_name}
       </p>
 
       <div className="space-y-1.5 text-sm">
         <div className="flex justify-between gap-6">
-          <span className="text-slate-500">
+          <span className="text-slate-500 dark:text-slate-400">
             Total Spend
           </span>
 
-          <span className="font-medium text-slate-900">
+          <span className="font-medium text-slate-900 dark:text-white">
             {formatFullCurrency(item.total_spend)}
           </span>
         </div>
 
         <div className="flex justify-between gap-6">
-          <span className="text-slate-500">
+          <span className="text-slate-500 dark:text-slate-400">
             Quantity
           </span>
 
-          <span className="font-medium text-slate-900">
+          <span className="font-medium text-slate-900 dark:text-white">
             {formatNumber(item.total_qty)}
           </span>
         </div>
 
         <div className="flex justify-between gap-6">
-          <span className="text-slate-500">
+          <span className="text-slate-500 dark:text-slate-400">
             Purchase Orders
           </span>
 
-          <span className="font-medium text-slate-900">
+          <span className="font-medium text-slate-900 dark:text-white">
             {formatNumber(item.total_purchase_orders)}
           </span>
         </div>
@@ -116,40 +104,27 @@ export default function TopItemSpendCard({
   items,
 }: TopItemSpendCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+      {/* HEADER */}
       <div className="mb-5">
-        <h2
-          className="text-lg font-semibold tracking-tight text-slate-900"
-          style={{
-            fontFamily:
-              "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          }}
-        >
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
           Top Items by Spend
         </h2>
 
-        <p
-          className="mt-1 text-sm text-slate-500"
-          style={{
-            fontFamily:
-              "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          }}
-        >
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Items with the highest procurement spending.
         </p>
       </div>
 
+      {/* CHART */}
       {items.length === 0 ? (
         <div className="flex h-[360px] items-center justify-center">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             No item data available for the selected filter.
           </p>
         </div>
       ) : (
-        <ResponsiveContainer
-          width="100%"
-          height={360}
-        >
+        <ResponsiveContainer width="100%" height={360}>
           <BarChart
             data={items}
             layout="vertical"
@@ -175,8 +150,6 @@ export default function TopItemSpendCard({
               tick={{
                 fontSize: 11,
                 fill: "#64748B",
-                fontFamily:
-                  "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
               }}
             />
 
@@ -186,14 +159,10 @@ export default function TopItemSpendCard({
               width={190}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) =>
-                truncateLabel(value)
-              }
+              tickFormatter={(value) => truncateLabel(value)}
               tick={{
                 fontSize: 11,
                 fill: "#475569",
-                fontFamily:
-                  "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
               }}
             />
 

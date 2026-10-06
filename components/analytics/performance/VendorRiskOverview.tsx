@@ -1,3 +1,7 @@
+"use client";
+
+import { ShieldAlert } from "lucide-react";
+
 interface VendorRiskRow {
   id: number;
   vendor: string;
@@ -27,7 +31,6 @@ function RiskBadge({
         py-1
         text-xs
         font-medium
-
         ${
           value
             ? "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400"
@@ -35,7 +38,7 @@ function RiskBadge({
         }
       `}
     >
-      {value ? "Ya" : "Tidak"}
+      {value ? "Yes" : "No"}
     </span>
   );
 }
@@ -49,7 +52,8 @@ function RiskLevelBadge({
     Low: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
     Medium:
       "bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
-    High: "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400",
+    High:
+      "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400",
   };
 
   return (
@@ -75,152 +79,347 @@ export default function VendorRiskOverview({
   risks,
 }: VendorRiskOverviewProps) {
   return (
-    <section className="flex h-[520px] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <section className="flex h-[520px] min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
 
       {/* HEADER */}
 
-      <div className="flex shrink-0 items-start justify-between px-5 pb-4 pt-5">
+      <div className="shrink-0 px-6 pb-4 pt-5">
 
         <div className="flex items-center gap-3">
 
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              className="h-5 w-5"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 3l8 4v5c0 4.8-3.4 8.8-8 10-4.6-1.2-8-5.2-8-10V7l8-4z" />
-              <path d="M12 8v5" />
-              <path d="M12 16h.01" />
-            </svg>
+            <ShieldAlert className="h-5 w-5" />
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
               Vendor Risk Overview
             </h2>
 
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Risk matrix vendor berdasarkan master data procurement
+              Vendor risk assessment based on procurement master data.
             </p>
           </div>
 
         </div>
 
-        <button
-          type="button"
-          className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400"
-        >
-          Lihat Semua →
-        </button>
-
       </div>
 
       {/* TABLE */}
 
-      <div className="min-h-0 flex-1 overflow-hidden px-5 pb-5">
-        <div className="h-full overflow-y-auto rounded-xl border border-slate-200 dark:border-neutral-800">
+      <div className="min-h-0 flex-1 overflow-hidden px-6 pb-6">
 
-          <table className="w-full min-w-[680px] border-collapse text-sm">
+        <div
+          className="
+            flex
+            h-full
+            min-h-0
+            flex-col
+            overflow-hidden
+            rounded-xl
+            border
+            border-slate-200
+            dark:border-slate-800
+          "
+        >
 
-            <thead className="sticky top-0 z-10 bg-blue-50 dark:bg-blue-950/40">
+          {/* TABLE HEADER */}
 
-              <tr className="border-b border-slate-200 dark:border-neutral-800">
+          <div className="shrink-0 overflow-hidden rounded-t-xl bg-[#1D63B3]">
 
-                <th className="w-12 px-2 py-3 text-center text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  No
-                </th>
+            <table className="w-full min-w-[680px] border-collapse text-sm">
 
-                <th className="min-w-[150px] px-3 py-3 text-left text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  Nama Vendor
-                </th>
+              <thead>
 
-                <th className="min-w-[130px] px-3 py-3 text-left text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  Material
-                </th>
+                <tr className="border-b border-[#174F8F]">
 
-                <th className="min-w-[120px] px-3 py-3 text-center text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  Single Source
-                </th>
-
-                <th className="min-w-[145px] px-3 py-3 text-center text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  Frequent Backorder
-                </th>
-
-                <th className="min-w-[100px] px-3 py-3 text-center text-xs font-semibold text-blue-900 dark:text-blue-300">
-                  Risk Level
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {risks.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="py-16 text-center text-sm text-slate-400"
+                  <th
+                    className="
+                      w-12
+                      border-r
+                      border-[#4A83C2]
+                      px-2
+                      py-4
+                      text-center
+                      text-xs
+                      font-semibold
+                      text-white
+                    "
                   >
-                    Tidak ada risk matrix untuk vendor yang dipilih.
-                  </td>
+                    No
+                  </th>
+
+                  <th
+                    className="
+                      min-w-[150px]
+                      border-r
+                      border-[#4A83C2]
+                      px-3
+                      py-4
+                      text-left
+                      text-xs
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    Vendor
+                  </th>
+
+                  <th
+                    className="
+                      min-w-[130px]
+                      border-r
+                      border-[#4A83C2]
+                      px-3
+                      py-4
+                      text-left
+                      text-xs
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    Material
+                  </th>
+
+                  <th
+                    className="
+                      min-w-[120px]
+                      border-r
+                      border-[#4A83C2]
+                      px-3
+                      py-4
+                      text-center
+                      text-xs
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    Single Source
+                  </th>
+
+                  <th
+                    className="
+                      min-w-[145px]
+                      border-r
+                      border-[#4A83C2]
+                      px-3
+                      py-4
+                      text-center
+                      text-xs
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    Frequent Backorder
+                  </th>
+
+                  <th
+                    className="
+                      min-w-[100px]
+                      px-3
+                      py-4
+                      text-center
+                      text-xs
+                      font-semibold
+                      text-white
+                    "
+                  >
+                    Risk Level
+                  </th>
+
                 </tr>
-              ) : (
-                risks.map((risk, index) => (
-                  <tr
-                    key={risk.id}
-                    className="border-b border-slate-100 transition hover:bg-slate-50 dark:border-neutral-800 dark:hover:bg-white/[0.03]"
-                  >
 
-                    <td className="px-2 py-3 text-center text-slate-500">
-                      {index + 1}
-                    </td>
+              </thead>
 
-                    <td className="px-3 py-3 font-medium text-slate-700 dark:text-slate-200">
-                      {risk.vendor}
-                    </td>
+            </table>
 
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-300">
-                      {risk.material}
-                    </td>
+          </div>
 
-                    <td className="px-3 py-3 text-center">
-                      <RiskBadge
-                        value={
-                          risk.single_source
-                        }
-                      />
-                    </td>
+          {/* SCROLLABLE TABLE BODY */}
 
-                    <td className="px-3 py-3 text-center">
-                      <RiskBadge
-                        value={
-                          risk.frequent_backorder
-                        }
-                      />
-                    </td>
+          <div
+            className="
+              min-h-0
+              flex-1
+              overflow-y-auto
 
-                    <td className="px-3 py-3 text-center">
-                      <RiskLevelBadge
-                        level={
-                          risk.risk_level
-                        }
-                      />
+              [&::-webkit-scrollbar]:w-2
+              [&::-webkit-scrollbar-track]:rounded-full
+              [&::-webkit-scrollbar-track]:bg-slate-100
+              [&::-webkit-scrollbar-thumb]:rounded-full
+              [&::-webkit-scrollbar-thumb]:bg-[#1D63B3]/70
+              [&::-webkit-scrollbar-thumb:hover]:bg-[#1D63B3]
+
+              dark:[&::-webkit-scrollbar-track]:bg-slate-900
+              dark:[&::-webkit-scrollbar-thumb]:bg-[#1D63B3]/80
+              dark:[&::-webkit-scrollbar-thumb:hover]:bg-[#1D63B3]
+            "
+          >
+
+            <table className="w-full min-w-[680px] border-collapse text-sm">
+
+              <tbody>
+
+                {risks.length === 0 ? (
+
+                  <tr>
+
+                    <td
+                      colSpan={6}
+                      className="
+                        py-16
+                        text-center
+                        text-sm
+                        text-slate-400
+                      "
+                    >
+                      No risk data available for the selected vendors.
                     </td>
 
                   </tr>
-                ))
-              )}
 
-            </tbody>
+                ) : (
 
-          </table>
+                  risks.map((risk, index) => (
+
+                    <tr
+                      key={risk.id}
+                      className="
+                        border-b
+                        border-slate-200
+                        transition-colors
+                        hover:bg-blue-50/40
+                        dark:border-slate-800
+                        dark:hover:bg-blue-500/[0.04]
+                      "
+                    >
+
+                      {/* NO */}
+
+                      <td
+                        className="
+                          w-12
+                          border-r
+                          border-slate-200
+                          px-2
+                          py-4
+                          text-center
+                          text-slate-500
+                          dark:border-slate-800
+                          dark:text-slate-400
+                        "
+                      >
+                        {index + 1}
+                      </td>
+
+                      {/* VENDOR */}
+
+                      <td
+                        className="
+                          min-w-[150px]
+                          border-r
+                          border-slate-200
+                          px-3
+                          py-4
+                          font-medium
+                          text-slate-700
+                          dark:border-slate-800
+                          dark:text-slate-200
+                        "
+                      >
+                        {risk.vendor}
+                      </td>
+
+                      {/* MATERIAL */}
+
+                      <td
+                        className="
+                          min-w-[130px]
+                          border-r
+                          border-slate-200
+                          px-3
+                          py-4
+                          text-slate-600
+                          dark:border-slate-800
+                          dark:text-slate-300
+                        "
+                      >
+                        {risk.material}
+                      </td>
+
+                      {/* SINGLE SOURCE */}
+
+                      <td
+                        className="
+                          min-w-[120px]
+                          border-r
+                          border-slate-200
+                          px-3
+                          py-4
+                          text-center
+                          dark:border-slate-800
+                        "
+                      >
+                        <RiskBadge
+                          value={
+                            risk.single_source
+                          }
+                        />
+                      </td>
+
+                      {/* FREQUENT BACKORDER */}
+
+                      <td
+                        className="
+                          min-w-[145px]
+                          border-r
+                          border-slate-200
+                          px-3
+                          py-4
+                          text-center
+                          dark:border-slate-800
+                        "
+                      >
+                        <RiskBadge
+                          value={
+                            risk.frequent_backorder
+                          }
+                        />
+                      </td>
+
+                      {/* RISK LEVEL */}
+
+                      <td
+                        className="
+                          min-w-[100px]
+                          px-3
+                          py-4
+                          text-center
+                        "
+                      >
+                        <RiskLevelBadge
+                          level={
+                            risk.risk_level
+                          }
+                        />
+                      </td>
+
+                    </tr>
+
+                  ))
+
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         </div>
+
       </div>
+
     </section>
   );
 }

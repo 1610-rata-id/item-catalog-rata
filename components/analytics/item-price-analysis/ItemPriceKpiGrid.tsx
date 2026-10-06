@@ -1,7 +1,7 @@
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  CircleDollarSign,
+  BadgeDollarSign,
 } from "lucide-react";
 
 import { ItemPriceKpi } from "@/types/item-price-analysis";
@@ -25,29 +25,23 @@ export default function ItemPriceKpiGrid({
     {
       title: "Average Price",
       value: formatCurrency(kpi.average_price),
-      icon: CircleDollarSign,
+      icon: BadgeDollarSign,
       cardClass:
-        "border-blue-100 bg-blue-50/70 dark:border-blue-900/50 dark:bg-blue-950/20",
-      iconClass:
-        "bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-400",
+        "border-blue-500/20 bg-gradient-to-br from-blue-600 to-indigo-700",
     },
     {
       title: "Highest Price",
       value: formatCurrency(kpi.highest_price),
       icon: ArrowUpCircle,
       cardClass:
-        "border-violet-100 bg-violet-50/70 dark:border-violet-900/50 dark:bg-violet-950/20",
-      iconClass:
-        "bg-violet-100 text-violet-600 dark:bg-violet-900/60 dark:text-violet-400",
+        "border-violet-500/20 bg-gradient-to-br from-violet-500 to-indigo-600",
     },
     {
       title: "Lowest Price",
       value: formatCurrency(kpi.lowest_price),
       icon: ArrowDownCircle,
       cardClass:
-        "border-emerald-100 bg-emerald-50/70 dark:border-emerald-900/50 dark:bg-emerald-950/20",
-      iconClass:
-        "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-400",
+        "border-emerald-500/20 bg-gradient-to-br from-teal-400 to-emerald-500",
     },
   ];
 
@@ -59,26 +53,26 @@ export default function ItemPriceKpiGrid({
         return (
           <div
             key={card.title}
-            className={`rounded-2xl border p-6 shadow-sm transition-shadow duration-200 hover:shadow-md ${card.cardClass}`}
+            className={`relative min-h-[150px] overflow-hidden rounded-2xl border p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${card.cardClass}`}
           >
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+            {/* TEXT */}
+            <div className="flex h-full flex-col justify-between pr-20">
+              <p className="text-base font-semibold text-white">
                 {card.title}
               </p>
 
-              <div
-                className={`flex h-11 w-11 items-center justify-center rounded-xl ${card.iconClass}`}
-              >
-                <Icon
-                  className="h-5 w-5"
-                  strokeWidth={2}
-                />
-              </div>
+              <p className="text-2xl font-semibold tracking-tight text-white">
+                {card.value}
+              </p>
             </div>
 
-            <p className="mt-5 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-              {card.value}
-            </p>
+            {/* ICON */}
+            <div className="absolute right-6 top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-2xl bg-white/15 text-white ring-1 ring-white/20">
+              <Icon
+                className="h-8 w-8"
+                strokeWidth={2}
+              />
+            </div>
           </div>
         );
       })}

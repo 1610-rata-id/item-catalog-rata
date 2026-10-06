@@ -33,21 +33,15 @@ export default function EvaluationFilters({
   onSearchChange,
   onReset,
 }: EvaluationFiltersProps) {
-  const [vendorOpen, setVendorOpen] =
-    useState(false);
+  const [vendorOpen, setVendorOpen] = useState(false);
 
-  const vendorRef =
-    useRef<HTMLDivElement>(null);
+  const vendorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(
-      event: MouseEvent
-    ) {
+    function handleClickOutside(event: MouseEvent) {
       if (
         vendorRef.current &&
-        !vendorRef.current.contains(
-          event.target as Node
-        )
+        !vendorRef.current.contains(event.target as Node)
       ) {
         setVendorOpen(false);
       }
@@ -89,8 +83,8 @@ export default function EvaluationFilters({
         : `${selectedVendors.length} Vendors`;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.7fr_1.5fr_auto_auto] xl:items-end">
+    <section className="rounded-2xl border-0 bg-[#1D63B3] p-4 shadow-sm">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.1fr_0.7fr_1.5fr_auto] xl:items-end">
 
         {/* VENDOR */}
 
@@ -98,7 +92,7 @@ export default function EvaluationFilters({
           ref={vendorRef}
           className="relative"
         >
-          <label className="mb-2 block text-xs font-medium text-slate-500 dark:text-slate-400">
+          <label className="mb-2 block text-xs font-medium text-white">
             Vendor
           </label>
 
@@ -107,10 +101,10 @@ export default function EvaluationFilters({
             onClick={() =>
               setVendorOpen(!vendorOpen)
             }
-            className="flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 transition hover:border-blue-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-slate-200"
+            className="flex h-11 w-full items-center justify-between rounded-xl border border-white/20 bg-white px-3 text-sm text-slate-700 transition hover:border-white/40"
           >
             <span className="flex min-w-0 items-center gap-2 truncate">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <Filter className="h-4 w-4" />
               </span>
 
@@ -123,14 +117,14 @@ export default function EvaluationFilters({
           </button>
 
           {vendorOpen && (
-            <div className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="absolute left-0 right-0 z-50 mt-2 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
 
               <button
                 type="button"
                 onClick={() =>
                   onVendorsChange([])
                 }
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-50"
               >
                 <span>All Vendors</span>
 
@@ -152,7 +146,7 @@ export default function EvaluationFilters({
                     onClick={() =>
                       toggleVendor(vendor)
                     }
-                    className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                    className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-50"
                   >
                     <span className="truncate">
                       {vendor}
@@ -171,7 +165,7 @@ export default function EvaluationFilters({
         {/* PERIOD */}
 
         <div>
-          <label className="mb-2 block text-xs font-medium text-slate-500 dark:text-slate-400">
+          <label className="mb-2 block text-xs font-medium text-white">
             Period
           </label>
 
@@ -185,7 +179,7 @@ export default function EvaluationFilters({
                   event.target.value
                 )
               }
-              className="h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white pl-10 pr-8 text-sm text-slate-700 outline-none transition focus:border-blue-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-slate-200"
+              className="h-11 w-full appearance-none rounded-xl border border-white/20 bg-white pl-10 pr-8 text-sm text-slate-700 outline-none transition focus:border-white/40"
             >
               <option value="">
                 All Periods
@@ -208,7 +202,7 @@ export default function EvaluationFilters({
         {/* SEARCH */}
 
         <div>
-          <label className="mb-2 block text-xs font-medium text-slate-500 dark:text-slate-400">
+          <label className="mb-2 block text-xs font-medium text-white">
             Search
           </label>
 
@@ -223,31 +217,22 @@ export default function EvaluationFilters({
                 )
               }
               placeholder="Search vendor name or keyword..."
-              className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-slate-200"
+              className="h-11 w-full rounded-xl border border-white/20 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-white/40"
             />
           </div>
         </div>
 
-        {/* FILTER */}
-
-        <button
-          type="button"
-          className="flex h-11 items-center justify-center gap-2 rounded-xl border border-blue-400 px-5 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-        >
-          <Filter className="h-4 w-4" />
-          Filter
-        </button>
 
         {/* RESET */}
 
-        <button
-          type="button"
-          onClick={onReset}
-          className="flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-neutral-700 dark:text-slate-300 dark:hover:bg-white/[0.04]"
-        >
-          <X className="h-4 w-4" />
-          Reset
-        </button>
+<button
+  type="button"
+  onClick={onReset}
+  className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+>
+  <X className="h-4 w-4" />
+  Reset Filter
+</button>
       </div>
     </section>
   );

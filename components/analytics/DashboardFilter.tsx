@@ -6,7 +6,13 @@ import { RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import MultiSelect from "@/components/ui/multi-select";
 
 import { useDashboardFilter } from "@/hooks/use-dashboard-filter";
@@ -52,7 +58,6 @@ export default function DashboardFilter({
 
   const [itemLoading, setItemLoading] = useState(false);
 
-
   // ============================================================
   // MONTH OPTIONS
   // ============================================================
@@ -72,7 +77,6 @@ export default function DashboardFilter({
     { value: "12", label: "December" },
   ];
 
-
   // ============================================================
   // VENDOR OPTIONS
   // ============================================================
@@ -85,7 +89,6 @@ export default function DashboardFilter({
       })),
     [vendors]
   );
-
 
   // ============================================================
   // LOAD ITEMS FROM API
@@ -100,21 +103,12 @@ export default function DashboardFilter({
 
         const params = new URLSearchParams();
 
-        params.set(
-          "year",
-          String(selectedYear)
-        );
+        params.set("year", String(selectedYear));
 
-        params.set(
-          "limit",
-          "100"
-        );
+        params.set("limit", "100");
 
         if (itemSearch.trim()) {
-          params.set(
-            "search",
-            itemSearch.trim()
-          );
+          params.set("search", itemSearch.trim());
         }
 
         const response = await fetch(
@@ -175,7 +169,6 @@ export default function DashboardFilter({
     };
   }, [selectedYear, itemSearch]);
 
-
   // ============================================================
   // KEEP SELECTED ITEMS VISIBLE
   // ============================================================
@@ -202,22 +195,47 @@ export default function DashboardFilter({
     return Array.from(map.values());
   }, [itemOptions, selectedItems]);
 
-
   // ============================================================
   // RENDER
   // ============================================================
 
   return (
-    <Card className="mb-8 rounded-2xl border-0 bg-white p-6 shadow-sm dark:bg-neutral-900">
-
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[220px_220px_320px_400px_170px]">
-
+    <Card
+      className="
+        mb-8
+        rounded-2xl
+        border-0
+        bg-gradient-to-r
+        from-[#1D63B3]
+        via-[#1D63B3]
+        to-[#0F5BAA]
+        p-5
+        shadow-sm
+      "
+    >
+      <div
+        className="
+          grid
+          grid-cols-1
+          gap-5
+          lg:grid-cols-[120px_280px_280px_270px_210px]
+          lg:justify-between
+        "
+      >
         {/* =====================================================
             YEAR
         ===================================================== */}
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label
+            className="
+              mb-3
+              block
+              text-base
+              font-semibold
+              text-white
+            "
+          >
             Year
           </label>
 
@@ -225,7 +243,20 @@ export default function DashboardFilter({
             value={selectedYear.toString()}
             onValueChange={handleYearChange}
           >
-            <SelectTrigger className="h-11 rounded-xl">
+            <SelectTrigger
+              className="
+                h-[60px]
+                rounded-xl
+                border-0
+                bg-white
+                text-base
+                font-medium
+                text-slate-800
+                shadow-sm
+                focus:ring-2
+                focus:ring-white/40
+              "
+            >
               <SelectValue />
             </SelectTrigger>
 
@@ -245,18 +276,35 @@ export default function DashboardFilter({
           </Select>
         </div>
 
-
         {/* =====================================================
             MONTH
         ===================================================== */}
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label
+            className="
+              mb-3
+              block
+              text-base
+              font-semibold
+              text-white
+            "
+          >
             Month
           </label>
 
           <MultiSelect
-            className="w-full"
+            className="
+              w-full
+              border-0
+              bg-white
+              text-base
+              font-medium
+              text-slate-800
+              shadow-sm
+              focus:ring-2
+              focus:ring-white/40
+            "
             placeholder="All Months"
             searchPlaceholder="Search month..."
             emptyMessage="No month found."
@@ -266,18 +314,35 @@ export default function DashboardFilter({
           />
         </div>
 
-
         {/* =====================================================
             VENDOR
         ===================================================== */}
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label
+            className="
+              mb-3
+              block
+              text-base
+              font-semibold
+              text-white
+            "
+          >
             Vendor
           </label>
 
           <MultiSelect
-            className="w-full"
+            className="
+              w-full
+              border-0
+              bg-white
+              text-base
+              font-medium
+              text-slate-800
+              shadow-sm
+              focus:ring-2
+              focus:ring-white/40
+            "
             placeholder="All Vendors"
             searchPlaceholder="Search vendor..."
             emptyMessage="No vendor found."
@@ -287,18 +352,35 @@ export default function DashboardFilter({
           />
         </div>
 
-
         {/* =====================================================
             ITEM
         ===================================================== */}
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">
+          <label
+            className="
+              mb-3
+              block
+              text-base
+              font-semibold
+              text-white
+            "
+          >
             Item
           </label>
 
           <MultiSelect
-            className="w-full"
+            className="
+              w-full
+              border-0
+              bg-white
+              text-base
+              font-medium
+              text-slate-800
+              shadow-sm
+              focus:ring-2
+              focus:ring-white/40
+            "
             placeholder={
               itemLoading
                 ? "Loading items..."
@@ -315,7 +397,6 @@ export default function DashboardFilter({
           />
         </div>
 
-
         {/* =====================================================
             RESET
         ===================================================== */}
@@ -324,15 +405,25 @@ export default function DashboardFilter({
           <Button
             variant="outline"
             onClick={handleReset}
-            className="h-11 w-full rounded-xl"
+            className="
+              h-11
+              w-full
+              rounded-xl
+              border-0
+              bg-white
+              text-base
+              font-medium
+              text-slate-800
+              shadow-sm
+              hover:bg-slate-50
+              hover:text-slate-900
+            "
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="mr-2 h-5 w-5" />
             Reset Filter
           </Button>
         </div>
-
       </div>
-
     </Card>
   );
 }

@@ -58,20 +58,22 @@ export default function PriceTrendCard({
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-      <div className="mb-6">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+      {/* HEADER */}
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
           Price Trend
         </h2>
 
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Rata-rata harga pembelian per bulan.
+          Average purchase price per month.
         </p>
       </div>
 
+      {/* CONTENT */}
       {chartData.length === 0 ? (
         <div className="flex h-[320px] items-center justify-center">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Tidak ada data harga untuk periode yang dipilih.
+            No price data available for the selected period.
           </p>
         </div>
       ) : (
@@ -118,7 +120,7 @@ export default function PriceTrendCard({
                   formatCurrency(Number(value)),
                   "Average Price",
                 ]}
-                labelFormatter={(label) => `Bulan: ${label}`}
+                labelFormatter={(label) => `Month: ${label}`}
                 contentStyle={{
                   borderRadius: "12px",
                   border: "1px solid #E2E8F0",

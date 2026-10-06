@@ -2,6 +2,7 @@ export interface ItemPerformanceKpi {
   total_spend: number;
   total_items: number;
   total_purchase_orders: number;
+  total_purchase_requests: number;
 }
 
 export interface ItemTopSpend {
