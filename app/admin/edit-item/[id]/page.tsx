@@ -259,7 +259,12 @@ const subCategoryRef =
   const subSet =
   new Set<string>();
 
-  data?.forEach((item: any) => {
+  data?.forEach(
+  (item: {
+    category?: string | null;
+    main_category?: string | null;
+    sub_category?: string | null;
+  }) => {
 
   if (item.category) {
 
@@ -396,6 +401,62 @@ setSubCategories(
       alert(error.message);
       return;
     }
+
+
+    // Bersihkan gambar lama setelah update database berhasil.
+    if (oldItem && updatedItem) {
+      const oldUrls = [
+        oldItem.image_url,
+        ...(Array.isArray(oldItem.image_urls)
+          ? oldItem.image_urls
+          : []),
+      ].filter(
+        (url): url is string =>
+          typeof url === "string" && url.trim().length > 0
+      );
+
+      const newUrls = new Set([
+        updatedItem.image_url,
+        ...(Array.isArray(updatedItem.image_urls)
+          ? updatedItem.image_urls
+          : []),
+      ]);
+
+      const removedUrls = [...new Set(oldUrls)].filter(
+        (url) => !newUrls.has(url)
+      );
+
+      if (removedUrls.length > 0) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          const cleanupResponse = await fetch(
+            "/api/admin/cleanup-item-images",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                itemId: updatedItem.id,
+                imageUrls: removedUrls,
+              }),
+            }
+          );
+
+          if (!cleanupResponse.ok) {
+            console.error(
+              "Image cleanup request failed:",
+              await cleanupResponse.text()
+            );
+          }
+        }
+      }
+    }
+
     if (
   user?.email &&
   oldItem &&
@@ -425,10 +486,16 @@ setSubCategories(
   }
 
   useEffect(() => {
-  if (!authLoading) {
-    getItem();
-    getCategories();
-  }
+  if (authLoading) return;
+
+  const loadData = async () => {
+    await Promise.all([
+      getItem(),
+      getCategories(),
+    ]);
+  };
+
+  void loadData();
 }, [authLoading]);
 
 useEffect(() => {

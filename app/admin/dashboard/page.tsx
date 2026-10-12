@@ -255,56 +255,74 @@ setStats({
 
 }
 
-  async function deleteItem(
-    id: string
-  ) {
-    const confirmDelete = confirm(
-      "Delete this item?"
+  async function deleteItem(id: string) {
+    const confirmDryRun = confirm(
+      "Jalankan SIMULASI pemeriksaan gambar untuk item ini?\n\nTidak ada item atau gambar yang akan dihapus."
     );
 
-    if (!confirmDelete) return;
+    if (!confirmDryRun) return;
 
-    const {
-  data: { user },
-} = await supabase.auth.getUser();
+    try {
+      // The server validates this token and checks the user's admin role.
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-   const { data: itemToDelete } =
-  await supabase
-    .from("items")
-    .select("*")
-    .eq("id", id)
-    .single();
+      if (sessionError || !session?.access_token) {
+        alert("Sesi login tidak ditemukan. Silakan login kembali.");
+        router.push("/admin/login");
+        return;
+      }
 
-    const { error } =
-      await supabase
-        .from("items")
-        .delete()
-        .eq("id", id);
+      const response = await fetch("/api/admin/delete-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        // Explicitly request dry-run. Never delete through this dashboard test.
+        body: JSON.stringify({ id, dryRun: true }),
+      });
 
-    if (error) {
-      alert(error.message);
-      return;
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.success || !result?.dryRun || !result?.report) {
+        alert(
+          result?.message ||
+            "Simulasi gagal atau respons server tidak sesuai. Tidak ada penghapusan yang dilanjutkan."
+        );
+        return;
+      }
+
+      const report = result.report;
+      const countEntries = (value: unknown) =>
+        Array.isArray(value) ? value.length : typeof value === "number" ? value : 0;
+      const message = [
+        "SIMULASI SELESAI — tidak ada item atau gambar yang dihapus.",
+        "",
+        `Item diperiksa: ${result.item?.item_name || result.item?.id || id}`,
+        `URL gambar kandidat: ${countEntries(report.candidateImages)}`,
+        `Path gambar yang berpotensi dihapus jika item benar-benar dihapus: ${report.imagePathsToDelete?.length ?? 0}`,
+        `Path gambar yang masih digunakan item lain: ${report.imagePathsStillUsed?.length ?? 0}`,
+        `URL eksternal/tidak didukung yang dilewati: ${countEntries(report.skippedExternalOrUnsupportedUrls)}`,
+        `Pemeriksaan referensi gagal: ${countEntries(report.referenceCheckFailures)}`,
+        `Path dengan pemeriksaan gagal: ${report.imagePathsWithCheckFailures?.length ?? 0}`,
+        "",
+        "Periksa hasil ini sebelum kita mengaktifkan penghapusan nyata.",
+      ].join("\n");
+
+      alert(message);
+      console.info("Delete item dry-run report:", {
+        item: result.item,
+        report,
+      });
+    } catch (error) {
+      console.error("Delete item dry-run request failed:", error);
+      alert(
+        "Simulasi gagal karena terjadi kesalahan. Tidak ada penghapusan yang dilanjutkan."
+      );
     }
-    if (
-  user?.email &&
-  itemToDelete
-) {
-  await createAuditLog({
-    userEmail: user.email,
-
-    action: "DELETE_ITEM",
-
-    itemId: itemToDelete.id,
-
-    itemName:
-      itemToDelete.item_name,
-
-    oldData:
-      itemToDelete,
-  });
-}
-
-    getItems();
   }
 
   useEffect(() => {
