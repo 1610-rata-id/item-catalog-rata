@@ -119,35 +119,62 @@ const subCategoryRef =
   ) {
     setUploading(true);
 
-    const fileExt =
-      file.name.split(".").pop();
+    try {
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+      ];
 
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(2)}.${fileExt}`;
+      if (!allowedTypes.includes(file.type)) {
+        alert(
+          `Format gambar tidak didukung: ${file.name}. Gunakan JPEG, PNG, atau WebP.`
+        );
+        return null;
+      }
 
-    const filePath = `catalog/${fileName}`;
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-    const { error } =
-      await supabase.storage
-        .from("item-images")
-        .upload(filePath, file);
+      if (sessionError || !session?.access_token) {
+        alert("Sesi login tidak ditemukan. Silakan login kembali.");
+        return null;
+      }
 
-    if (error) {
-      setUploading(false);
+      const formData = new FormData();
+      formData.append("file", file);
 
-      alert(error.message);
+      const response = await fetch(
+        "/api/admin/upload-item-image",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
 
+      const result = await response.json();
+
+      if (!response.ok || !result.success || !result.url) {
+        alert(
+          result.error ||
+            `Gagal mengunggah gambar: ${file.name}`
+        );
+        return null;
+      }
+
+      return result.url as string;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      alert(`Terjadi kesalahan saat mengunggah gambar: ${file.name}`);
       return null;
+    } finally {
+      setUploading(false);
     }
-
-    const { data } = supabase.storage
-      .from("item-images")
-      .getPublicUrl(filePath);
-
-    setUploading(false);
-
-    return data.publicUrl;
   }
 
   async function getItem() {
@@ -404,6 +431,13 @@ setSubCategories(
 
 
     // Bersihkan gambar lama setelah update database berhasil.
+    // Ringkasan hanya ditampilkan jika ada gambar yang dikeluarkan dari form.
+    let cleanupSummary: {
+      deletedImages: number;
+      keptImages: number;
+      failedImages: number;
+    } | null = null;
+
     if (oldItem && updatedItem) {
       const oldUrls = [
         oldItem.image_url,
@@ -427,32 +461,62 @@ setSubCategories(
       );
 
       if (removedUrls.length > 0) {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        try {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
 
-        if (session?.access_token) {
-          const cleanupResponse = await fetch(
-            "/api/admin/cleanup-item-images",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${session.access_token}`,
-              },
-              body: JSON.stringify({
-                itemId: updatedItem.id,
-                imageUrls: removedUrls,
-              }),
-            }
-          );
-
-          if (!cleanupResponse.ok) {
-            console.error(
-              "Image cleanup request failed:",
-              await cleanupResponse.text()
+          if (!session?.access_token) {
+            cleanupSummary = {
+              deletedImages: 0,
+              keptImages: 0,
+              failedImages: removedUrls.length,
+            };
+          } else {
+            const cleanupResponse = await fetch(
+              "/api/admin/cleanup-item-images",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
+                  itemId: updatedItem.id,
+                  imageUrls: removedUrls,
+                }),
+              }
             );
+
+            const cleanupResult = await cleanupResponse.json();
+
+            if (!cleanupResponse.ok) {
+              console.error(
+                "Image cleanup request failed:",
+                cleanupResult
+              );
+
+              cleanupSummary = {
+                deletedImages: Number(cleanupResult.deletedImages) || 0,
+                keptImages: Number(cleanupResult.keptImages) || 0,
+                failedImages:
+                  Number(cleanupResult.failedImages) || removedUrls.length,
+              };
+            } else {
+              cleanupSummary = {
+                deletedImages: Number(cleanupResult.deletedImages) || 0,
+                keptImages: Number(cleanupResult.keptImages) || 0,
+                failedImages: Number(cleanupResult.failedImages) || 0,
+              };
+            }
           }
+        } catch (cleanupError) {
+          console.error("Image cleanup request failed:", cleanupError);
+          cleanupSummary = {
+            deletedImages: 0,
+            keptImages: 0,
+            failedImages: removedUrls.length,
+          };
         }
       }
     }
@@ -478,7 +542,13 @@ setSubCategories(
   });
 }
 
-    alert("Item updated!");
+    if (cleanupSummary) {
+      alert(
+        `Item updated!\n\nHasil cleanup gambar:\n${cleanupSummary.deletedImages} gambar dihapus, ${cleanupSummary.keptImages} gambar dipertahankan, ${cleanupSummary.failedImages} gagal.`
+      );
+    } else {
+      alert("Item updated!");
+    }
 
     router.push(
       "/admin/dashboard"
@@ -1318,7 +1388,7 @@ transition
 
             <input
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
               multiple
               onChange={async (e) => {
                 const files =
