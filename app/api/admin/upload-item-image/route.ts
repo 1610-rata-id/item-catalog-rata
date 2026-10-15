@@ -122,7 +122,7 @@ export async function POST(request: Request) {
       return jsonError("Dimensi gambar terlalu besar atau tidak valid.", 400);
     }
 
-    let outputBuffer = originalBuffer;
+    let outputBuffer: Buffer<ArrayBufferLike> = originalBuffer;
     let outputFormat = metadata.format;
     let compressed = false;
 
