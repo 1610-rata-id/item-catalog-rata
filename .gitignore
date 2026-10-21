@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated ETL reports
+/reports/etl-report-*.json
+
+# Temporary image processing files and local backups
+/temp/
