@@ -238,32 +238,37 @@ export class ItemPerformanceRepository {
     }
 
     return (data ?? []).map(
-      (row: {
-        order_date: string;
-        item_name: string;
-        vendor_name: string;
-        pr_number: string | null;
-        po_number: string | null;
-        qty: number | string | null;
-        uom: string;
-        unit_price: number | string | null;
-        total_price: number | string | null;
-      }) => ({
-        order_date: row.order_date,
-        item_name: row.item_name,
-        vendor_name: row.vendor_name,
-        pr_number: row.pr_number ?? null,
-        po_number: row.po_number ?? null,
-        qty: Number(row.qty ?? 0),
-        uom: row.uom,
-        unit_price: Number(
-          row.unit_price ?? 0
-        ),
-        total_price: Number(
-          row.total_price ?? 0
-        ),
-      })
-    );
+  (row: {
+    order_date: string;
+    item_name: string;
+    vendor_name: string;
+    pr_number: string | null;
+    po_number: string | null;
+    qty: number | string | null;
+    uom: string;
+    unit_price: number | string | null;
+    ppn: number | string | null;
+    total_price: number | string | null;
+  }) => ({
+    order_date: row.order_date,
+    item_name: row.item_name,
+    vendor_name: row.vendor_name,
+    pr_number: row.pr_number ?? null,
+    po_number: row.po_number ?? null,
+    qty: Number(row.qty ?? 0),
+    uom: row.uom,
+    unit_price: Number(
+      row.unit_price ?? 0
+    ),
+    ppn:
+      row.ppn === null || row.ppn === undefined
+        ? null
+        : Number(row.ppn),
+    total_price: Number(
+      row.total_price ?? 0
+    ),
+  })
+);
   }
 }
 

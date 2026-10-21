@@ -1,17 +1,18 @@
+
 "use client";
 
 import { useMemo, useState } from "react";
 
 import EvaluationHeader from "@/components/analytics/evaluation/EvaluationHeader";
-import EvaluationFilters from "@/components/analytics/evaluation/EvaluationFilters";
+import EvaluationFilters, {
+  type VendorType,
+} from "@/components/analytics/evaluation/EvaluationFilters";
 import EvaluationKpiGrid from "@/components/analytics/evaluation/EvaluationKpiGrid";
 import EvaluationDistribution from "@/components/analytics/evaluation/EvaluationDistribution";
 import EvaluationTopVendors from "@/components/analytics/evaluation/EvaluationTopVendors";
 import EvaluationDetail from "@/components/analytics/evaluation/EvaluationDetail";
 
-import type {
-  VendorEvaluation,
-} from "@/repositories/vendor-evaluation.repository";
+import type { VendorEvaluation } from "@/repositories/vendor-evaluation.repository";
 
 interface EvaluationPageProps {
   evaluations: VendorEvaluation[];
@@ -21,6 +22,29 @@ interface EvaluationPageProps {
   defaultPeriod: string;
 }
 
+function matchesVendorType(
+  category: string,
+  selectedType: VendorType
+) {
+  if (selectedType === "all") return true;
+
+  const normalized = category.trim().toLowerCase();
+
+  if (selectedType === "goods") {
+    return (
+      normalized.includes("goods") ||
+      normalized.includes("product") ||
+      normalized.includes("produk") ||
+      normalized.includes("barang")
+    );
+  }
+
+  return (
+    normalized.includes("service") ||
+    normalized.includes("jasa")
+  );
+}
+
 export default function EvaluationPage({
   evaluations,
   vendors,
@@ -28,57 +52,39 @@ export default function EvaluationPage({
   year,
   defaultPeriod,
 }: EvaluationPageProps) {
-  const [selectedVendors, setSelectedVendors] =
-    useState<string[]>([]);
-
-  const [selectedPeriod, setSelectedPeriod] =
-  useState("");
-
-  const [search, setSearch] =
-    useState("");
+  const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState(defaultPeriod);
+  const [selectedType, setSelectedType] = useState<VendorType>("all");
+  const [search, setSearch] = useState("");
 
   const filteredEvaluations = useMemo(() => {
-    const keyword = search
-      .trim()
-      .toLowerCase();
+    const keyword = search.trim().toLowerCase();
 
-    return evaluations.filter(
-      (evaluation) => {
-        const vendorMatch =
-          selectedVendors.length === 0 ||
-          selectedVendors.includes(
-            evaluation.vendor
-          );
+    return evaluations.filter((evaluation) => {
+      const typeMatch = matchesVendorType(
+        evaluation.category,
+        selectedType
+      );
 
-        const periodMatch =
-          !selectedPeriod ||
-          evaluation.period ===
-            selectedPeriod;
+      const vendorMatch =
+        selectedVendors.length === 0 ||
+        selectedVendors.includes(evaluation.vendor);
 
-        const searchMatch =
-          !keyword ||
-          evaluation.vendor
-            .toLowerCase()
-            .includes(keyword) ||
-          evaluation.category
-            .toLowerCase()
-            .includes(keyword) ||
-          evaluation.period
-            .toLowerCase()
-            .includes(keyword) ||
-          evaluation.status
-            .toLowerCase()
-            .includes(keyword);
+      const periodMatch =
+        !selectedPeriod || evaluation.period === selectedPeriod;
 
-        return (
-          vendorMatch &&
-          periodMatch &&
-          searchMatch
-        );
-      }
-    );
+      const searchMatch =
+        !keyword ||
+        evaluation.vendor.toLowerCase().includes(keyword) ||
+        evaluation.category.toLowerCase().includes(keyword) ||
+        evaluation.period.toLowerCase().includes(keyword) ||
+        evaluation.status.toLowerCase().includes(keyword);
+
+      return typeMatch && vendorMatch && periodMatch && searchMatch;
+    });
   }, [
     evaluations,
+    selectedType,
     selectedVendors,
     selectedPeriod,
     search,
@@ -91,37 +97,20 @@ export default function EvaluationPage({
       | "actual_quantity_delivery"
       | "on_time_delivery"
   ) => {
-    if (filteredEvaluations.length === 0) {
-      return 0;
-    }
+    if (filteredEvaluations.length === 0) return 0;
 
-    const total =
-      filteredEvaluations.reduce(
-        (sum, item) =>
-          sum + Number(item[field]),
-        0
-      );
+    const total = filteredEvaluations.reduce(
+      (sum, item) => sum + Number(item[field]),
+      0
+    );
 
     return total / filteredEvaluations.length;
   };
 
   const price = average("price");
   const quality = average("quality");
-  const actualQuantityDelivery = average(
-    "actual_quantity_delivery"
-  );
-  const onTimeDelivery = average(
-    "on_time_delivery"
-  );
-
-  const averageScore =
-    filteredEvaluations.length > 0
-      ? filteredEvaluations.reduce(
-          (sum, item) =>
-            sum + Number(item.final_score),
-          0
-        ) / filteredEvaluations.length
-      : 0;
+  const actualQuantityDelivery = average("actual_quantity_delivery");
+  const onTimeDelivery = average("on_time_delivery");
 
   const good = filteredEvaluations.filter(
     (item) => item.status === "Good"
@@ -137,39 +126,29 @@ export default function EvaluationPage({
 
   const topVendors = [...filteredEvaluations]
     .sort(
-      (a, b) =>
-        Number(b.final_score) -
-        Number(a.final_score)
+      (a, b) => Number(b.final_score) - Number(a.final_score)
     )
     .slice(0, 10)
     .map((item) => ({
       vendor: item.vendor,
-      final_score: Number(
-        item.final_score
-      ),
+      final_score: Number(item.final_score),
       status: item.status,
     }));
 
-  const uniqueTopVendors =
-    Array.from(
-      new Map(
-        topVendors.map((item) => [
-          item.vendor,
-          item,
-        ])
-      ).values()
-    ).slice(0, 10);
+  const uniqueTopVendors = Array.from(
+    new Map(topVendors.map((item) => [item.vendor, item])).values()
+  ).slice(0, 10);
 
   function handleReset() {
     setSelectedVendors([]);
     setSelectedPeriod("");
+    setSelectedType("all");
     setSearch("");
   }
 
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-neutral-950">
       <div className="mx-auto max-w-[1600px] px-6 py-8 lg:px-8">
-
         <EvaluationHeader year={year} />
 
         <div className="mt-6">
@@ -178,13 +157,11 @@ export default function EvaluationPage({
             periods={periods}
             selectedVendors={selectedVendors}
             selectedPeriod={selectedPeriod}
+            selectedType={selectedType}
             search={search}
-            onVendorsChange={
-              setSelectedVendors
-            }
-            onPeriodChange={
-              setSelectedPeriod
-            }
+            onVendorsChange={setSelectedVendors}
+            onPeriodChange={setSelectedPeriod}
+            onTypeChange={setSelectedType}
             onSearchChange={setSearch}
             onReset={handleReset}
           />
@@ -194,36 +171,29 @@ export default function EvaluationPage({
           <EvaluationKpiGrid
             price={price}
             quality={quality}
-            actualQuantityDelivery={
-              actualQuantityDelivery
-            }
-            onTimeDelivery={
-              onTimeDelivery
-            }
+            actualQuantityDelivery={actualQuantityDelivery}
+            onTimeDelivery={onTimeDelivery}
           />
         </div>
 
-        <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-          <EvaluationDistribution
-            good={good}
-            enough={enough}
-            bad={bad}
-            averageScore={averageScore}
-          />
+        <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[40fr_60fr]">
+  <EvaluationDistribution
+    good={good}
+    enough={enough}
+    bad={bad}
+  />
 
-          <EvaluationTopVendors
-            vendors={uniqueTopVendors}
-          />
-        </section>
+  <EvaluationTopVendors
+    vendors={uniqueTopVendors}
+  />
+</section>
 
         <section className="mt-5">
           <EvaluationDetail
-            evaluations={
-              filteredEvaluations
-            }
+            evaluations={filteredEvaluations}
+            selectedType={selectedType}
           />
         </section>
-
       </div>
     </main>
   );

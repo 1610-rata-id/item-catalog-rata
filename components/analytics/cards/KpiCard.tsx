@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 
 import {
@@ -12,9 +13,10 @@ interface KpiCardProps {
   value: string;
   icon: LucideIcon;
   iconBg: string;
-
   growth?: number | null;
   comparisonLabel?: string;
+  showComparison?: boolean;
+  subtitle?: string;
 }
 
 function getGradient(title: string) {
@@ -46,14 +48,14 @@ export default function KpiCard({
   iconBg,
   growth = null,
   comparisonLabel = "No comparison",
+  showComparison = true,
+  subtitle,
 }: KpiCardProps) {
   const hasGrowth =
     growth !== null &&
     growth !== undefined;
 
-  const isPositive =
-    (growth ?? 0) >= 0;
-
+  const isPositive = (growth ?? 0) >= 0;
   const gradient = getGradient(title);
 
   return (
@@ -62,10 +64,11 @@ export default function KpiCard({
     >
       <CardContent className="p-6">
         {/* Header */}
-
         <div className="flex items-start justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15">
+            <div
+              className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${iconBg} bg-white/15`}
+            >
               <Icon className="h-8 w-8 text-white" />
             </div>
 
@@ -78,13 +81,18 @@ export default function KpiCard({
         </div>
 
         {/* Value */}
-
         <h2 className="mt-5 text-3xl font-bold tracking-tight text-white">
           {value}
         </h2>
 
-        {/* Footer */}
+        {/* Subtitle */}
+        {subtitle && (
+          <p className="mt-1 text-xs font-medium text-white/80">
+            {subtitle}
+          </p>
+        )}
 
+        {/* Footer */}
         <div className="mt-5">
           <div className="space-y-1">
             {hasGrowth ? (
@@ -110,14 +118,18 @@ export default function KpiCard({
               </div>
             )}
 
-            <div className="text-xs leading-4 text-white/70">
-              Compared to
-              <br />
-              {comparisonLabel.replace("vs ", "")}
-            </div>
+            {showComparison && (
+              <div className="text-xs leading-4 text-white/70">
+                Compared to
+                <br />
+                {comparisonLabel.replace("vs ", "")}
+              </div>
+            )}
           </div>
 
-          <CircleHelp className="mt-2 h-4 w-4 text-white/50 transition-colors hover:text-white/80" />
+          {showComparison && (
+            <CircleHelp className="mt-2 h-4 w-4 text-white/50 transition-colors hover:text-white/80" />
+          )}
         </div>
       </CardContent>
     </Card>

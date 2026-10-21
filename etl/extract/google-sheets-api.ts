@@ -57,6 +57,14 @@ export async function extractGoogleSheets(): Promise<ProcurementRawRow[]> {
     uom: String(row.uom ?? ""),
     unit_price: String(row.unit_price ?? ""),
     total_price: String(row.total_price ?? ""),
+    // PPN in the source sheet is a percentage number: 11 means 11%.
+    // Blank cells stay null; they must not be converted to 0.
+    ppn:
+      row.PPN === null ||
+      row.PPN === undefined ||
+      String(row.PPN).trim() === ""
+        ? null
+        : String(row.PPN).trim(),
     qcf_name: String(row.qcf_name ?? ""),
     receive_date: String(row.receive_date ?? ""),
     payment_request_id: String(

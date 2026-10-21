@@ -60,10 +60,10 @@ export default async function Page({
   );
 
   const defaultPeriod =
-    params.period &&
-    periods.includes(params.period)
-      ? params.period
-      : sortedPeriods[0] ?? "";
+  params.period &&
+  periods.includes(params.period)
+    ? params.period
+    : "";
 
   return (
     <EvaluationPage

@@ -14,6 +14,9 @@ export interface ProcurementRawRow {
   uom: string;
   unit_price: string;
   total_price: string;
+
+  // Optional for sources such as CSV that may not provide PPN.
+  ppn?: string | null;
   qcf_name: string;
   receive_date: string;
   payment_request_id: string;
@@ -43,6 +46,9 @@ export interface ProcurementRecord {
 
   unit_price: number | null;
   total_price: number | null;
+
+  // Percentage points: 11 means 11%; null means the source cell is blank.
+  ppn: number | null;
 
   qcf_name: string | null;
 

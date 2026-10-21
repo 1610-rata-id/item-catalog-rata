@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -62,9 +63,7 @@ export default function VendorDetailModal({
   open,
   onClose,
 }: VendorDetailModalProps) {
-  const [vendor, setVendor] =
-    useState<VendorDetails | null>(null);
-
+  const [vendor, setVendor] = useState<VendorDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,25 +81,15 @@ export default function VendorDetailModal({
         setVendor(null);
 
         const response = await fetch(
-          `/api/analytics/documents/${encodeURIComponent(
-            vendorId
-          )}`,
-          {
-            cache: "no-store",
-          }
+          `/api/analytics/documents/${encodeURIComponent(vendorId)}`,
+          { cache: "no-store" }
         );
 
-        const result: VendorDetailApiResponse =
-          await response.json();
+        const result: VendorDetailApiResponse = await response.json();
 
-        if (
-          !response.ok ||
-          !result.success ||
-          !result.data
-        ) {
+        if (!response.ok || !result.success || !result.data) {
           throw new Error(
-            result.error ||
-              "Failed to load vendor details"
+            result.error || "Failed to load vendor details"
           );
         }
 
@@ -120,9 +109,7 @@ export default function VendorDetailModal({
   }, [open, vendorId]);
 
   useEffect(() => {
-    if (!open) {
-      return;
-    }
+    if (!open) return;
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -130,64 +117,53 @@ export default function VendorDetailModal({
       }
     };
 
-    document.addEventListener(
-      "keydown",
-      handleEscape
-    );
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleEscape
-      );
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [open, onClose]);
 
-  if (!open) {
-    return null;
-  }
+  if (!open) return null;
 
-  const checklist: DocumentChecklistItem[] = vendor
+  const financeChecklist: DocumentChecklistItem[] = vendor
     ? [
-        {
-          label: "Pakta Integritas",
-          value: vendor.pakta_integritas,
-        },
-        {
-          label: "Akta Pendirian",
-          value: vendor.akta_pendirian,
-        },
         {
           label: "Surat Pernyataan",
           value: vendor.surat_pernyataan,
-        },
-        {
-          label: "TDP",
-          value: vendor.tdp,
         },
         {
           label: "KTP",
           value: vendor.ktp,
         },
         {
-          label: "SKT",
-          value: vendor.skt,
-        },
-        {
           label: "Cover Buku Tabungan",
           value: vendor.cover_buku_tabungan,
         },
+      ]
+    : [];
+
+  const legalityChecklist: DocumentChecklistItem[] = vendor
+    ? [
         {
-          label: "NIB",
-          value: vendor.nib,
+          label: "Pakta Integritas",
+          value: vendor.pakta_integritas,
         },
         {
-          label: "Surat Kuasa Direksi",
-          value: vendor.surat_kuasa_direksi,
+          label: "TDP",
+          value: vendor.tdp,
         },
         {
           label: "SPP",
           value: vendor.spp,
+        },
+        {
+          label: "Akta Pendirian",
+          value: vendor.akta_pendirian,
+        },
+        {
+          label: "NIB",
+          value: vendor.nib,
         },
         {
           label: "NPWP",
@@ -196,6 +172,14 @@ export default function VendorDetailModal({
         {
           label: "SIUP",
           value: vendor.siup,
+        },
+        {
+          label: "SKT",
+          value: vendor.skt,
+        },
+        {
+          label: "Surat Kuasa Direksi",
+          value: vendor.surat_kuasa_direksi,
         },
       ]
     : [];
@@ -208,15 +192,36 @@ export default function VendorDetailModal({
     }
   };
 
+  const renderChecklist = (items: DocumentChecklistItem[]) => (
+    <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="flex min-h-[48px] items-center justify-between gap-2 rounded-lg border px-3 py-2.5"
+        >
+          <span className="pr-2 text-sm">{item.label}</span>
+
+          {item.value ? (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+              <Check className="h-4 w-4" />
+            </span>
+          ) : (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400">
+              <XCircle className="h-4 w-4" />
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
       onMouseDown={handleBackdropClick}
     >
       <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl">
-        {/* ========================================================
-            HEADER
-        ======================================================== */}
+        {/* HEADER */}
         <div className="flex items-start justify-between border-b px-6 py-5">
           <div className="min-w-0">
             <h2 className="text-xl font-semibold tracking-tight">
@@ -240,9 +245,7 @@ export default function VendorDetailModal({
           </button>
         </div>
 
-        {/* ========================================================
-            CONTENT
-        ======================================================== */}
+        {/* CONTENT */}
         <div className="overflow-y-auto px-6 py-6">
           {loading && (
             <div className="flex min-h-[300px] items-center justify-center">
@@ -260,9 +263,7 @@ export default function VendorDetailModal({
 
           {!loading && !error && vendor && (
             <div className="space-y-6">
-              {/* ==================================================
-                  VENDOR INFORMATION
-              ================================================== */}
+              {/* VENDOR INFORMATION */}
               <section className="rounded-xl border bg-background p-5">
                 <div className="mb-5">
                   <h3 className="text-base font-semibold">
@@ -279,7 +280,6 @@ export default function VendorDetailModal({
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Vendor ID
                     </p>
-
                     <p className="mt-1 text-sm font-medium">
                       {vendor.vendor_id}
                     </p>
@@ -289,7 +289,6 @@ export default function VendorDetailModal({
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Vendor
                     </p>
-
                     <p className="mt-1 text-sm font-medium">
                       {vendor.vendor_name}
                     </p>
@@ -299,12 +298,10 @@ export default function VendorDetailModal({
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                       <User className="h-4 w-4" />
                     </div>
-
                     <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         PIC
                       </p>
-
                       <p className="mt-1 text-sm">
                         {vendor.pic || "-"}
                       </p>
@@ -315,12 +312,10 @@ export default function VendorDetailModal({
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                       <Mail className="h-4 w-4" />
                     </div>
-
                     <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Email
                       </p>
-
                       <p className="mt-1 break-all text-sm">
                         {vendor.email || "-"}
                       </p>
@@ -331,12 +326,10 @@ export default function VendorDetailModal({
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                       <Phone className="h-4 w-4" />
                     </div>
-
                     <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Phone
                       </p>
-
                       <p className="mt-1 text-sm">
                         {vendor.phone || "-"}
                       </p>
@@ -347,12 +340,10 @@ export default function VendorDetailModal({
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                       <MapPin className="h-4 w-4" />
                     </div>
-
                     <div className="min-w-0">
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         Address
                       </p>
-
                       <p className="mt-1 text-sm leading-6">
                         {vendor.address || "-"}
                       </p>
@@ -361,9 +352,7 @@ export default function VendorDetailModal({
                 </div>
               </section>
 
-              {/* ==================================================
-                  DOCUMENT CHECKLIST
-              ================================================== */}
+              {/* DOCUMENT CHECKLIST */}
               <section className="rounded-xl border bg-background p-5">
                 <div className="mb-5">
                   <h3 className="text-base font-semibold">
@@ -375,33 +364,28 @@ export default function VendorDetailModal({
                   </p>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {checklist.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center justify-between rounded-lg border px-4 py-3"
-                    >
-                      <span className="pr-3 text-sm">
-                        {item.label}
-                      </span>
+                <div className="space-y-5">
+                  {/* DOCUMENT MANDATORY FINANCE */}
+                  <div className="rounded-xl border p-4">
+                    <h4 className="mb-4 text-sm font-semibold">
+                      Document Mandatory Finance
+                    </h4>
 
-                      {item.value ? (
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
-                          <Check className="h-4 w-4" />
-                        </span>
-                      ) : (
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400">
-                          <XCircle className="h-4 w-4" />
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                    {renderChecklist(financeChecklist)}
+                  </div>
+
+                  {/* DOCUMENT LEGALITY VENDOR */}
+                  <div className="rounded-xl border p-4">
+                    <h4 className="mb-4 text-sm font-semibold">
+                      Document Legality Vendor
+                    </h4>
+
+                    {renderChecklist(legalityChecklist)}
+                  </div>
                 </div>
               </section>
 
-              {/* ==================================================
-                  CONTRACT DOCUMENT
-              ================================================== */}
+              {/* CONTRACT DOCUMENT */}
               <section className="rounded-xl border bg-background p-5">
                 <div className="mb-4">
                   <h3 className="text-base font-semibold">
@@ -439,9 +423,7 @@ export default function VendorDetailModal({
           )}
         </div>
 
-        {/* ========================================================
-            FOOTER
-        ======================================================== */}
+        {/* FOOTER */}
         <div className="flex justify-end border-t px-6 py-4">
           <button
             type="button"

@@ -35,6 +35,9 @@ export function mapProcurementRow(
 
     total_price: transformCurrency(row.total_price),
 
+    // Keep the source convention: 11 means 11%, and blank becomes null.
+    ppn: transformNumber(row.ppn),
+
     qcf_name: row.qcf_name || null,
 
     receive_date: row.receive_date || null,

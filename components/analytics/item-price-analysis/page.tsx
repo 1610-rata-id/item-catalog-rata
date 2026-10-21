@@ -179,14 +179,15 @@ export default function ItemPriceAnalysisPage() {
 
 <PriceTrendCard data={data.priceTrend} />
 
-<div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+<div className="flex flex-col gap-6">
   <VendorPriceComparisonCard
     data={data.vendorPriceComparison}
   />
 
   <PriceDistributionCard
-  data={data.priceDistribution}
-/>
+    data={data.priceDistribution}
+    enableClickSelection={selectedItems.length > 0}
+  />
 </div>
 
 <PriceHistory data={data.priceHistory} />

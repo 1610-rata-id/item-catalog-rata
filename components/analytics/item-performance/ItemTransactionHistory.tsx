@@ -33,6 +33,30 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
+function getPriceBeforePpn(
+  item: ItemTransactionHistoryType
+): number {
+  // NULL berarti unit_price sudah termasuk PPN 11%.
+  if (item.ppn === null) {
+    return item.unit_price / 1.11;
+  }
+
+  // Jika ppn berisi angka, unit_price adalah harga sebelum PPN.
+  return item.unit_price;
+}
+
+function getPricePpn(
+  item: ItemTransactionHistoryType
+): number {
+  // NULL berarti unit_price sudah termasuk PPN.
+  if (item.ppn === null) {
+    return item.unit_price;
+  }
+
+  // Contoh: PPN 11 berarti harga dikalikan 1.11.
+  return item.unit_price * (1 + item.ppn / 100);
+}
+
 function formatDate(value: string) {
   if (!value) return "-";
 
@@ -177,7 +201,7 @@ export default function ItemTransactionHistory({
       ) : (
         <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
           <div className="max-h-[570px] overflow-y-auto overflow-x-auto">
-            <table className="w-full min-w-[1050px] border-collapse text-sm">
+            <table className="w-full min-w-[1200px] border-collapse text-sm">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-[#1D63B3]">
                   <th className="h-[50px] whitespace-nowrap px-4 text-left text-xs font-semibold text-white">
@@ -209,8 +233,12 @@ export default function ItemTransactionHistory({
                   </th>
 
                   <th className="h-[50px] whitespace-nowrap px-4 text-right text-xs font-semibold text-white">
-                    Unit Price
-                  </th>
+  Price Before PPN
+</th>
+
+<th className="h-[50px] whitespace-nowrap px-4 text-right text-xs font-semibold text-white">
+  Price After PPN
+</th>
 
                   <th className="h-[50px] whitespace-nowrap px-4 text-right text-xs font-semibold text-white">
                     Total Price
@@ -263,8 +291,12 @@ export default function ItemTransactionHistory({
                     </td>
 
                     <td className="whitespace-nowrap px-4 text-right text-slate-600 dark:text-slate-300">
-                      {formatCurrency(item.unit_price)}
-                    </td>
+  {formatCurrency(getPriceBeforePpn(item))}
+</td>
+
+<td className="whitespace-nowrap px-4 text-right text-slate-600 dark:text-slate-300">
+  {formatCurrency(getPricePpn(item))}
+</td>
 
                     <td className="whitespace-nowrap px-4 text-right font-medium text-slate-900 dark:text-white">
                       {formatCurrency(item.total_price)}

@@ -371,13 +371,13 @@ async getItemPriceDistribution(
     ).padStart(2, "0")}`;
   }
 
-  return await itemPriceAnalysisRepository.getPriceDistribution(
-    startDate,
-    endDate,
-    vendors ?? [],
-    items ?? [],
-    10
-  );
+  
+return itemPriceAnalysisRepository.getPriceDistribution(
+  startDate,
+  endDate,
+  vendors ?? [],
+  items ?? []
+);
 }
 
 async getItemPriceHistory(

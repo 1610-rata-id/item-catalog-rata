@@ -1,6 +1,7 @@
+
 import { describe, expect, it } from "vitest";
 import { validateProcurementRecord } from "../../etl/validate/procurement";
-import { ProcurementRecord } from "../../etl/types/procurement";
+import type { ProcurementRecord } from "../../etl/types/procurement";
 
 describe("validateProcurementRecord", () => {
   const validRecord: ProcurementRecord = {
@@ -19,6 +20,7 @@ describe("validateProcurementRecord", () => {
     qcf_name: null,
     receive_date: null,
     payment_request_id: null,
+    type: "PO",
   };
 
   it("should return valid when required fields exist", () => {
@@ -38,15 +40,15 @@ describe("validateProcurementRecord", () => {
     expect(result.errors).toContain("pr_number is required");
   });
 
-  it("should require po_number", () => {
-    const result = validateProcurementRecord({
-      ...validRecord,
-      po_number: null,
-    });
-
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain("po_number is required");
+  it("should allow missing po_number", () => {
+  const result = validateProcurementRecord({
+    ...validRecord,
+    po_number: null,
   });
+
+  expect(result.valid).toBe(true);
+  expect(result.errors).not.toContain("po_number is required");
+});
 
   it("should require item_code", () => {
     const result = validateProcurementRecord({

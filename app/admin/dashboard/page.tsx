@@ -255,15 +255,16 @@ setStats({
 
 }
 
-  async function deleteItem(id: string) {
-    const confirmDryRun = confirm(
-      "Jalankan SIMULASI pemeriksaan gambar untuk item ini?\n\nTidak ada item atau gambar yang akan dihapus."
+    async function deleteItem(id: string) {
+    const confirmed = confirm(
+      "Apakah kamu yakin ingin menghapus item ini?\n\n" +
+        "Sistem akan memeriksa gambar terlebih dahulu. " +
+        "Jika dilanjutkan, item akan dihapus secara permanen."
     );
 
-    if (!confirmDryRun) return;
+    if (!confirmed) return;
 
     try {
-      // The server validates this token and checks the user's admin role.
       const {
         data: { session },
         error: sessionError,
@@ -275,56 +276,126 @@ setStats({
         return;
       }
 
-      const response = await fetch("/api/admin/delete-item", {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      };
+
+      // 1. Simulasi: periksa item dan referensi gambar tanpa menghapus data.
+      const dryRunResponse = await fetch("/api/admin/delete-item", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        // Explicitly request dry-run. Never delete through this dashboard test.
+        headers,
         body: JSON.stringify({ id, dryRun: true }),
       });
 
-      const result = await response.json().catch(() => null);
+      const dryRunResult = await dryRunResponse.json().catch(() => null);
 
-      if (!response.ok || !result?.success || !result?.dryRun || !result?.report) {
+      if (
+        !dryRunResponse.ok ||
+        !dryRunResult?.success ||
+        !dryRunResult?.dryRun ||
+        !dryRunResult?.report
+      ) {
         alert(
-          result?.message ||
-            "Simulasi gagal atau respons server tidak sesuai. Tidak ada penghapusan yang dilanjutkan."
+          dryRunResult?.message ||
+            "Pemeriksaan gagal. Item tidak dihapus."
         );
         return;
       }
 
-      const report = result.report;
-      const countEntries = (value: unknown) =>
-        Array.isArray(value) ? value.length : typeof value === "number" ? value : 0;
-      const message = [
-        "SIMULASI SELESAI — tidak ada item atau gambar yang dihapus.",
-        "",
-        `Item diperiksa: ${result.item?.item_name || result.item?.id || id}`,
-        `URL gambar kandidat: ${countEntries(report.candidateImages)}`,
-        `Path gambar yang berpotensi dihapus jika item benar-benar dihapus: ${report.imagePathsToDelete?.length ?? 0}`,
-        `Path gambar yang masih digunakan item lain: ${report.imagePathsStillUsed?.length ?? 0}`,
-        `URL eksternal/tidak didukung yang dilewati: ${countEntries(report.skippedExternalOrUnsupportedUrls)}`,
-        `Pemeriksaan referensi gagal: ${countEntries(report.referenceCheckFailures)}`,
-        `Path dengan pemeriksaan gagal: ${report.imagePathsWithCheckFailures?.length ?? 0}`,
-        "",
-        "Periksa hasil ini sebelum kita mengaktifkan penghapusan nyata.",
-      ].join("\n");
+      const report = dryRunResult.report;
 
-      alert(message);
-      console.info("Delete item dry-run report:", {
-        item: result.item,
-        report,
+      // Jangan melanjutkan jika pemeriksaan referensi gambar gagal.
+      const referenceFailures = Array.isArray(
+        report.imagePathsWithCheckFailures
+      )
+        ? report.imagePathsWithCheckFailures.length
+        : typeof report.referenceCheckFailures === "number"
+          ? report.referenceCheckFailures
+          : 0;
+
+      if (referenceFailures > 0) {
+        alert(
+          "Penghapusan dibatalkan karena ada gambar yang gagal diverifikasi.\n\n" +
+            "Item tetap tersimpan. Periksa log server sebelum mencoba kembali."
+        );
+        return;
+      }
+
+      const itemName =
+        dryRunResult.item?.item_name ||
+        dryRunResult.item?.id ||
+        id;
+
+      const finalConfirmed = confirm(
+        `Konfirmasi penghapusan permanen\n\n` +
+          `Item: ${itemName}\n` +
+          `Gambar yang berpotensi dihapus: ${
+            report.imagePathsToDelete?.length ?? 0
+          }\n` +
+          `Gambar yang masih digunakan item lain: ${
+            report.imagePathsStillUsed?.length ?? 0
+          }\n` +
+          `Gambar eksternal/tidak didukung yang dilewati: ${
+            Array.isArray(report.skippedExternalOrUnsupportedUrls)
+              ? report.skippedExternalOrUnsupportedUrls.length
+              : report.skippedExternalOrUnsupportedUrls ?? 0
+          }\n\n` +
+          "Item akan dihapus dari database. Lanjutkan?"
+      );
+
+      if (!finalConfirmed) {
+        alert("Penghapusan dibatalkan. Item tetap tersimpan.");
+        return;
+      }
+
+      // 2. Penghapusan nyata: membutuhkan kedua flag konfirmasi.
+      const response = await fetch("/api/admin/delete-item", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          id,
+          dryRun: false,
+          confirmDelete: true,
+        }),
       });
-    } catch (error) {
-      console.error("Delete item dry-run request failed:", error);
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.success || result?.dryRun !== false) {
+        alert(
+          result?.message ||
+            "Penghapusan gagal atau status hasil tidak dapat dipastikan. Periksa database sebelum mencoba kembali."
+        );
+        return;
+      }
+
+      // Perbarui dashboard setelah server mengonfirmasi item terhapus.
+      await Promise.all([
+        getItems(),
+        getStats(),
+        getActivityStats(),
+        getRecentLogs(),
+      ]);
+
+      const cleanup = result.cleanup;
+
       alert(
-        "Simulasi gagal karena terjadi kesalahan. Tidak ada penghapusan yang dilanjutkan."
+        `Item "${itemName}" berhasil dihapus dari database.\n\n` +
+          `Gambar berhasil dihapus: ${cleanup?.deletedImages ?? 0}\n` +
+          `Gambar yang dipertahankan: ${cleanup?.keptImages ?? 0}\n` +
+          `Gambar yang gagal dibersihkan: ${cleanup?.failedImages ?? 0}\n\n` +
+          (cleanup?.failedImages > 0
+            ? "Perhatian: sebagian gambar masih tertinggal di Storage. Periksa log server."
+            : "Proses selesai.")
+      );
+    } catch (error) {
+      console.error("Delete item request failed:", error);
+      alert(
+        "Terjadi kesalahan saat menghapus item. Periksa database sebelum mencoba kembali."
       );
     }
   }
-
   useEffect(() => {
   async function checkUser() {
     const {

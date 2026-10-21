@@ -1,7 +1,10 @@
+
 import {
   ExternalLink,
   FileText,
 } from "lucide-react";
+
+import type { VendorType } from "./EvaluationFilters";
 
 interface EvaluationRow {
   id: number;
@@ -20,11 +23,10 @@ interface EvaluationRow {
 
 interface EvaluationDetailProps {
   evaluations: EvaluationRow[];
+  selectedType: VendorType;
 }
 
-function statusClass(
-  status: EvaluationRow["status"]
-) {
+function statusClass(status: EvaluationRow["status"]) {
   if (status === "Good") {
     return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400";
   }
@@ -38,21 +40,29 @@ function statusClass(
 
 export default function EvaluationDetail({
   evaluations,
+  selectedType,
 }: EvaluationDetailProps) {
+  const isService = selectedType === "service";
+
+  const quantityHeader = isService
+    ? "Accuracy of Work Results"
+    : "Accuracy Quantity Delivery";
+
+  const timingHeader = isService
+    ? "Work Completed On Time"
+    : "On Time Delivery";
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-      {/* Header */}
       <div className="mb-5">
         <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
           Vendor Evaluation Detail
         </h2>
-
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Detailed evaluation results for each vendor by period.
         </p>
       </div>
 
-      {/* Table */}
       <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-neutral-800">
         <div className="max-h-[570px] overflow-y-auto overflow-x-auto">
           <table className="w-full min-w-[1150px] border-collapse text-sm">
@@ -61,39 +71,30 @@ export default function EvaluationDetail({
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
                   No
                 </th>
-
                 <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
                   Period
                 </th>
-
                 <th className="h-[50px] px-4 text-left text-xs font-semibold text-white">
                   Vendor Name
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
                   Price
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
                   Quality
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
-                  Actual Quantity Delivery
+                  {quantityHeader}
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
-                  On-Time Delivery
+                  {timingHeader}
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
                   Final Score
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
                   Status
                 </th>
-
                 <th className="h-[50px] px-4 text-center text-xs font-semibold text-white">
                   Action
                 </th>
@@ -103,14 +104,10 @@ export default function EvaluationDetail({
             <tbody>
               {evaluations.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={10}
-                    className="py-16 text-center"
-                  >
+                  <td colSpan={10} className="py-16 text-center">
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                       No evaluation data available.
                     </p>
-
                     <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                       Try adjusting your filters.
                     </p>
@@ -122,47 +119,30 @@ export default function EvaluationDetail({
                     key={evaluation.id}
                     className="h-[52px] border-b border-slate-200 bg-white transition-colors hover:bg-slate-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-white/[0.03]"
                   >
-                    {/* No */}
                     <td className="px-4 text-center text-slate-500 dark:text-slate-400">
                       {index + 1}
                     </td>
-
-                    {/* Period */}
                     <td className="whitespace-nowrap px-4 text-slate-600 dark:text-slate-300">
                       {evaluation.period} {evaluation.year}
                     </td>
-
-                    {/* Vendor */}
                     <td className="px-4 font-medium text-slate-700 dark:text-slate-200">
                       {evaluation.vendor}
                     </td>
-
-                    {/* Price */}
                     <td className="px-4 text-center text-slate-600 dark:text-slate-300">
-                      {evaluation.price.toFixed(2)}
+                      {Number(evaluation.price).toFixed(2)}
                     </td>
-
-                    {/* Quality */}
                     <td className="px-4 text-center text-slate-600 dark:text-slate-300">
-                      {evaluation.quality.toFixed(2)}
+                      {Number(evaluation.quality).toFixed(2)}
                     </td>
-
-                    {/* Actual Quantity Delivery */}
                     <td className="px-4 text-center text-slate-600 dark:text-slate-300">
-                      {evaluation.actual_quantity_delivery.toFixed(2)}
+                      {Number(evaluation.actual_quantity_delivery).toFixed(2)}
                     </td>
-
-                    {/* On-Time Delivery */}
                     <td className="px-4 text-center text-slate-600 dark:text-slate-300">
-                      {evaluation.on_time_delivery.toFixed(2)}
+                      {Number(evaluation.on_time_delivery).toFixed(2)}
                     </td>
-
-                    {/* Final Score */}
                     <td className="px-4 text-center font-semibold text-slate-800 dark:text-slate-100">
-                      {evaluation.final_score.toFixed(2)}
+                      {Number(evaluation.final_score).toFixed(2)}
                     </td>
-
-                    {/* Status */}
                     <td className="px-4 text-center">
                       <span
                         className={`inline-flex min-w-[70px] justify-center rounded-full px-3 py-1 text-xs font-semibold ${statusClass(
@@ -172,8 +152,6 @@ export default function EvaluationDetail({
                         {evaluation.status}
                       </span>
                     </td>
-
-                    {/* Action */}
                     <td className="px-4 text-center">
                       {evaluation.evaluation_pdf ? (
                         <a

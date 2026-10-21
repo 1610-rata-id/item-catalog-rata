@@ -277,23 +277,28 @@ export default function TopVendorCard({
                         )}
                       </div>
 
-                      {/* BAR */}
+                      
+{/* BAR */}
+<div
+  className="
+    relative
+    w-full
+    max-w-[76px]
+    rounded-t-md
+    bg-blue-600
+    transition-all
+    duration-300
+    group-hover:bg-blue-500
+  "
+  style={{
+    height: `${barHeight}%`,
+  }}
+>
+  <span className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[10px] font-semibold text-white drop-shadow-sm">
+    {purchaseOrders.toLocaleString("id-ID")} PO
+  </span>
+</div>
 
-                      <div
-                        className="
-                          relative
-                          w-full
-                          max-w-[76px]
-                          rounded-t-md
-                          bg-blue-600
-                          transition-all
-                          duration-300
-                          group-hover:bg-blue-500
-                        "
-                        style={{
-                          height: `${barHeight}%`,
-                        }}
-                      />
 
                       {/* LABEL */}
 
@@ -302,16 +307,6 @@ export default function TopVendorCard({
                           {vendor.vendor_name}
                         </p>
                       </div>
-
-                      {/* PO */}
-
-                      <span className="mt-1 text-[10px] text-slate-400">
-                        {purchaseOrders.toLocaleString(
-                          "id-ID"
-                        )}{" "}
-                        PO
-                      </span>
-
                     </div>
                   );
                 }

@@ -1,3 +1,4 @@
+
 import { describe, expect, it } from "vitest";
 import { mapProcurementRow } from "../../etl/mappers/procurement";
 
@@ -19,6 +20,7 @@ describe("mapProcurementRow", () => {
       qcf_name: "John",
       receive_date: "2026-07-03",
       payment_request_id: "PAY001",
+      type: "PO",
     };
 
     const mapped = mapProcurementRow(raw);
@@ -27,6 +29,7 @@ describe("mapProcurementRow", () => {
     expect(mapped.po_number).toBe("PO001");
     expect(mapped.sub_pr_id).toBe("PR001-001");
     expect(mapped.item_code).toBe("ITEM001");
+    expect(mapped.type).toBe("PO");
     expect(mapped.qty).toBe(2);
     expect(mapped.unit_price).toBe(1500);
     expect(mapped.total_price).toBe(3000);
@@ -49,6 +52,7 @@ describe("mapProcurementRow", () => {
       qcf_name: "",
       receive_date: "",
       payment_request_id: "",
+      type: "",
     };
 
     const mapped = mapProcurementRow(raw);
@@ -57,6 +61,7 @@ describe("mapProcurementRow", () => {
     expect(mapped.po_number).toBeNull();
     expect(mapped.sub_pr_id).toBeNull();
     expect(mapped.item_code).toBeNull();
+    expect(mapped.type).toBeNull();
     expect(mapped.qty).toBeNull();
     expect(mapped.unit_price).toBeNull();
     expect(mapped.total_price).toBeNull();

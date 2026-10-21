@@ -4,7 +4,6 @@ interface EvaluationDistributionProps {
   good: number;
   enough: number;
   bad: number;
-  averageScore: number;
 }
 
 function Donut({
@@ -102,7 +101,6 @@ export default function EvaluationDistribution({
   good,
   enough,
   bad,
-  averageScore,
 }: EvaluationDistributionProps) {
   const total = good + enough + bad;
 
@@ -164,20 +162,7 @@ export default function EvaluationDistribution({
             total={total}
           />
 
-          <div className="rounded-xl bg-blue-50 p-4 dark:bg-blue-500/10">
-            <p className="text-sm font-semibold text-[#1D63B3] dark:text-blue-400">
-              Average Vendor Score
-            </p>
-
-            <p className="mt-1 text-3xl font-bold tracking-tight text-[#1D63B3] dark:text-blue-300">
-              {averageScore.toFixed(2)}
-
-              <span className="ml-1 text-lg font-medium text-[#1D63B3]/70 dark:text-blue-300/70">
-                / 3.00
-              </span>
-            </p>
-          </div>
-        </div>
+         </div>
       </div>
 
       {/* FOOTNOTE */}

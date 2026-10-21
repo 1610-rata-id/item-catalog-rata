@@ -35,6 +35,30 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
+function getPriceBeforePpn(
+  row: ItemPriceHistoryData
+): number {
+  // NULL berarti harga sudah termasuk PPN 11%.
+  if (row.ppn === null) {
+    return row.unit_price / 1.11;
+  }
+
+  // Jika PPN berisi angka, unit_price adalah harga sebelum PPN.
+  return row.unit_price;
+}
+
+function getPriceAfterPpn(
+  row: ItemPriceHistoryData
+): number {
+  // NULL berarti unit_price sudah termasuk PPN.
+  if (row.ppn === null) {
+    return row.unit_price;
+  }
+
+  // Contoh ppn = 11: harga ditambah 11%.
+  return row.unit_price * (1 + row.ppn / 100);
+}
+
 function formatNumber(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
 }
@@ -103,16 +127,16 @@ export default function PriceHistory({
           );
 
         case "unit-price-desc":
-          return (
-            Number(b.unit_price) -
-            Number(a.unit_price)
-          );
+  return (
+    getPriceBeforePpn(b) -
+    getPriceBeforePpn(a)
+  );
 
-        case "unit-price-asc":
-          return (
-            Number(a.unit_price) -
-            Number(b.unit_price)
-          );
+case "unit-price-asc":
+  return (
+    getPriceBeforePpn(a) -
+    getPriceBeforePpn(b)
+  );
 
         case "total-price-desc":
           return (
@@ -196,12 +220,12 @@ export default function PriceHistory({
                 </SelectItem>
 
                 <SelectItem value="unit-price-desc">
-                  Unit Price: Highest → Lowest
-                </SelectItem>
+  Price Before PPN: Highest → Lowest
+</SelectItem>
 
-                <SelectItem value="unit-price-asc">
-                  Unit Price: Lowest → Highest
-                </SelectItem>
+<SelectItem value="unit-price-asc">
+  Price Before PPN: Lowest → Highest
+</SelectItem>
 
                 <SelectItem value="total-price-desc">
                   Total Price: Highest → Lowest
@@ -237,7 +261,7 @@ export default function PriceHistory({
           ) : (
             <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
               <div className="max-h-[570px] overflow-y-auto overflow-x-auto">
-                <table className="w-full min-w-[1150px] border-collapse text-sm">
+                <table className="w-full min-w-[1300px] border-collapse text-sm">
                   <thead className="sticky top-0 z-10">
                     <tr className="bg-[#1D63B3]">
                       <th className="h-[50px] px-5 text-left text-xs font-semibold text-white">
@@ -260,9 +284,13 @@ export default function PriceHistory({
                         UOM
                       </th>
 
-                      <th className="h-[50px] px-5 text-right text-xs font-semibold text-white">
-                        Unit Price
-                      </th>
+                      <th className="h-[50px] whitespace-nowrap px-5 text-right text-xs font-semibold text-white">
+  Price Before PPN
+</th>
+
+<th className="h-[50px] whitespace-nowrap px-5 text-right text-xs font-semibold text-white">
+  Price After PPN
+</th>
 
                       <th className="h-[50px] px-5 text-right text-xs font-semibold text-white">
                         Qty
@@ -311,8 +339,12 @@ export default function PriceHistory({
                         </td>
 
                         <td className="whitespace-nowrap px-5 text-right font-medium text-slate-900 dark:text-white">
-                          {formatCurrency(row.unit_price)}
-                        </td>
+  {formatCurrency(getPriceBeforePpn(row))}
+</td>
+
+<td className="whitespace-nowrap px-5 text-right font-medium text-slate-900 dark:text-white">
+  {formatCurrency(getPriceAfterPpn(row))}
+</td>
 
                         <td className="whitespace-nowrap px-5 text-right text-slate-600 dark:text-slate-300">
                           {formatNumber(row.qty)}

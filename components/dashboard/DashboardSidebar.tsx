@@ -303,7 +303,7 @@ export default function DashboardSidebar() {
               >
                 <BarChart3 className="h-4 w-4" />
 
-                Performance
+                Dashboard
               </button>
 
               {/* EVALUATION */}

@@ -32,5 +32,6 @@ export interface ItemTransactionHistory {
   qty: number;
   uom: string;
   unit_price: number;
+  ppn: number | null;
   total_price: number;
 }

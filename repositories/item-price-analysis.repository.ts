@@ -65,43 +65,39 @@ export class ItemPriceAnalysisRepository {
     );
   }
 
-  async getKpi(
-    filters: ItemPriceAnalysisFilters
-  ): Promise<ItemPriceKpi> {
-    const { startDate, endDate } =
-      this.getRange(filters);
+  
+async getKpi(
+  filters: ItemPriceAnalysisFilters
+): Promise<ItemPriceKpi> {
+  const { startDate, endDate } = this.getRange(filters);
 
-    const { data, error } =
-      await supabaseAdmin.rpc(
-        "get_item_price_kpi",
-        {
-          p_start_date: startDate,
-          p_end_date: endDate,
-          p_vendors: filters.vendors ?? [],
-          p_items: filters.items ?? [],
-        }
-      );
-
-    if (error) {
-      throw new Error(
-        `Failed to load item price KPI: ${error.message}`
-      );
+  const { data, error } = await supabaseAdmin.rpc(
+    "get_item_price_kpi",
+    {
+      p_start_date: startDate,
+      p_end_date: endDate,
+      p_vendors: filters.vendors ?? [],
+      p_items: filters.items ?? [],
     }
+  );
 
-    const row = data?.[0];
-
-    return {
-      average_price: Number(
-        row?.average_price ?? 0
-      ),
-      highest_price: Number(
-        row?.highest_price ?? 0
-      ),
-      lowest_price: Number(
-        row?.lowest_price ?? 0
-      ),
-    };
+  if (error) {
+    throw new Error(
+      `Failed to load item price KPI: ${error.message}`
+    );
   }
+
+  const row = data?.[0];
+
+  return {
+    average_price: Number(row?.average_price ?? 0),
+    highest_price: Number(row?.highest_price ?? 0),
+    lowest_price: Number(row?.lowest_price ?? 0),
+    total_po: Number(row?.total_po ?? 0),
+    transaction_count: Number(row?.transaction_count ?? 0),
+  };
+}
+
 
   async getPriceTrend(
     filters: ItemPriceAnalysisFilters
@@ -126,17 +122,25 @@ export class ItemPriceAnalysisRepository {
       );
     }
 
-    return (data ?? []).map(
-      (row: {
-        month_start: string;
-        average_price: number | string | null;
-      }) => ({
-        month_start: row.month_start,
-        average_price: Number(
-          row.average_price ?? 0
-        ),
-      })
-    );
+    
+return (data ?? []).map(
+  (row: {
+    month_start: string;
+    average_price: number | string | null;
+    highest_price: number | string | null;
+    lowest_price: number | string | null;
+    transaction_count: number | string | null;
+    total_po: number | string | null;
+  }) => ({
+    month_start: row.month_start,
+    average_price: Number(row.average_price ?? 0),
+    highest_price: Number(row.highest_price ?? 0),
+    lowest_price: Number(row.lowest_price ?? 0),
+    transaction_count: Number(row.transaction_count ?? 0),
+    total_po: Number(row.total_po ?? 0),
+  })
+);
+
   }
 
   async getVendorPriceComparison(
@@ -184,45 +188,43 @@ export class ItemPriceAnalysisRepository {
     );
   }
 
-  async getPriceDistribution(
+  
+
+async getPriceDistribution(
   startDate: string,
   endDate: string,
   vendors: string[],
-  items: string[],
-  bins = 10
+  items: string[]
 ): Promise<ItemPriceDistribution[]> {
-  const { data, error } =
-    await supabaseAdmin.rpc(
-      "get_item_price_distribution",
-      {
-        p_start_date: startDate,
-        p_end_date: endDate,
-        p_vendors: vendors,
-        p_items: items,
-        p_bins: bins,
-      }
-    );
+  const { data, error } = await supabaseAdmin.rpc(
+    "get_item_price_distribution_monthly",
+    {
+      p_start_date: startDate,
+      p_end_date: endDate,
+      p_vendors: vendors,
+      p_items: items,
+    }
+  );
 
   if (error) {
     throw new Error(
-      `Failed to fetch item price distribution: ${error.message}`
+      `Failed to fetch monthly item price distribution: ${error.message}`
     );
   }
 
   return (data ?? []).map(
     (row: {
-      range_start: number | string;
-      range_end: number | string;
+      month_start: string;
+      unit_price: number | string;
       transaction_count: number | string;
     }) => ({
-      range_start: Number(row.range_start),
-      range_end: Number(row.range_end),
-      transaction_count: Number(
-        row.transaction_count
-      ),
+      month_start: row.month_start,
+      unit_price: Number(row.unit_price),
+      transaction_count: Number(row.transaction_count),
     })
   );
 }
+
 
   async getPriceHistory(
     filters: ItemPriceAnalysisFilters,
@@ -257,6 +259,7 @@ export class ItemPriceAnalysisRepository {
     po_number: string | null;
     uom: string;
     unit_price: number | string | null;
+    ppn: number | string | null;
     qty: number | string | null;
     total_price: number | string | null;
   }) => ({
@@ -268,6 +271,10 @@ export class ItemPriceAnalysisRepository {
     unit_price: Number(
       row.unit_price ?? 0
     ),
+    ppn:
+      row.ppn === null || row.ppn === undefined
+        ? null
+        : Number(row.ppn),
     qty: Number(row.qty ?? 0),
     total_price: Number(
       row.total_price ?? 0
